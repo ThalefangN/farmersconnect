@@ -2,8 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useToast } from "@/hooks/use-toast";
+import OfflineAlert from "@/components/OfflineAlert";
 import GetStarted from "./pages/GetStarted";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
@@ -26,23 +29,70 @@ import CurrentExams from "./pages/CurrentExams";
 import UpcomingExams from "./pages/UpcomingExams";
 import PastExams from "./pages/PastExams";
 
-const App = () => {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        retry: 1,
-      },
-    },
-  }));
+// Routes that require authentication or internet connection
+const PROTECTED_ROUTES = [
+  '/signin',
+  '/signup',
+  '/verify',
+  '/add-course',
+  '/report-issue',
+];
+
+const AppContent = () => {
+  const isOnline = useOnlineStatus();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isOnline) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    const handlePopState = (e: PopStateEvent) => {
+      if (!isOnline) {
+        e.preventDefault();
+        toast({
+          title: "Navigation Restricted",
+          description: "You're offline. Please connect to the internet to navigate.",
+          variant: "destructive",
+        });
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+
+    // Prevent back navigation when offline
+    if (!isOnline) {
+      window.history.pushState(null, '', window.location.pathname);
+    }
+
+    // Check if current route is protected and user is offline
+    if (!isOnline && PROTECTED_ROUTES.includes(location.pathname)) {
+      navigate('/home');
+      toast({
+        title: "Access Restricted",
+        description: "This feature requires an internet connection.",
+        variant: "destructive",
+      });
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isOnline, location.pathname, navigate, toast]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
+    <>
+      <OfflineAlert show={!isOnline} />
+      <Routes>
             <Route path="/" element={<Navigate to="/get-started" replace />} />
             <Route path="/get-started" element={<GetStarted />} />
             <Route path="/signup" element={<SignUp />} />
@@ -65,7 +115,28 @@ const App = () => {
             <Route path="/current-exams" element={<CurrentExams />} />
             <Route path="/upcoming-exams" element={<UpcomingExams />} />
             <Route path="/past-exams" element={<PastExams />} />
-          </Routes>
+      </Routes>
+    </>
+  );
+};
+
+const App = () => {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        retry: 1,
+      },
+    },
+  }));
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
