@@ -5,9 +5,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import PaymentMethodSelector from "./payment/PaymentMethodSelector";
 import PaymentDetails from "./payment/PaymentDetails";
 import PaymentConfirmation from "./payment/PaymentConfirmation";
@@ -62,49 +64,69 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Enroll in {courseName}</DialogTitle>
+          <DialogDescription>
+            Complete your payment details to enroll in this course
+          </DialogDescription>
         </DialogHeader>
         
-        <AnimatePresence>
-          {!isSuccess ? (
-            <motion.form
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onSubmit={handleSubmit}
-              className="space-y-6"
-            >
-              <div className="space-y-2">
-                <div className="text-lg font-semibold">Course Price: BWP {price.toFixed(2)}</div>
-              </div>
-
-              <PaymentMethodSelector
-                value={paymentMethod}
-                onChange={setPaymentMethod}
-              />
-
-              <PaymentDetails
-                paymentMethod={paymentMethod}
-                fullName={fullName}
-                onFullNameChange={setFullName}
-                proofOfPayment={proofOfPayment}
-                onProofOfPaymentChange={setProofOfPayment}
-              />
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isProcessing}
+        <ScrollArea className="max-h-[70vh] px-1">
+          <AnimatePresence mode="wait">
+            {!isSuccess ? (
+              <motion.form
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                onSubmit={handleSubmit}
+                className="space-y-6"
               >
-                {isProcessing ? "Processing..." : "Submit Payment"}
-              </Button>
-            </motion.form>
-          ) : (
-            <PaymentConfirmation />
-          )}
-        </AnimatePresence>
+                <div className="space-y-2">
+                  <div className="text-lg font-semibold">Course Price: BWP {price.toFixed(2)}</div>
+                </div>
+
+                <PaymentMethodSelector
+                  value={paymentMethod}
+                  onChange={setPaymentMethod}
+                />
+
+                <PaymentDetails
+                  paymentMethod={paymentMethod}
+                  fullName={fullName}
+                  onFullNameChange={setFullName}
+                  proofOfPayment={proofOfPayment}
+                  onProofOfPaymentChange={setProofOfPayment}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center space-x-2"
+                    >
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                      />
+                      <span>Processing...</span>
+                    </motion.div>
+                  ) : (
+                    "Submit Payment"
+                  )}
+                </Button>
+              </motion.form>
+            ) : (
+              <PaymentConfirmation />
+            )}
+          </AnimatePresence>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
