@@ -100,9 +100,21 @@ const BGCSECourses = () => {
       title: "English Grammar Basics",
       description: "Essential English grammar rules and writing skills",
       videos: [
-        { title: "Parts of Speech", duration: "12:15" },
-        { title: "Sentence Structure", duration: "16:40" },
-        { title: "Common Grammar Rules", duration: "14:55" }
+        { 
+          title: "Parts of Speech", 
+          duration: "12:15",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Sentence Structure", 
+          duration: "16:40",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Common Grammar Rules", 
+          duration: "14:55",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        }
       ],
       notes: [
         { title: "Grammar Rules Summary", url: "/notes/grammar-rules.pdf" },
@@ -117,9 +129,21 @@ const BGCSECourses = () => {
       title: "Science Fundamentals",
       description: "Basic concepts in physics, chemistry, and biology",
       videos: [
-        { title: "Scientific Method", duration: "10:25" },
-        { title: "Basic Physics Laws", duration: "22:30" },
-        { title: "Chemistry Basics", duration: "19:15" }
+        { 
+          title: "Scientific Method", 
+          duration: "10:25",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Basic Physics Laws", 
+          duration: "22:30",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Chemistry Basics", 
+          duration: "19:15",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        }
       ],
       notes: [
         { title: "Science Concepts", url: "/notes/science-concepts.pdf" },
