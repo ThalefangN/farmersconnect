@@ -1,39 +1,59 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, UserPlus } from "lucide-react";
+import { ArrowLeft, Users, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import BottomNav from "@/components/BottomNav";
+import { CreateGroupDialog } from "@/components/community/CreateGroupDialog";
 
 const Groups = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [joinedGroups, setJoinedGroups] = useState<string[]>([]);
 
   const groups = [
     {
-      title: "Gaborone Farmers Association",
-      description: "Local farmers supporting each other",
+      id: "1",
+      title: "Balemogi Farmers",
+      description: "Local farmers supporting each other in Gaborone",
       members: 156,
       location: "Gaborone",
       meetingDay: "Every Saturday",
-      image: "https://images.unsplash.com/photo-1591115765373-5207764f72e7"
+      activities: "Crop sharing, farming techniques discussion, market access"
     },
     {
-      title: "Sustainable Farming Network",
+      id: "2",
+      title: "Batswana Sustainable Farming",
       description: "Focus on eco-friendly farming practices",
       members: 89,
       location: "Francistown",
       meetingDay: "First Sunday of month",
-      image: "https://images.unsplash.com/photo-1592991538534-788c605766ce"
+      activities: "Organic farming, water conservation, soil management"
     }
   ];
 
-  const handleJoin = (group: string) => {
+  const handleJoin = (groupId: string) => {
+    if (joinedGroups.includes(groupId)) {
+      toast({
+        title: "Already a Member",
+        description: "You are already a member of this group",
+      });
+      return;
+    }
+    
+    setJoinedGroups([...joinedGroups, groupId]);
     toast({
-      title: "Request Sent",
-      description: `Your request to join ${group} has been sent to the group admin.`,
+      title: "Group Joined",
+      description: "You have successfully joined the group!",
     });
+  };
+
+  const handleViewDetails = (group: any) => {
+    setSelectedGroup(group);
   };
 
   return (
@@ -55,51 +75,49 @@ const Groups = () => {
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-semibold text-green-800 mb-4">Join a Farming Group</h2>
+            <h2 className="text-xl font-semibold text-green-800 mb-4">Join Farming Groups</h2>
             <p className="text-gray-600 mb-4">
               Connect with local farmers in your area. Share experiences,
               knowledge, and support each other in your farming journey.
             </p>
-            <Button className="w-full bg-green-600 hover:bg-green-700">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Create New Group
-            </Button>
+            <CreateGroupDialog />
           </div>
 
           <div className="grid gap-6">
-            {groups.map((item, index) => (
+            {groups.map((group) => (
               <motion.div
-                key={index}
+                key={group.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
               >
                 <Card className="overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.title}
-                    className="w-full h-48 object-cover"
-                  />
                   <CardHeader>
-                    <CardTitle className="text-xl text-green-800">{item.title}</CardTitle>
-                    <CardDescription className="text-green-600">{item.description}</CardDescription>
+                    <CardTitle className="text-xl text-green-800">{group.title}</CardTitle>
+                    <CardDescription className="text-green-600">{group.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 mb-4">
-                      <p className="text-gray-600"><strong>Members:</strong> {item.members}</p>
-                      <p className="text-gray-600"><strong>Location:</strong> {item.location}</p>
-                      <p className="text-gray-600"><strong>Meetings:</strong> {item.meetingDay}</p>
+                      <p className="text-gray-600"><strong>Members:</strong> {group.members}</p>
+                      <p className="text-gray-600"><strong>Location:</strong> {group.location}</p>
+                      <p className="text-gray-600"><strong>Meetings:</strong> {group.meetingDay}</p>
                     </div>
                     <div className="flex space-x-2">
                       <Button 
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handleJoin(item.title)}
+                        className={`flex-1 ${joinedGroups.includes(group.id) ? 'bg-green-200' : 'bg-green-600 hover:bg-green-700'}`}
+                        onClick={() => handleJoin(group.id)}
+                        disabled={joinedGroups.includes(group.id)}
                       >
-                        Join Group
+                        {joinedGroups.includes(group.id) ? 'Joined' : 'Join Group'}
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button variant="outline" className="flex-1" onClick={() => handleViewDetails(group)}>
                         View Details
                       </Button>
+                      {joinedGroups.includes(group.id) && (
+                        <Button variant="outline" className="flex-1">
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          Discussion
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -108,6 +126,22 @@ const Groups = () => {
           </div>
         </motion.div>
       </div>
+
+      <Dialog open={!!selectedGroup} onOpenChange={() => setSelectedGroup(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{selectedGroup?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p><strong>Description:</strong> {selectedGroup?.description}</p>
+            <p><strong>Location:</strong> {selectedGroup?.location}</p>
+            <p><strong>Meeting Schedule:</strong> {selectedGroup?.meetingDay}</p>
+            <p><strong>Activities:</strong> {selectedGroup?.activities}</p>
+            <p><strong>Current Members:</strong> {selectedGroup?.members}</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <BottomNav />
     </div>
   );
