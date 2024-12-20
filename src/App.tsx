@@ -21,6 +21,7 @@ import Services from "./pages/Services";
 import BGCSECourses from "./pages/BGCSECourses";
 import JCECourses from "./pages/JCECourses";
 import PSLECourses from "./pages/PSLECourses";
+import AddCourse from "./pages/AddCourse";
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient({
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="/bgcse-courses" element={<BGCSECourses />} />
             <Route path="/jce-courses" element={<JCECourses />} />
             <Route path="/psle-courses" element={<PSLECourses />} />
+            <Route path="/add-course" element={<AddCourse />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
