@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, ShoppingBag, Share2 } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Share2, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,7 +15,9 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState<{
     title: string;
     price: string;
+    quantity: number;
   } | null>(null);
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   const products = [
     {
@@ -36,8 +38,19 @@ const Products = () => {
     }
   ];
 
-  const handlePurchase = (product: { title: string; price: string }) => {
-    setSelectedProduct(product);
+  const handleQuantityChange = (productTitle: string, change: number) => {
+    setQuantities(prev => {
+      const currentQuantity = prev[productTitle] || 1;
+      const newQuantity = Math.max(1, currentQuantity + change);
+      return { ...prev, [productTitle]: newQuantity };
+    });
+  };
+
+  const handlePurchase = (item: { title: string; price: string }) => {
+    setSelectedProduct({
+      ...item,
+      quantity: quantities[item.title] || 1
+    });
     setIsPaymentModalOpen(true);
   };
 
@@ -94,6 +107,33 @@ const Products = () => {
                       <p className="text-gray-600"><strong>Price:</strong> BWP {item.price}</p>
                       <p className="text-gray-600"><strong>Seller:</strong> {item.seller}</p>
                       <p className="text-gray-600"><strong>Location:</strong> {item.location}</p>
+                      
+                      <div className="flex items-center space-x-4 mt-4">
+                        <span className="text-gray-600"><strong>Quantity:</strong></span>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleQuantityChange(item.title, -1)}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="w-8 text-center">
+                            {quantities[item.title] || 1}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleQuantityChange(item.title, 1)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <p className="text-gray-600 font-semibold mt-2">
+                        <strong>Total:</strong> BWP {Number(item.price) * (quantities[item.title] || 1)}
+                      </p>
                     </div>
                     <div className="flex space-x-2">
                       <Button 
@@ -121,8 +161,8 @@ const Products = () => {
             setIsPaymentModalOpen(false);
             setSelectedProduct(null);
           }}
-          courseName={selectedProduct.title}
-          price={Number(selectedProduct.price)}
+          courseName={`${selectedProduct.title} (Quantity: ${selectedProduct.quantity})`}
+          price={Number(selectedProduct.price) * selectedProduct.quantity}
         />
       )}
       
