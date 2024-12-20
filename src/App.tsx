@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from
 import { useState, useEffect } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useToast } from "@/hooks/use-toast";
-import BottomNav from "@/components/OfflineAlert";
+import OfflineAlert from "@/components/OfflineAlert";
 import GetStarted from "./pages/GetStarted";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
