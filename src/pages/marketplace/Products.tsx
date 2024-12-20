@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ShoppingBag, Share2, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -5,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
-import { useState } from "react";
 import PaymentModal from "@/components/PaymentModal";
+import MarketplacePaymentConfirmation from "@/components/payment/MarketplacePaymentConfirmation";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -161,8 +162,9 @@ const Products = () => {
             setIsPaymentModalOpen(false);
             setSelectedProduct(null);
           }}
-          courseName={`${selectedProduct.title} (Quantity: ${selectedProduct.quantity})`}
+          courseName={`Order: ${selectedProduct.title} (Quantity: ${selectedProduct.quantity})`}
           price={Number(selectedProduct.price) * selectedProduct.quantity}
+          confirmationComponent={MarketplacePaymentConfirmation}
         />
       )}
       

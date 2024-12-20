@@ -19,9 +19,16 @@ interface PaymentModalProps {
   onClose: () => void;
   courseName: string;
   price: number;
+  confirmationComponent?: React.ComponentType;
 }
 
-const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps) => {
+const PaymentModal = ({ 
+  isOpen, 
+  onClose, 
+  courseName, 
+  price,
+  confirmationComponent: ConfirmationComponent = PaymentConfirmation 
+}: PaymentModalProps) => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [fullName, setFullName] = useState("");
   const [proofOfPayment, setProofOfPayment] = useState<File | null>(null);
@@ -48,7 +55,7 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
     setIsSuccess(true);
 
     toast({
-      title: "Payment Submitted!",
+      title: "Order Submitted!",
       description: "Your payment will be verified within 24 hours.",
     });
 
@@ -66,9 +73,9 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Enroll in {courseName}</DialogTitle>
+          <DialogTitle>{courseName}</DialogTitle>
           <DialogDescription>
-            Complete your payment details to enroll in this course
+            Complete your payment details to confirm your order
           </DialogDescription>
         </DialogHeader>
         
@@ -83,7 +90,7 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
                 className="space-y-6"
               >
                 <div className="space-y-2">
-                  <div className="text-lg font-semibold">Course Price: BWP {price.toFixed(2)}</div>
+                  <div className="text-lg font-semibold">Total Price: BWP {price.toFixed(2)}</div>
                 </div>
 
                 <PaymentMethodSelector
@@ -118,12 +125,12 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
                       <span>Processing...</span>
                     </motion.div>
                   ) : (
-                    "Submit Payment"
+                    "Confirm Order"
                   )}
                 </Button>
               </motion.form>
             ) : (
-              <PaymentConfirmation />
+              <ConfirmationComponent />
             )}
           </AnimatePresence>
         </ScrollArea>
