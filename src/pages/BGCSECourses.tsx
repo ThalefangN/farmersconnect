@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PaymentModal from "@/components/PaymentModal";
 import FreeCourse from "@/components/FreeCourse";
+import FeaturedCourse from "@/components/courses/FeaturedCourse";
 
 const BGCSECourses = () => {
   const [selectedCourse, setSelectedCourse] = useState<{
@@ -27,7 +28,8 @@ const BGCSECourses = () => {
       price: 400.00,
       rating: 4.8,
       icon: Calculator,
-      color: "bg-blue-50 hover:bg-blue-100"
+      color: "bg-blue-50 hover:bg-blue-100",
+      image: "/lovable-uploads/e7ea7dda-5d30-40df-8145-7a6191d1ee16.png"
     },
     {
       title: "English Language",
@@ -35,7 +37,8 @@ const BGCSECourses = () => {
       price: 350.00,
       rating: 4.7,
       icon: Languages,
-      color: "bg-green-50 hover:bg-green-100"
+      color: "bg-green-50 hover:bg-green-100",
+      image: "/lovable-uploads/61982df0-4ff8-4103-9052-1c44eaef3477.png"
     },
     {
       title: "Science",
@@ -68,9 +71,21 @@ const BGCSECourses = () => {
       title: "Introduction to Mathematics",
       description: "Basic mathematics concepts and problem-solving techniques",
       videos: [
-        { title: "Numbers and Operations", duration: "15:30" },
-        { title: "Basic Algebra", duration: "20:45" },
-        { title: "Geometry Fundamentals", duration: "18:20" }
+        { 
+          title: "Numbers and Operations", 
+          duration: "15:30",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Basic Algebra", 
+          duration: "20:45",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Geometry Fundamentals", 
+          duration: "18:20",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        }
       ],
       notes: [
         { title: "Mathematics Formulas", url: "/notes/math-formulas.pdf" },
@@ -145,34 +160,14 @@ const BGCSECourses = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className={`overflow-hidden transition-all duration-300 ${course.color}`}>
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-4 flex-1">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-2 rounded-lg bg-primary/10">
-                              <course.icon className="h-6 w-6 text-primary" />
-                            </div>
-                            <h2 className="text-xl font-semibold">{course.title}</h2>
-                          </div>
-                          <p className="text-muted-foreground">{course.description}</p>
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium text-lg">BWP {course.price.toFixed(2)}</span>
-                            <div className="flex items-center gap-1">
-                              <span>{course.rating}</span>
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            </div>
-                          </div>
-                          <Button 
-                            className="w-full bg-primary hover:bg-primary/90"
-                            onClick={() => setSelectedCourse(course)}
-                          >
-                            Enroll Now
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <FeaturedCourse
+                    title={course.title}
+                    description={course.description}
+                    price={course.price}
+                    rating={course.rating}
+                    image={course.image}
+                    onEnroll={() => setSelectedCourse(course)}
+                  />
                 </motion.div>
               ))}
             </div>
