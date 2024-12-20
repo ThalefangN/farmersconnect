@@ -23,8 +23,19 @@ import Notifications from "./pages/Notifications";
 import LivestockFarming from "./pages/forums/LivestockFarming";
 import CropCultivation from "./pages/forums/CropCultivation";
 import MarketTrends from "./pages/forums/MarketTrends";
+import Equipment from "./pages/resources/Equipment";
+import Seeds from "./pages/resources/Seeds";
+import Land from "./pages/resources/Land";
+import Products from "./pages/marketplace/Products";
+import MarketEquipment from "./pages/marketplace/Equipment";
+import Supplies from "./pages/marketplace/Supplies";
+import Guides from "./pages/learning/Guides";
+import Videos from "./pages/learning/Videos";
+import Certificates from "./pages/learning/Certificates";
+import Groups from "./pages/community/Groups";
+import Events from "./pages/community/Events";
+import Mentorship from "./pages/community/Mentorship";
 
-// Routes that require authentication or internet connection
 const PROTECTED_ROUTES = [
   '/signin',
   '/signup',
@@ -74,9 +85,31 @@ const AppContent = () => {
         <Route path="/services" element={<Services />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/notifications" element={<Notifications />} />
+        
+        {/* Forum Routes */}
         <Route path="/forums/livestock" element={<LivestockFarming />} />
         <Route path="/forums/crops" element={<CropCultivation />} />
         <Route path="/forums/market" element={<MarketTrends />} />
+        
+        {/* Resource Routes */}
+        <Route path="/resources/equipment" element={<Equipment />} />
+        <Route path="/resources/seeds" element={<Seeds />} />
+        <Route path="/resources/land" element={<Land />} />
+        
+        {/* Marketplace Routes */}
+        <Route path="/marketplace/products" element={<Products />} />
+        <Route path="/marketplace/equipment" element={<MarketEquipment />} />
+        <Route path="/marketplace/supplies" element={<Supplies />} />
+        
+        {/* Learning Routes */}
+        <Route path="/learning/guides" element={<Guides />} />
+        <Route path="/learning/videos" element={<Videos />} />
+        <Route path="/learning/certificates" element={<Certificates />} />
+        
+        {/* Community Routes */}
+        <Route path="/community/groups" element={<Groups />} />
+        <Route path="/community/events" element={<Events />} />
+        <Route path="/community/mentorship" element={<Mentorship />} />
       </Routes>
     </>
   );
@@ -104,5 +137,3 @@ const App = () => {
     </QueryClientProvider>
   );
 };
-
-export default App;
