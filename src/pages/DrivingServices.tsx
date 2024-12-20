@@ -32,14 +32,14 @@ const DrivingServices = () => {
   const featuredCourses = [
     {
       title: "Mathematics BGCSE",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+      image: "/lovable-uploads/b9de3ee1-4bb1-459c-9c6c-c1a37f8925da.png",
       description: "Master advanced mathematical concepts with our comprehensive BGCSE Mathematics course.",
       price: 200.00,
       rating: 4.5
     },
     {
       title: "English Language JCE",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      image: "/lovable-uploads/5300ff40-9cfb-473a-80e9-7c1f0842c731.png",
       description: "Improve your English language skills with interactive lessons and practice exercises.",
       price: 350.00,
       rating: 4.7

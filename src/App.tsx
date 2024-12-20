@@ -22,6 +22,9 @@ import BGCSECourses from "./pages/BGCSECourses";
 import JCECourses from "./pages/JCECourses";
 import PSLECourses from "./pages/PSLECourses";
 import AddCourse from "./pages/AddCourse";
+import CurrentExams from "./pages/CurrentExams";
+import UpcomingExams from "./pages/UpcomingExams";
+import PastExams from "./pages/PastExams";
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient({
@@ -59,6 +62,9 @@ const App = () => {
             <Route path="/jce-courses" element={<JCECourses />} />
             <Route path="/psle-courses" element={<PSLECourses />} />
             <Route path="/add-course" element={<AddCourse />} />
+            <Route path="/current-exams" element={<CurrentExams />} />
+            <Route path="/upcoming-exams" element={<UpcomingExams />} />
+            <Route path="/past-exams" element={<PastExams />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
