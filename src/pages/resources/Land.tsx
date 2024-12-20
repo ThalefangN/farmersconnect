@@ -3,15 +3,14 @@ import { ArrowLeft, MapPin, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import BottomNav from "@/components/BottomNav";
 import { useState } from "react";
 import InquiryDialog from "@/components/resources/InquiryDialog";
 import ContactDetailsDialog from "@/components/resources/ContactDetailsDialog";
+import LandDetails from "@/components/resources/LandDetails";
+import BottomNav from "@/components/BottomNav";
 
 const Land = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [showInquiry, setShowInquiry] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedLand, setSelectedLand] = useState<any>(null);
@@ -150,60 +149,21 @@ const Land = () => {
         </motion.div>
       </div>
 
+      <LandDetails
+        isOpen={showDetails}
+        onClose={() => setShowDetails(false)}
+        selectedLand={selectedLand}
+        onContactOwner={() => {
+          setShowDetails(false);
+          setShowContactDetails(true);
+        }}
+      />
+
       <InquiryDialog
         isOpen={showInquiry}
         onClose={() => setShowInquiry(false)}
         itemTitle={selectedLand?.title || ""}
       />
-
-      <Dialog 
-        open={showDetails} 
-        onOpenChange={() => setShowDetails(false)}
-      >
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>{selectedLand?.title}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedLand && (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Soil Type</h4>
-                    <p>{selectedLand.details.soilType}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Water Source</h4>
-                    <p>{selectedLand.details.waterSource}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Accessibility</h4>
-                    <p>{selectedLand.details.accessibility}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Facilities</h4>
-                    <p>{selectedLand.details.facilities}</p>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-2">Previous Crops</h4>
-                  <p>{selectedLand.details.previousCrops}</p>
-                </div>
-                <Button 
-                  className="w-full"
-                  onClick={() => {
-                    setShowDetails(false);
-                    setSelectedLand(selectedLand);
-                    setShowContactDetails(true);
-                  }}
-                >
-                  Contact Owner
-                </Button>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <ContactDetailsDialog
         isOpen={showContactDetails}

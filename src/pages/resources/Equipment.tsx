@@ -50,14 +50,14 @@ const Equipment = () => {
       id: "1",
       requesterName: "James Smith",
       date: "2024-02-20",
-      status: "pending",
+      status: "pending" as const,
       message: "I would like to rent the tractor for 3 days starting next week."
     },
     {
       id: "2",
       requesterName: "Mary Johnson",
       date: "2024-02-19",
-      status: "approved",
+      status: "approved" as const,
       message: "Requesting the irrigation system for my farm."
     }
   ] as const;
@@ -134,7 +134,6 @@ const Equipment = () => {
                   <CardContent>
                     <div className="space-y-2 mb-4">
                       <p className="text-gray-600"><strong>Location:</strong> {item.location}</p>
-                      <p className="text-gray-600"><strong>Owner:</strong> {item.owner.name}</p>
                       <p className="text-gray-600"><strong>Rate:</strong> {item.rate}</p>
                     </div>
                     <div className="flex space-x-2">
