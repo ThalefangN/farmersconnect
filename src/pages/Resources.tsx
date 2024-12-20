@@ -13,21 +13,39 @@ const Resources = () => {
       title: "Farming Equipment",
       description: "Access and share agricultural machinery and tools",
       icon: Wrench,
-      details: "Browse available tractors, harvesters, irrigation systems, and more",
+      details: "Browse available tractors, harvesters, irrigation systems, and more. Connect with equipment owners in your area and arrange sharing or rental agreements. Save on costs while accessing modern farming equipment.",
+      features: [
+        "Equipment sharing network",
+        "Machinery rental services",
+        "Tool maintenance guides",
+        "Equipment training sessions"
+      ],
       path: "/resources/equipment"
     },
     {
       title: "Seeds and Plants",
       description: "Exchange quality seeds and seedlings",
       icon: Leaf,
-      details: "Find certified seeds, share successful varieties, and connect with seed suppliers",
+      details: "Find certified seeds, share successful varieties, and connect with seed suppliers. Access a wide variety of crop seeds, seedlings, and planting materials suitable for your region.",
+      features: [
+        "Certified seed catalog",
+        "Seasonal planting guide",
+        "Seed exchange program",
+        "Expert growing tips"
+      ],
       path: "/resources/seeds"
     },
     {
       title: "Land Resources",
       description: "Discover available farming land",
       icon: MapPin,
-      details: "Explore arable land for lease or purchase, soil quality information, and water sources",
+      details: "Explore arable land for lease or purchase, soil quality information, and water sources. Find detailed information about land characteristics, ownership, and usage rights.",
+      features: [
+        "Land listings database",
+        "Soil analysis reports",
+        "Water source mapping",
+        "Legal documentation support"
+      ],
       path: "/resources/land"
     }
   ];
@@ -45,14 +63,16 @@ const Resources = () => {
             <h1 className="text-2xl font-bold text-green-800">Resource Sharing</h1>
           </div>
           
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <p className="text-gray-600 text-lg">
+          <div className="bg-white rounded-lg p-8 shadow-md">
+            <h2 className="text-xl font-semibold text-green-800 mb-4">Community Resource Hub</h2>
+            <p className="text-gray-600 text-lg leading-relaxed">
               Connect with other farmers to share and access essential farming resources. 
-              Our platform facilitates efficient resource allocation and community collaboration.
+              Our platform facilitates efficient resource allocation and community collaboration,
+              helping you reduce costs and improve productivity through shared resources.
             </p>
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-8">
             {resources.map((resource, index) => (
               <motion.div
                 key={resource.title}
@@ -61,24 +81,32 @@ const Resources = () => {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card 
-                  className="hover:shadow-lg transition-all cursor-pointer"
+                  className="hover:shadow-lg transition-all cursor-pointer overflow-hidden"
                   onClick={() => navigate(resource.path)}
                 >
-                  <CardHeader>
+                  <CardHeader className="space-y-4">
                     <div className="flex items-center space-x-4">
-                      <div className="bg-green-100 p-3 rounded-lg">
-                        <resource.icon className="h-6 w-6 text-green-700" />
+                      <div className="bg-green-100 p-4 rounded-lg">
+                        <resource.icon className="h-8 w-8 text-green-700" />
                       </div>
                       <div>
-                        <CardTitle className="text-xl text-green-800">{resource.title}</CardTitle>
-                        <CardDescription className="text-green-600">{resource.description}</CardDescription>
+                        <CardTitle className="text-2xl text-green-800">{resource.title}</CardTitle>
+                        <CardDescription className="text-lg text-green-600">{resource.description}</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">{resource.details}</p>
+                  <CardContent className="space-y-6">
+                    <p className="text-gray-600 text-lg leading-relaxed">{resource.details}</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      {resource.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full" />
+                          <span className="text-gray-600">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
                     <Button 
-                      className="mt-4 w-full bg-green-600 hover:bg-green-700"
+                      className="w-full mt-4 bg-green-600 hover:bg-green-700 text-lg py-6"
                       onClick={() => navigate(resource.path)}
                     >
                       Explore {resource.title}
