@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sprout, Tool, Seedling, MapPin } from "lucide-react";
+import { Sprout, Wrench, Leaf, MapPin } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,14 @@ const Resources = () => {
     {
       title: "Farming Equipment",
       description: "Access and share agricultural machinery and tools",
-      icon: Tool,
+      icon: Wrench,
       details: "Browse available tractors, harvesters, irrigation systems, and more",
       path: "/resources/equipment"
     },
     {
       title: "Seeds and Plants",
       description: "Exchange quality seeds and seedlings",
-      icon: Seedling,
+      icon: Leaf,
       details: "Find certified seeds, share successful varieties, and connect with seed suppliers",
       path: "/resources/seeds"
     },

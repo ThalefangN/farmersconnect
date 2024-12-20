@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ShoppingBag, Leaf, Tool, Package } from "lucide-react";
+import { ShoppingBag, Leaf, Wrench, Package } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ const Marketplace = () => {
     {
       title: "Equipment",
       description: "Farming tools and machinery",
-      icon: Tool,
+      icon: Wrench,
       details: "Trade new and used farming equipment, spare parts, and tools",
       path: "/marketplace/equipment"
     },
