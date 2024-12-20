@@ -28,7 +28,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,8 +44,8 @@ const SignIn = () => {
         )}
 
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-muted-foreground mt-2">Sign in to your account</p>
+          <h1 className="text-2xl font-bold text-green-800">Welcome Back to Sebotsa</h1>
+          <p className="text-green-700 mt-2">Sign in to your farmer account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -53,7 +53,7 @@ const SignIn = () => {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Mail className="absolute left-3 top-3 h-5 w-5 text-green-600" />
                 <Input id="email" type="email" placeholder="Enter email" className="pl-10" />
               </div>
             </div>
@@ -61,31 +61,43 @@ const SignIn = () => {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-green-600" />
                 <Input id="password" type="password" placeholder="Enter password" className="pl-10" />
               </div>
             </div>
           </div>
 
-          <Button type="submit" className="w-full" size="lg">
+          <Button 
+            type="submit" 
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black" 
+            size="lg"
+          >
             Sign In
           </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-green-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-[#F2FCE2] px-2 text-green-700">Or continue with</span>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" type="button" className="w-full">
+            <Button 
+              variant="outline" 
+              type="button" 
+              className="w-full border-green-700 text-green-700 hover:bg-green-50"
+            >
               <Facebook className="mr-2 h-4 w-4" />
               Facebook
             </Button>
-            <Button variant="outline" type="button" className="w-full">
+            <Button 
+              variant="outline" 
+              type="button" 
+              className="w-full border-green-700 text-green-700 hover:bg-green-50"
+            >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -109,10 +121,10 @@ const SignIn = () => {
             </Button>
           </div>
 
-          <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/signup" className="font-medium text-primary hover:underline">
-              Sign up
+          <p className="text-center text-sm text-green-700">
+            New to Sebotsa?{" "}
+            <Link to="/signup" className="font-medium text-yellow-600 hover:underline">
+              Create an account
             </Link>
           </p>
         </form>

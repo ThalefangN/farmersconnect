@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, Phone, Facebook } from "lucide-react";
+import { User, Mail, Lock, Phone, MapPin, Facebook } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
 import { useState } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
@@ -33,7 +34,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -49,16 +50,16 @@ const SignUp = () => {
         )}
 
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Join BotseduLearn</h1>
-          <p className="text-muted-foreground mt-2">Start your learning journey today</p>
+          <h1 className="text-2xl font-bold text-green-800">Join Sebotsa Farmers Hub</h1>
+          <p className="text-green-700 mt-2">Create your farmer account today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Student Name</Label>
+              <Label htmlFor="username">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <User className="absolute left-3 top-3 h-5 w-5 text-green-600" />
                 <Input id="username" placeholder="Enter your full name" className="pl-10" />
               </div>
             </div>
@@ -66,7 +67,7 @@ const SignUp = () => {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Mail className="absolute left-3 top-3 h-5 w-5 text-green-600" />
                 <Input id="email" type="email" placeholder="Enter your email" className="pl-10" />
               </div>
             </div>
@@ -74,7 +75,7 @@ const SignUp = () => {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-green-600" />
                 <Input id="password" type="password" placeholder="Create a secure password" className="pl-10" />
               </div>
             </div>
@@ -84,32 +85,56 @@ const SignUp = () => {
               <PhoneInput value={phone} onChange={setPhone} />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-5 w-5 text-green-600" />
+                <Input id="location" placeholder="Enter your location" className="pl-10" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="farmingType">Farming Type</Label>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your farming type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="livestock">Livestock Farming</SelectItem>
+                  <SelectItem value="crops">Crop Farming</SelectItem>
+                  <SelectItem value="mixed">Mixed Farming</SelectItem>
+                  <SelectItem value="poultry">Poultry Farming</SelectItem>
+                  <SelectItem value="horticulture">Horticulture</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex items-center space-x-2">
               <Checkbox id="terms" checked={agreed} onCheckedChange={(checked) => setAgreed(checked as boolean)} />
               <label
                 htmlFor="terms"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                I agree to BotseduLearn's terms of service and privacy policy
+                I agree to Sebotsa Farmers Hub's terms of service and privacy policy
               </label>
             </div>
           </div>
 
           <Button 
             type="submit" 
-            className={`w-full ${!isOnline ? "opacity-50" : ""}`} 
+            className={`w-full bg-yellow-500 hover:bg-yellow-600 text-black ${!isOnline ? "opacity-50" : ""}`} 
             size="lg" 
             disabled={!agreed || !isOnline}
           >
-            Create Student Account
+            Create Farmer Account
           </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-green-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-[#F2FCE2] px-2 text-green-700">Or continue with</span>
             </div>
           </div>
 
@@ -117,7 +142,7 @@ const SignUp = () => {
             <Button 
               variant="outline" 
               type="button" 
-              className={`w-full ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`w-full border-green-700 text-green-700 hover:bg-green-50 ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={() => {
                 if (!isOnline) {
                   toast({
@@ -134,7 +159,7 @@ const SignUp = () => {
             <Button 
               variant="outline" 
               type="button" 
-              className={`w-full ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`w-full border-green-700 text-green-700 hover:bg-green-50 ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={() => {
                 if (!isOnline) {
                   toast({
@@ -168,9 +193,9 @@ const SignUp = () => {
             </Button>
           </div>
 
-          <p className="text-center text-sm text-muted-foreground">
-            Already a student?{" "}
-            <Link to="/signin" className="font-medium text-primary hover:underline">
+          <p className="text-center text-sm text-green-700">
+            Already a member?{" "}
+            <Link to="/signin" className="font-medium text-yellow-600 hover:underline">
               Sign in
             </Link>
           </p>

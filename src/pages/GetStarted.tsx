@@ -20,7 +20,7 @@ const GetStarted = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -36,16 +36,16 @@ const GetStarted = () => {
         )}
 
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">BotseduLearn</h1>
-          <p className="text-muted-foreground">
-            Your gateway to quality education in Botswana
+          <h1 className="text-4xl font-bold tracking-tight text-green-800">Sebotsa Farmers Hub</h1>
+          <p className="text-lg text-green-700">
+            Empowering Botswana Farmers through Collaboration and Innovation
           </p>
         </div>
         
-        <div className="relative h-64 w-full rounded-2xl overflow-hidden">
+        <div className="relative h-64 w-full rounded-2xl overflow-hidden shadow-xl">
           <img
             src="/lovable-uploads/18a8902a-f4eb-4b86-8c45-c8914ecb854c.png"
-            alt="BotseduLearn Banner"
+            alt="Botswana Farming"
             className="object-cover w-full h-full"
           />
         </div>
@@ -53,25 +53,25 @@ const GetStarted = () => {
         <div className="space-y-4">
           <Button 
             asChild 
-            className={`w-full ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`w-full bg-yellow-500 hover:bg-yellow-600 text-black ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
             size="lg"
             onClick={handleAction}
           >
-            <Link to="/signup">Create Student Account</Link>
+            <Link to="/signup">Join Sebotsa</Link>
           </Button>
           <Button 
             asChild 
             variant="outline" 
-            className={`w-full ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`w-full border-green-700 text-green-700 hover:bg-green-50 ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
             size="lg"
             onClick={handleAction}
           >
-            <Link to="/signin">Sign In to Learn</Link>
+            <Link to="/signin">Sign In</Link>
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          By continuing, you agree to our Terms of Service and Privacy Policy
+        <p className="text-sm text-green-700/80">
+          Join our community of farmers and agricultural experts
         </p>
       </motion.div>
     </div>
