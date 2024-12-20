@@ -5,10 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
+import GuideContentDialog from "@/components/learning/GuideContentDialog";
+import { useState } from "react";
 
 const Guides = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [selectedGuide, setSelectedGuide] = useState<{ title: string; content?: string } | null>(null);
 
   const guides = [
     {
@@ -94,7 +97,11 @@ const Guides = () => {
                         <Download className="mr-2 h-4 w-4" />
                         Download Guide
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => setSelectedGuide(item)}
+                      >
                         Read Online
                       </Button>
                     </div>
@@ -105,6 +112,13 @@ const Guides = () => {
           </div>
         </motion.div>
       </div>
+      
+      <GuideContentDialog
+        isOpen={!!selectedGuide}
+        onClose={() => setSelectedGuide(null)}
+        guide={selectedGuide || { title: "" }}
+      />
+      
       <BottomNav />
     </div>
   );
