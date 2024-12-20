@@ -20,6 +20,9 @@ import Community from "./pages/Community";
 import Services from "./pages/Services";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
+import LivestockFarming from "./pages/forums/LivestockFarming";
+import CropCultivation from "./pages/forums/CropCultivation";
+import MarketTrends from "./pages/forums/MarketTrends";
 
 // Routes that require authentication or internet connection
 const PROTECTED_ROUTES = [
@@ -71,6 +74,9 @@ const AppContent = () => {
         <Route path="/services" element={<Services />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/forums/livestock" element={<LivestockFarming />} />
+        <Route path="/forums/crops" element={<CropCultivation />} />
+        <Route path="/forums/market" element={<MarketTrends />} />
       </Routes>
     </>
   );
