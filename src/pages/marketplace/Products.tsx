@@ -5,16 +5,23 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
+import { useState } from "react";
+import PaymentModal from "@/components/PaymentModal";
 
 const Products = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{
+    title: string;
+    price: string;
+  } | null>(null);
 
   const products = [
     {
       title: "Fresh Vegetables Bundle",
       description: "Assorted organic vegetables",
-      price: "M150",
+      price: "150",
       seller: "Green Farm Fresh",
       location: "Gaborone",
       image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c"
@@ -22,18 +29,16 @@ const Products = () => {
     {
       title: "Free-Range Eggs",
       description: "Farm fresh eggs",
-      price: "M45/dozen",
+      price: "45",
       seller: "Happy Hens Farm",
       location: "Molepolole",
       image: "https://images.unsplash.com/photo-1569288052389-dac9b0ac9eac"
     }
   ];
 
-  const handlePurchase = (product: string) => {
-    toast({
-      title: "Order Initiated",
-      description: `Your order for ${product} has been initiated. The seller will contact you soon.`,
-    });
+  const handlePurchase = (product: { title: string; price: string }) => {
+    setSelectedProduct(product);
+    setIsPaymentModalOpen(true);
   };
 
   return (
@@ -86,14 +91,14 @@ const Products = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 mb-4">
-                      <p className="text-gray-600"><strong>Price:</strong> {item.price}</p>
+                      <p className="text-gray-600"><strong>Price:</strong> BWP {item.price}</p>
                       <p className="text-gray-600"><strong>Seller:</strong> {item.seller}</p>
                       <p className="text-gray-600"><strong>Location:</strong> {item.location}</p>
                     </div>
                     <div className="flex space-x-2">
                       <Button 
                         className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handlePurchase(item.title)}
+                        onClick={() => handlePurchase(item)}
                       >
                         Purchase
                       </Button>
@@ -108,6 +113,19 @@ const Products = () => {
           </div>
         </motion.div>
       </div>
+
+      {selectedProduct && (
+        <PaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => {
+            setIsPaymentModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          courseName={selectedProduct.title}
+          price={Number(selectedProduct.price)}
+        />
+      )}
+      
       <BottomNav />
     </div>
   );
