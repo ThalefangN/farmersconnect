@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Cow } from "lucide-react";
+import { ArrowLeft, Beef } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
@@ -20,7 +20,7 @@ const LivestockFarming = () => {
               <ArrowLeft className="h-6 w-6 text-green-700" />
             </Button>
             <div className="flex items-center space-x-2">
-              <Cow className="h-6 w-6 text-green-700" />
+              <Beef className="h-6 w-6 text-green-700" />
               <h1 className="text-2xl font-bold text-green-800">Livestock Farming</h1>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MessageSquare, Cow, Sprout, TrendingUp } from "lucide-react";
+import { MessageSquare, Beef, Leaf, TrendingUp } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -11,13 +11,13 @@ const Forums = () => {
     {
       title: "Livestock Farming",
       description: "Discuss livestock management and care",
-      icon: Cow,
+      icon: Beef,
       path: "/forums/livestock"
     },
     {
       title: "Crop Cultivation",
       description: "Share crop farming techniques and tips",
-      icon: Sprout,
+      icon: Leaf,
       path: "/forums/crops"
     },
     {
