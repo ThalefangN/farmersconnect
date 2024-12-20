@@ -4,11 +4,20 @@ import { Star, Book, Calculator, Languages, Beaker, Globe, ChartBar } from "luci
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PaymentModal from "@/components/PaymentModal";
+import FreeCourse from "@/components/FreeCourse";
 
 const BGCSECourses = () => {
   const [selectedCourse, setSelectedCourse] = useState<{
     title: string;
     price: number;
+  } | null>(null);
+
+  const [selectedFreeCourse, setSelectedFreeCourse] = useState<{
+    title: string;
+    description: string;
+    videos: Array<{ title: string; duration: string }>;
+    notes: Array<{ title: string; url: string }>;
+    documents: Array<{ title: string; url: string }>;
   } | null>(null);
 
   const courses = [
@@ -54,6 +63,60 @@ const BGCSECourses = () => {
     }
   ];
 
+  const freeCourses = [
+    {
+      title: "Introduction to Mathematics",
+      description: "Basic mathematics concepts and problem-solving techniques",
+      videos: [
+        { title: "Numbers and Operations", duration: "15:30" },
+        { title: "Basic Algebra", duration: "20:45" },
+        { title: "Geometry Fundamentals", duration: "18:20" }
+      ],
+      notes: [
+        { title: "Mathematics Formulas", url: "/notes/math-formulas.pdf" },
+        { title: "Practice Problems", url: "/notes/practice-problems.pdf" }
+      ],
+      documents: [
+        { title: "Study Guide", url: "/docs/math-study-guide.pdf" },
+        { title: "Exercise Workbook", url: "/docs/math-workbook.pdf" }
+      ]
+    },
+    {
+      title: "English Grammar Basics",
+      description: "Essential English grammar rules and writing skills",
+      videos: [
+        { title: "Parts of Speech", duration: "12:15" },
+        { title: "Sentence Structure", duration: "16:40" },
+        { title: "Common Grammar Rules", duration: "14:55" }
+      ],
+      notes: [
+        { title: "Grammar Rules Summary", url: "/notes/grammar-rules.pdf" },
+        { title: "Writing Tips", url: "/notes/writing-tips.pdf" }
+      ],
+      documents: [
+        { title: "Grammar Workbook", url: "/docs/grammar-workbook.pdf" },
+        { title: "Practice Exercises", url: "/docs/grammar-exercises.pdf" }
+      ]
+    },
+    {
+      title: "Science Fundamentals",
+      description: "Basic concepts in physics, chemistry, and biology",
+      videos: [
+        { title: "Scientific Method", duration: "10:25" },
+        { title: "Basic Physics Laws", duration: "22:30" },
+        { title: "Chemistry Basics", duration: "19:15" }
+      ],
+      notes: [
+        { title: "Science Concepts", url: "/notes/science-concepts.pdf" },
+        { title: "Lab Safety Guidelines", url: "/notes/lab-safety.pdf" }
+      ],
+      documents: [
+        { title: "Science Handbook", url: "/docs/science-handbook.pdf" },
+        { title: "Experiment Guide", url: "/docs/experiment-guide.pdf" }
+      ]
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background p-4">
       <motion.div
@@ -71,44 +134,86 @@ const BGCSECourses = () => {
           <Book className="h-12 w-12 text-primary" />
         </div>
 
-        <div className="grid gap-6">
-          {courses.map((course, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className={`overflow-hidden transition-all duration-300 ${course.color}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-4 flex-1">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <course.icon className="h-6 w-6 text-primary" />
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Premium Courses</h2>
+            <div className="grid gap-6">
+              {courses.map((course, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className={`overflow-hidden transition-all duration-300 ${course.color}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-4 flex-1">
+                          <div className="flex items-center space-x-4">
+                            <div className="p-2 rounded-lg bg-primary/10">
+                              <course.icon className="h-6 w-6 text-primary" />
+                            </div>
+                            <h2 className="text-xl font-semibold">{course.title}</h2>
+                          </div>
+                          <p className="text-muted-foreground">{course.description}</p>
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-lg">BWP {course.price.toFixed(2)}</span>
+                            <div className="flex items-center gap-1">
+                              <span>{course.rating}</span>
+                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            </div>
+                          </div>
+                          <Button 
+                            className="w-full bg-primary hover:bg-primary/90"
+                            onClick={() => setSelectedCourse(course)}
+                          >
+                            Enroll Now
+                          </Button>
                         </div>
-                        <h2 className="text-xl font-semibold">{course.title}</h2>
                       </div>
-                      <p className="text-muted-foreground">{course.description}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-lg">BWP {course.price.toFixed(2)}</span>
-                        <div className="flex items-center gap-1">
-                          <span>{course.rating}</span>
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Free Courses</h2>
+            <div className="grid gap-6">
+              {freeCourses.map((course, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="overflow-hidden transition-all duration-300 bg-accent/50 hover:bg-accent">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-4 flex-1">
+                          <div className="flex items-center space-x-4">
+                            <div className="p-2 rounded-lg bg-primary/10">
+                              <Book className="h-6 w-6 text-primary" />
+                            </div>
+                            <h2 className="text-xl font-semibold">{course.title}</h2>
+                          </div>
+                          <p className="text-muted-foreground">{course.description}</p>
+                          <Button 
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => setSelectedFreeCourse(course)}
+                          >
+                            Start Learning
+                          </Button>
                         </div>
                       </div>
-                      <Button 
-                        className="w-full bg-primary hover:bg-primary/90"
-                        onClick={() => setSelectedCourse(course)}
-                      >
-                        Enroll Now
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </motion.div>
 
@@ -118,6 +223,14 @@ const BGCSECourses = () => {
           onClose={() => setSelectedCourse(null)}
           courseName={selectedCourse.title}
           price={selectedCourse.price}
+        />
+      )}
+
+      {selectedFreeCourse && (
+        <FreeCourse
+          isOpen={!!selectedFreeCourse}
+          onClose={() => setSelectedFreeCourse(null)}
+          course={selectedFreeCourse}
         />
       )}
     </div>
