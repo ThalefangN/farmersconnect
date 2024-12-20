@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, School, Calculator, Language, Flask, Globe, BookOpen, Computer } from "lucide-react";
+import { Star, School, Calculator, Languages, Beaker, Globe, BookOpen, Computer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PaymentModal from "@/components/PaymentModal";
@@ -25,7 +25,7 @@ const PSLECourses = () => {
       description: "Develop essential English language skills with focus on reading, writing, speaking, and listening. Features storytelling and creative writing activities.",
       price: 130.00,
       rating: 4.7,
-      icon: Language,
+      icon: Languages,
       color: "bg-green-50 hover:bg-green-100"
     },
     {
@@ -33,7 +33,7 @@ const PSLECourses = () => {
       description: "Discover the wonders of science through simple experiments and observations. Covers basic concepts in nature, technology, and the environment.",
       price: 180.00,
       rating: 4.6,
-      icon: Flask,
+      icon: Beaker,
       color: "bg-purple-50 hover:bg-purple-100"
     },
     {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Book, Calculator, Language, Flask, Globe, ChartBar } from "lucide-react";
+import { Star, Book, Calculator, Languages, Beaker, Globe, ChartBar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PaymentModal from "@/components/PaymentModal";
@@ -25,7 +25,7 @@ const BGCSECourses = () => {
       description: "Develop strong communication skills through intensive reading, writing, speaking, and listening exercises. Features literature analysis and essay writing techniques.",
       price: 350.00,
       rating: 4.7,
-      icon: Language,
+      icon: Languages,
       color: "bg-green-50 hover:bg-green-100"
     },
     {
@@ -33,7 +33,7 @@ const BGCSECourses = () => {
       description: "Explore physics, chemistry, and biology through interactive lessons and virtual lab experiments. Covers all major topics in the BGCSE syllabus.",
       price: 380.00,
       rating: 4.6,
-      icon: Flask,
+      icon: Beaker,
       color: "bg-purple-50 hover:bg-purple-100"
     },
     {

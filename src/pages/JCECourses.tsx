@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, GraduationCap, Calculator, Language, Flask, Globe, BookOpen, Sprout } from "lucide-react";
+import { Star, Book, Calculator, Languages, Beaker, Globe, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PaymentModal from "@/components/PaymentModal";
@@ -14,7 +14,7 @@ const JCECourses = () => {
   const courses = [
     {
       title: "Mathematics",
-      description: "Build a strong foundation in mathematics with comprehensive coverage of arithmetic, algebra, and geometry. Includes interactive problem-solving exercises.",
+      description: "Improve your math skills with comprehensive coverage of arithmetic, algebra, and geometry. Includes interactive problem-solving exercises.",
       price: 250.00,
       rating: 4.5,
       icon: Calculator,
@@ -22,10 +22,10 @@ const JCECourses = () => {
     },
     {
       title: "English Language",
-      description: "Improve your English language skills through reading comprehension, grammar, and writing exercises. Features vocabulary building and communication practice.",
+      description: "Enhance your English language skills through reading comprehension, grammar, and writing exercises. Features vocabulary building and communication practice.",
       price: 220.00,
       rating: 4.6,
-      icon: Language,
+      icon: Languages,
       color: "bg-green-50 hover:bg-green-100"
     },
     {
@@ -33,7 +33,7 @@ const JCECourses = () => {
       description: "Explore basic science concepts through hands-on experiments and interactive lessons. Covers physics, chemistry, and biology fundamentals.",
       price: 280.00,
       rating: 4.7,
-      icon: Flask,
+      icon: Beaker,
       color: "bg-purple-50 hover:bg-purple-100"
     },
     {
@@ -68,7 +68,7 @@ const JCECourses = () => {
               Prepare for your Junior Certificate Examination with our comprehensive courses
             </p>
           </div>
-          <GraduationCap className="h-12 w-12 text-primary" />
+          <Book className="h-12 w-12 text-primary" />
         </div>
 
         <div className="grid gap-6">
