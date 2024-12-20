@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, User, Mail, Phone, Shield, LogOut, ChevronRight, GraduationCap } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, Shield, LogOut, ChevronRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
@@ -10,9 +10,9 @@ const Profile = () => {
 
   const menuItems = [
     {
-      title: "Academic Profile",
+      title: "Farmer Profile",
       icon: User,
-      onClick: () => console.log("Navigate to academic profile")
+      onClick: () => console.log("Navigate to farmer profile")
     },
     {
       title: "Security Settings",
@@ -37,7 +37,7 @@ const Profile = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/home")}>
             <ArrowLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-2xl font-bold">Profile</h1>
+          <h1 className="text-2xl font-bold">Farmer Profile</h1>
         </motion.div>
 
         <motion.div
@@ -58,7 +58,7 @@ const Profile = () => {
           </motion.div>
           <div className="text-center">
             <h2 className="text-xl font-semibold">Tlhalefang Ntshilane</h2>
-            <p className="text-muted-foreground">Student ID: BEL123456</p>
+            <p className="text-muted-foreground">Livestock Farmer</p>
           </div>
         </motion.div>
 
@@ -69,16 +69,16 @@ const Profile = () => {
                 <Mail className="h-5 w-5 text-muted-foreground" />
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">tlhalefang.ntshilane@botsedu.ac.bw</p>
+                  <p className="font-medium">tlhalefang.ntshilane@sebotsa.com</p>
                 </div>
               </div>
             </Card>
             <Card className="p-4">
               <div className="flex items-center space-x-4">
-                <GraduationCap className="h-5 w-5 text-muted-foreground" />
+                <MapPin className="h-5 w-5 text-muted-foreground" />
                 <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Program</p>
-                  <p className="font-medium">Bachelor of Computer Science</p>
+                  <p className="text-sm text-muted-foreground">Location</p>
+                  <p className="font-medium">Gaborone, Botswana</p>
                 </div>
               </div>
             </Card>

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, GraduationCap, Library, Award, MessageSquare } from "lucide-react";
+import { ArrowLeft, Tractor, Sprout, ShoppingBag, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
@@ -10,28 +10,28 @@ const Services = () => {
 
   const services = [
     {
-      title: "Online Courses",
-      description: "Access our wide range of online courses and learning materials",
-      icon: BookOpen,
-      path: "/jce-courses"
+      title: "Equipment Rental",
+      description: "Rent farming equipment from other farmers or list your own equipment for rent",
+      icon: Tractor,
+      path: "/resources/equipment"
     },
     {
-      title: "Academic Programs",
-      description: "Browse and enroll in academic programs and certifications",
-      icon: GraduationCap,
-      path: "/bgcse-courses"
+      title: "Resource Sharing",
+      description: "Share and access farming resources including seeds, land, and tools",
+      icon: Sprout,
+      path: "/resources"
     },
     {
-      title: "Digital Library",
-      description: "Access our extensive collection of digital learning resources",
-      icon: Library,
-      path: "/past-exams"
+      title: "Marketplace",
+      description: "Buy and sell agricultural products, supplies, and equipment",
+      icon: ShoppingBag,
+      path: "/marketplace"
     },
     {
-      title: "Student Support",
-      description: "Get help from our tutors and academic support team",
-      icon: MessageSquare,
-      path: "/report-issue"
+      title: "Community Support",
+      description: "Connect with other farmers, join groups, and access mentorship",
+      icon: Users,
+      path: "/community"
     }
   ];
 
@@ -46,7 +46,7 @@ const Services = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/home")}>
             <ArrowLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-2xl font-bold">Learning Services</h1>
+          <h1 className="text-2xl font-bold">Sebotsa Services</h1>
         </motion.div>
 
         <div className="space-y-4">
@@ -60,7 +60,7 @@ const Services = () => {
             >
               <Card className="cursor-pointer hover:bg-accent transition-colors">
                 <CardHeader className="flex flex-row items-start space-x-4">
-                  <div className="p-2 rounded-full bg-primary/10 text-primary">
+                  <div className="p-2 rounded-full bg-green-100 text-green-700">
                     <service.icon className="h-5 w-5" />
                   </div>
                   <div className="space-y-1">

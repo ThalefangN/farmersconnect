@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Bell, Book, Calendar, Clock, Info } from "lucide-react";
+import { Bell, Tractor, ShoppingBag, Users, Clock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import BottomNav from "@/components/BottomNav";
 
 const Notifications = () => {
   const navigate = useNavigate();
@@ -11,29 +12,29 @@ const Notifications = () => {
   const notifications = [
     {
       id: 1,
-      title: "New Course Available",
-      message: "Advanced Mathematics BGCSE course is now available",
+      title: "New Equipment Available",
+      message: "A new tractor is available for rent in your area",
       time: "2 hours ago",
-      type: "course",
-      icon: Book,
-      action: () => navigate("/bgcse-courses")
+      type: "equipment",
+      icon: Tractor,
+      action: () => navigate("/resources/equipment")
     },
     {
       id: 2,
-      title: "Upcoming Exam",
-      message: "BGCSE Mock Test scheduled for next week",
+      title: "Marketplace Update",
+      message: "New farming supplies listed in your area",
       time: "1 day ago",
-      type: "exam",
-      icon: Calendar,
-      action: () => navigate("/current-exams")
+      type: "marketplace",
+      icon: ShoppingBag,
+      action: () => navigate("/marketplace")
     },
     {
       id: 3,
-      title: "System Update",
-      message: "Platform maintenance scheduled for this weekend",
+      title: "Community Event",
+      message: "Upcoming farmer's meetup in your region",
       time: "2 days ago",
-      type: "system",
-      icon: Info
+      type: "community",
+      icon: Users
     }
   ];
 
@@ -64,8 +65,8 @@ const Notifications = () => {
                 <Card className="hover:bg-accent transition-colors">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-4">
-                      <div className="bg-primary/10 p-2 rounded-lg">
-                        <notification.icon className="h-5 w-5 text-primary" />
+                      <div className="bg-green-100 p-2 rounded-lg">
+                        <notification.icon className="h-5 w-5 text-green-700" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium">{notification.title}</h3>
@@ -87,6 +88,7 @@ const Notifications = () => {
           </div>
         </ScrollArea>
       </motion.div>
+      <BottomNav />
     </div>
   );
 };
