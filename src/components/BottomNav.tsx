@@ -1,15 +1,17 @@
 import { HomeIcon, Settings, Bell, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const BottomNav = () => {
   const location = useLocation();
+  const { t } = useLanguage();
 
   const items = [
     { icon: HomeIcon, label: "Sebotsa", path: "/home" },
-    { icon: Settings, label: "Services", path: "/services" },
-    { icon: Bell, label: "Notifications", path: "/notifications" },
-    { icon: User, label: "Profile", path: "/profile" },
+    { icon: Settings, label: t("services"), path: "/services" },
+    { icon: Bell, label: t("notifications"), path: "/notifications" },
+    { icon: User, label: t("profile"), path: "/profile" },
   ];
 
   return (

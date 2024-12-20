@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const GetStarted = () => {
   const isOnline = useOnlineStatus();
   const { toast } = useToast();
-  const [language, setLanguage] = useState("en");
+  const { language, setLanguage } = useLanguage();
 
   const content = {
     en: {
@@ -49,7 +49,7 @@ const GetStarted = () => {
       <div className="absolute top-4 w-full max-w-xs mx-auto">
         <RadioGroup
           defaultValue={language}
-          onValueChange={setLanguage}
+          onValueChange={(value) => setLanguage(value as "en" | "tn")}
           className="flex justify-center space-x-4 p-2 bg-white rounded-lg shadow-sm"
         >
           <div className="flex items-center space-x-2">
