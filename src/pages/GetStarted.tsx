@@ -3,16 +3,41 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const GetStarted = () => {
   const isOnline = useOnlineStatus();
   const { toast } = useToast();
+  const [language, setLanguage] = useState("en");
+
+  const content = {
+    en: {
+      title: "Sebotsa Farmers Hub",
+      description: "Empowering Botswana Farmers through Collaboration and Innovation",
+      joinButton: "Join Sebotsa",
+      signInButton: "Sign In",
+      communityText: "Join our community of farmers and agricultural experts",
+      offlineMessage: "You are currently offline. Some features may be limited."
+    },
+    tn: {
+      title: "Sebotsa ya Balemi",
+      description: "Re thusa balemi ba Botswana ka tirisano mmogo le ditlhabololo",
+      joinButton: "Tsena mo Sebotsa",
+      signInButton: "Tsena",
+      communityText: "Nna leloko la setshaba sa balemi le baitseanape ba temo",
+      offlineMessage: "Ga o a golagana le inthanete. Ditirelo dingwe di ka nna tsa sa bereke."
+    }
+  };
 
   const handleAction = () => {
     if (!isOnline) {
       toast({
-        title: "You're offline",
-        description: "Please connect to the internet to proceed.",
+        title: language === "en" ? "You're offline" : "Ga o a golagana",
+        description: language === "en" 
+          ? "Please connect to the internet to proceed."
+          : "Tswêê-tswêê golagana le inthanete go tswelela.",
         variant: "destructive",
       });
       return;
@@ -21,6 +46,23 @@ const GetStarted = () => {
 
   return (
     <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4">
+      <div className="absolute top-4 w-full max-w-xs mx-auto">
+        <RadioGroup
+          defaultValue={language}
+          onValueChange={setLanguage}
+          className="flex justify-center space-x-4 p-2 bg-white rounded-lg shadow-sm"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="en" id="en" />
+            <Label htmlFor="en">English</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="tn" id="tn" />
+            <Label htmlFor="tn">Setswana</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -30,15 +72,17 @@ const GetStarted = () => {
         {!isOnline && (
           <div className="bg-destructive/10 text-destructive p-4 rounded-lg mb-4">
             <p className="text-sm font-medium">
-              You are currently offline. Some features may be limited.
+              {content[language as keyof typeof content].offlineMessage}
             </p>
           </div>
         )}
 
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight text-green-800">Sebotsa Farmers Hub</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-green-800">
+            {content[language as keyof typeof content].title}
+          </h1>
           <p className="text-lg text-green-700">
-            Empowering Botswana Farmers through Collaboration and Innovation
+            {content[language as keyof typeof content].description}
           </p>
         </div>
         
@@ -57,7 +101,9 @@ const GetStarted = () => {
             size="lg"
             onClick={handleAction}
           >
-            <Link to="/signup">Join Sebotsa</Link>
+            <Link to="/signup">
+              {content[language as keyof typeof content].joinButton}
+            </Link>
           </Button>
           <Button 
             asChild 
@@ -66,12 +112,14 @@ const GetStarted = () => {
             size="lg"
             onClick={handleAction}
           >
-            <Link to="/signin">Sign In</Link>
+            <Link to="/signin">
+              {content[language as keyof typeof content].signInButton}
+            </Link>
           </Button>
         </div>
 
         <p className="text-sm text-green-700/80">
-          Join our community of farmers and agricultural experts
+          {content[language as keyof typeof content].communityText}
         </p>
       </motion.div>
     </div>
