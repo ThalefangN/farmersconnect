@@ -5,37 +5,71 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
+import { useState } from "react";
+import InquiryDialog from "@/components/resources/InquiryDialog";
+import ContactDetailsDialog from "@/components/resources/ContactDetailsDialog";
 
 const Land = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showInquiry, setShowInquiry] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedLand, setSelectedLand] = useState<any>(null);
+  const [showContactDetails, setShowContactDetails] = useState(false);
 
   const landList = [
     {
       title: "Arable Land - 5 Hectares",
       description: "Fertile soil with water access",
       location: "Serowe District",
-      owner: "John's Estate",
+      owner: {
+        name: "John's Estate",
+        phone: "+267 71234569",
+        email: "johns@example.com",
+        location: "Serowe District"
+      },
       price: "Contact for pricing",
       type: "Lease",
+      details: {
+        soilType: "Loamy",
+        waterSource: "Borehole available",
+        accessibility: "Good road access",
+        facilities: "Basic storage shed",
+        previousCrops: "Maize, Sorghum"
+      },
       image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
     },
     {
       title: "Farmland - 3 Hectares",
       description: "Previously cultivated, ready for farming",
       location: "Maun Region",
-      owner: "Agricultural Trust",
+      owner: {
+        name: "Agricultural Trust",
+        phone: "+267 71234570",
+        email: "agtrust@example.com",
+        location: "Maun Region"
+      },
       price: "M2500/month",
       type: "Rent",
+      details: {
+        soilType: "Clay-loam mix",
+        waterSource: "River access",
+        accessibility: "Seasonal road",
+        facilities: "Irrigation system installed",
+        previousCrops: "Vegetables"
+      },
       image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
     }
   ];
 
-  const handleInquiry = (land: string) => {
-    toast({
-      title: "Inquiry Sent",
-      description: `Your inquiry about ${land} has been sent to the owner.`,
-    });
+  const handleInquiry = (land: any) => {
+    setSelectedLand(land);
+    setShowInquiry(true);
+  };
+
+  const handleViewDetails = (land: any) => {
+    setSelectedLand(land);
+    setShowDetails(true);
   };
 
   return (
@@ -89,18 +123,22 @@ const Land = () => {
                   <CardContent>
                     <div className="space-y-2 mb-4">
                       <p className="text-gray-600"><strong>Location:</strong> {item.location}</p>
-                      <p className="text-gray-600"><strong>Owner:</strong> {item.owner}</p>
+                      <p className="text-gray-600"><strong>Owner:</strong> {item.owner.name}</p>
                       <p className="text-gray-600"><strong>Price:</strong> {item.price}</p>
                       <p className="text-gray-600"><strong>Type:</strong> {item.type}</p>
                     </div>
                     <div className="flex space-x-2">
                       <Button 
                         className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handleInquiry(item.title)}
+                        onClick={() => handleInquiry(item)}
                       >
                         Make Inquiry
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleViewDetails(item)}
+                      >
                         View Details
                       </Button>
                     </div>
@@ -111,6 +149,73 @@ const Land = () => {
           </div>
         </motion.div>
       </div>
+
+      <InquiryDialog
+        isOpen={showInquiry}
+        onClose={() => setShowInquiry(false)}
+        itemTitle={selectedLand?.title || ""}
+      />
+
+      <Dialog 
+        open={showDetails} 
+        onOpenChange={() => setShowDetails(false)}
+      >
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{selectedLand?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedLand && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Soil Type</h4>
+                    <p>{selectedLand.details.soilType}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Water Source</h4>
+                    <p>{selectedLand.details.waterSource}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Accessibility</h4>
+                    <p>{selectedLand.details.accessibility}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Facilities</h4>
+                    <p>{selectedLand.details.facilities}</p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Previous Crops</h4>
+                  <p>{selectedLand.details.previousCrops}</p>
+                </div>
+                <Button 
+                  className="w-full"
+                  onClick={() => {
+                    setShowDetails(false);
+                    setSelectedLand(selectedLand);
+                    setShowContactDetails(true);
+                  }}
+                >
+                  Contact Owner
+                </Button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <ContactDetailsDialog
+        isOpen={showContactDetails}
+        onClose={() => setShowContactDetails(false)}
+        ownerDetails={selectedLand?.owner || {
+          name: "",
+          phone: "",
+          email: "",
+          location: ""
+        }}
+      />
+
       <BottomNav />
     </div>
   );
