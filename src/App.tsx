@@ -18,6 +18,9 @@ import DigitalID from "./pages/DigitalID";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Services from "./pages/Services";
+import BGCSECourses from "./pages/BGCSECourses";
+import JCECourses from "./pages/JCECourses";
+import PSLECourses from "./pages/PSLECourses";
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient({
@@ -51,6 +54,9 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/bgcse-courses" element={<BGCSECourses />} />
+            <Route path="/jce-courses" element={<JCECourses />} />
+            <Route path="/psle-courses" element={<PSLECourses />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
