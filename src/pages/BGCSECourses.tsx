@@ -16,7 +16,7 @@ const BGCSECourses = () => {
   const [selectedFreeCourse, setSelectedFreeCourse] = useState<{
     title: string;
     description: string;
-    videos: Array<{ title: string; duration: string }>;
+    videos: Array<{ title: string; duration: string; url: string }>;
     notes: Array<{ title: string; url: string }>;
     documents: Array<{ title: string; url: string }>;
   } | null>(null);
