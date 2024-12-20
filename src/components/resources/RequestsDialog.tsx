@@ -13,7 +13,7 @@ interface Request {
 interface RequestsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  requests: Request[];
+  requests: readonly Request[];  // Changed to accept readonly array
 }
 
 const RequestsDialog = ({ isOpen, onClose, requests }: RequestsDialogProps) => {
