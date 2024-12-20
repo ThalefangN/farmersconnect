@@ -71,21 +71,13 @@ const Home = () => {
               We connect farmers, share resources, and provide essential knowledge to help you succeed 
               in your farming journey.
             </p>
-            <div className="flex space-x-4">
-              <Button 
-                className="bg-green-700 hover:bg-green-800 text-white"
-                onClick={() => navigate("/signup")}
-              >
-                Join Sebotsa
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-green-700 text-green-700 hover:bg-green-50"
-                onClick={() => navigate("/about")}
-              >
-                Learn More
-              </Button>
-            </div>
+            <Button 
+              variant="outline" 
+              className="border-green-700 text-green-700 hover:bg-green-50"
+              onClick={() => navigate("/about")}
+            >
+              Learn More
+            </Button>
           </div>
         </motion.div>
 
