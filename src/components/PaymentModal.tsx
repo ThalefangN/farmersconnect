@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, CreditCard, Building2, Smartphone } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +7,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import PaymentMethodSelector from "./payment/PaymentMethodSelector";
+import PaymentDetails from "./payment/PaymentDetails";
+import PaymentConfirmation from "./payment/PaymentConfirmation";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -22,11 +21,8 @@ interface PaymentModalProps {
 
 const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps) => {
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [accountName, setAccountName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [proofOfPayment, setProofOfPayment] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
@@ -34,29 +30,10 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate based on payment method
-    if (paymentMethod === "card" && (!cardNumber || !expiryDate || !cvv)) {
+    if (!paymentMethod || !fullName || !proofOfPayment) {
       toast({
         title: "Error",
-        description: "Please fill in all card details",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (paymentMethod === "bank" && (!accountName || !cardNumber)) {
-      toast({
-        title: "Error",
-        description: "Please fill in all bank details",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (paymentMethod === "mobile" && !mobileNumber) {
-      toast({
-        title: "Error",
-        description: "Please enter mobile number",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       return;
@@ -69,100 +46,18 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
     setIsSuccess(true);
 
     toast({
-      title: "Success!",
-      description: "You have successfully enrolled in the course.",
+      title: "Payment Submitted!",
+      description: "Your payment will be verified within 24 hours.",
     });
 
+    // Reset form after 5 seconds and close modal
     setTimeout(() => {
       setIsSuccess(false);
       onClose();
       setPaymentMethod("");
-      setCardNumber("");
-      setExpiryDate("");
-      setCvv("");
-      setAccountName("");
-      setMobileNumber("");
-    }, 2000);
-  };
-
-  const renderPaymentFields = () => {
-    switch (paymentMethod) {
-      case "card":
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="cardNumber">Card Number</Label>
-              <Input
-                id="cardNumber"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
-                placeholder="1234 5678 9012 3456"
-                maxLength={19}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="expiryDate">Expiry Date</Label>
-                <Input
-                  id="expiryDate"
-                  value={expiryDate}
-                  onChange={(e) => setExpiryDate(e.target.value)}
-                  placeholder="MM/YY"
-                  maxLength={5}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cvv">CVV</Label>
-                <Input
-                  id="cvv"
-                  value={cvv}
-                  onChange={(e) => setCvv(e.target.value)}
-                  placeholder="123"
-                  maxLength={3}
-                  type="password"
-                />
-              </div>
-            </div>
-          </div>
-        );
-      case "bank":
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="accountName">Account Holder Name</Label>
-              <Input
-                id="accountName"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-                placeholder="Enter account holder name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="accountNumber">Account Number</Label>
-              <Input
-                id="accountNumber"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
-                placeholder="Enter account number"
-              />
-            </div>
-          </div>
-        );
-      case "mobile":
-        return (
-          <div className="space-y-2">
-            <Label htmlFor="mobileNumber">Mobile Number</Label>
-            <Input
-              id="mobileNumber"
-              value={mobileNumber}
-              onChange={(e) => setMobileNumber(e.target.value)}
-              placeholder="Enter mobile number"
-            />
-          </div>
-        );
-      default:
-        return null;
-    }
+      setFullName("");
+      setProofOfPayment(null);
+    }, 5000);
   };
 
   return (
@@ -182,67 +77,32 @@ const PaymentModal = ({ isOpen, onClose, courseName, price }: PaymentModalProps)
               className="space-y-6"
             >
               <div className="space-y-2">
-                <Label>Course Price</Label>
-                <div className="text-lg font-semibold">BWP {price.toFixed(2)}</div>
+                <div className="text-lg font-semibold">Course Price: BWP {price.toFixed(2)}</div>
               </div>
 
-              <div className="space-y-4">
-                <Label>Payment Method</Label>
-                <RadioGroup
-                  value={paymentMethod}
-                  onValueChange={setPaymentMethod}
-                  className="grid gap-4"
-                >
-                  <div className="flex items-center space-x-2 rounded-lg border p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer">
-                      <CreditCard className="h-4 w-4" />
-                      Credit/Debit Card
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-lg border p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="bank" id="bank" />
-                    <Label htmlFor="bank" className="flex items-center gap-2 cursor-pointer">
-                      <Building2 className="h-4 w-4" />
-                      Bank Transfer
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-lg border p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="mobile" id="mobile" />
-                    <Label htmlFor="mobile" className="flex items-center gap-2 cursor-pointer">
-                      <Smartphone className="h-4 w-4" />
-                      Mobile Money
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
+              <PaymentMethodSelector
+                value={paymentMethod}
+                onChange={setPaymentMethod}
+              />
 
-              {renderPaymentFields()}
+              <PaymentDetails
+                paymentMethod={paymentMethod}
+                fullName={fullName}
+                onFullNameChange={setFullName}
+                proofOfPayment={proofOfPayment}
+                onProofOfPaymentChange={setProofOfPayment}
+              />
 
               <Button
                 type="submit"
                 className="w-full"
                 disabled={isProcessing}
               >
-                {isProcessing ? "Processing..." : "Complete Payment"}
+                {isProcessing ? "Processing..." : "Submit Payment"}
               </Button>
             </motion.form>
           ) : (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="flex flex-col items-center justify-center py-8"
-            >
-              <div className="rounded-full bg-green-100 p-3 mb-4">
-                <Check className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-center">
-                Payment Successful!
-              </h3>
-              <p className="text-center text-muted-foreground mt-2">
-                You are now enrolled in the course.
-              </p>
-            </motion.div>
+            <PaymentConfirmation />
           )}
         </AnimatePresence>
       </DialogContent>
