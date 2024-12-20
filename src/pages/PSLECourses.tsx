@@ -1,14 +1,24 @@
+<lov-code>
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star, School, Calculator, Languages, Beaker, Globe, BookOpen, Computer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PaymentModal from "@/components/PaymentModal";
+import FreeCourse from "@/components/FreeCourse";
 
 const PSLECourses = () => {
   const [selectedCourse, setSelectedCourse] = useState<{
     title: string;
     price: number;
+  } | null>(null);
+
+  const [selectedFreeCourse, setSelectedFreeCourse] = useState<{
+    title: string;
+    description: string;
+    videos: Array<{ title: string; duration: string; url: string }>;
+    notes: Array<{ title: string; url: string }>;
+    documents: Array<{ title: string; url: string }>;
   } | null>(null);
 
   const courses = [
@@ -62,74 +72,31 @@ const PSLECourses = () => {
     }
   ];
 
-  return (
-    <div className="min-h-screen bg-background p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6 max-w-4xl mx-auto"
-      >
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">PSLE Courses</h1>
-            <p className="text-muted-foreground">
-              Prepare for your Primary School Leaving Examination with our engaging courses
-            </p>
-          </div>
-          <School className="h-12 w-12 text-primary" />
-        </div>
-
-        <div className="grid gap-6">
-          {courses.map((course, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className={`overflow-hidden transition-all duration-300 ${course.color}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-4 flex-1">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <course.icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <h2 className="text-xl font-semibold">{course.title}</h2>
-                      </div>
-                      <p className="text-muted-foreground">{course.description}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-lg">BWP {course.price.toFixed(2)}</span>
-                        <div className="flex items-center gap-1">
-                          <span>{course.rating}</span>
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        </div>
-                      </div>
-                      <Button 
-                        className="w-full bg-primary hover:bg-primary/90"
-                        onClick={() => setSelectedCourse(course)}
-                      >
-                        Enroll Now
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {selectedCourse && (
-        <PaymentModal
-          isOpen={!!selectedCourse}
-          onClose={() => setSelectedCourse(null)}
-          courseName={selectedCourse.title}
-          price={selectedCourse.price}
-        />
-      )}
-    </div>
-  );
-};
-
-export default PSLECourses;
+  const freeCourses = [
+    {
+      title: "Introduction to Mathematics",
+      description: "Basic mathematics for primary school students",
+      videos: [
+        { 
+          title: "Basic Numbers", 
+          duration: "10:30",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Simple Addition", 
+          duration: "15:45",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        }
+      ],
+      notes: [
+        { title: "Math Basics", url: "/notes/primary-math.pdf" },
+        { title: "Practice Sheets", url: "/notes/practice-sheets.pdf" }
+      ],
+      documents: [
+        { title: "Study Guide", url: "/docs/primary-guide.pdf" },
+        { title: "Workbook", url: "/docs/primary-workbook.pdf" }
+      ]
+    },
+    {
+      title: "Basic English",
+      description: "Fundamental English

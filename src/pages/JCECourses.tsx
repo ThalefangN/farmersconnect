@@ -1,14 +1,24 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Book, Calculator, Languages, Beaker, Globe, Sprout } from "lucide-react";
+import { Star, Book, Calculator, Languages, Beaker, Globe, ChartBar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PaymentModal from "@/components/PaymentModal";
+import FreeCourse from "@/components/FreeCourse";
+import FeaturedCourse from "@/components/courses/FeaturedCourse";
 
 const JCECourses = () => {
   const [selectedCourse, setSelectedCourse] = useState<{
     title: string;
     price: number;
+  } | null>(null);
+
+  const [selectedFreeCourse, setSelectedFreeCourse] = useState<{
+    title: string;
+    description: string;
+    videos: Array<{ title: string; duration: string; url: string }>;
+    notes: Array<{ title: string; url: string }>;
+    documents: Array<{ title: string; url: string }>;
   } | null>(null);
 
   const courses = [
@@ -43,14 +53,57 @@ const JCECourses = () => {
       rating: 4.6,
       icon: Globe,
       color: "bg-yellow-50 hover:bg-yellow-100"
+    }
+  ];
+
+  const freeCourses = [
+    {
+      title: "Basic Mathematics",
+      description: "Introduction to fundamental mathematical concepts",
+      videos: [
+        { 
+          title: "Numbers and Operations", 
+          duration: "15:30",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Basic Algebra", 
+          duration: "20:45",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        }
+      ],
+      notes: [
+        { title: "Mathematics Basics", url: "/notes/math-basics.pdf" },
+        { title: "Practice Problems", url: "/notes/practice-problems.pdf" }
+      ],
+      documents: [
+        { title: "Study Guide", url: "/docs/math-study-guide.pdf" },
+        { title: "Exercise Workbook", url: "/docs/math-workbook.pdf" }
+      ]
     },
     {
-      title: "Agriculture",
-      description: "Study agricultural practices, crop production, and animal husbandry. Features practical farming techniques and environmental conservation.",
-      price: 260.00,
-      rating: 4.5,
-      icon: Sprout,
-      color: "bg-emerald-50 hover:bg-emerald-100"
+      title: "English Fundamentals",
+      description: "Basic English language skills and grammar",
+      videos: [
+        { 
+          title: "Basic Grammar", 
+          duration: "12:15",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Reading Skills", 
+          duration: "16:40",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        }
+      ],
+      notes: [
+        { title: "Grammar Rules", url: "/notes/grammar-rules.pdf" },
+        { title: "Reading Tips", url: "/notes/reading-tips.pdf" }
+      ],
+      documents: [
+        { title: "English Workbook", url: "/docs/english-workbook.pdf" },
+        { title: "Practice Exercises", url: "/docs/english-exercises.pdf" }
+      ]
     }
   ];
 
@@ -71,44 +124,66 @@ const JCECourses = () => {
           <Book className="h-12 w-12 text-primary" />
         </div>
 
-        <div className="grid gap-6">
-          {courses.map((course, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className={`overflow-hidden transition-all duration-300 ${course.color}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-4 flex-1">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <course.icon className="h-6 w-6 text-primary" />
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Premium Courses</h2>
+            <div className="grid gap-6">
+              {courses.map((course, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <FeaturedCourse
+                    title={course.title}
+                    description={course.description}
+                    price={course.price}
+                    rating={course.rating}
+                    image={course.image}
+                    onEnroll={() => setSelectedCourse(course)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Free Courses</h2>
+            <div className="grid gap-6">
+              {freeCourses.map((course, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="overflow-hidden transition-all duration-300 bg-accent/50 hover:bg-accent">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-4 flex-1">
+                          <div className="flex items-center space-x-4">
+                            <div className="p-2 rounded-lg bg-primary/10">
+                              <Book className="h-6 w-6 text-primary" />
+                            </div>
+                            <h2 className="text-xl font-semibold">{course.title}</h2>
+                          </div>
+                          <p className="text-muted-foreground">{course.description}</p>
+                          <Button 
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => setSelectedFreeCourse(course)}
+                          >
+                            Start Learning
+                          </Button>
                         </div>
-                        <h2 className="text-xl font-semibold">{course.title}</h2>
                       </div>
-                      <p className="text-muted-foreground">{course.description}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-lg">BWP {course.price.toFixed(2)}</span>
-                        <div className="flex items-center gap-1">
-                          <span>{course.rating}</span>
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        </div>
-                      </div>
-                      <Button 
-                        className="w-full bg-primary hover:bg-primary/90"
-                        onClick={() => setSelectedCourse(course)}
-                      >
-                        Enroll Now
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </motion.div>
 
@@ -118,6 +193,14 @@ const JCECourses = () => {
           onClose={() => setSelectedCourse(null)}
           courseName={selectedCourse.title}
           price={selectedCourse.price}
+        />
+      )}
+
+      {selectedFreeCourse && (
+        <FreeCourse
+          isOpen={!!selectedFreeCourse}
+          onClose={() => setSelectedFreeCourse(null)}
+          course={selectedFreeCourse}
         />
       )}
     </div>

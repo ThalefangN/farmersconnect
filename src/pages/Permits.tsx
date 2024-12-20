@@ -1,10 +1,76 @@
 import { motion } from "framer-motion";
-import { GraduationCap, ArrowLeft, BookOpen, Award, Library } from "lucide-react";
+import { GraduationCap, ArrowLeft, BookOpen, Award, Library, Clock, Users, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const Permits = () => {
   const navigate = useNavigate();
+
+  const programs = [
+    {
+      title: "BGCSE Program",
+      description: "Botswana General Certificate of Secondary Education",
+      features: [
+        {
+          icon: BookOpen,
+          title: "Core Subjects",
+          description: "Mathematics, English, Science, Agriculture, and more"
+        },
+        {
+          icon: Clock,
+          title: "Duration",
+          description: "2-year program with flexible learning options"
+        },
+        {
+          icon: Target,
+          title: "Learning Outcomes",
+          description: "Comprehensive preparation for higher education"
+        }
+      ]
+    },
+    {
+      title: "JCE Program",
+      description: "Junior Certificate Examination",
+      features: [
+        {
+          icon: BookOpen,
+          title: "Core Subjects",
+          description: "Basic Mathematics, English, Integrated Science"
+        },
+        {
+          icon: Users,
+          title: "Support",
+          description: "Dedicated tutors and study groups"
+        },
+        {
+          icon: Library,
+          title: "Resources",
+          description: "Interactive content and practice materials"
+        }
+      ]
+    },
+    {
+      title: "PSLE Program",
+      description: "Primary School Leaving Examination",
+      features: [
+        {
+          icon: BookOpen,
+          title: "Core Subjects",
+          description: "Mathematics, English, Science, Setswana"
+        },
+        {
+          icon: Award,
+          title: "Achievement",
+          description: "Foundation for academic excellence"
+        },
+        {
+          icon: Target,
+          title: "Goals",
+          description: "Building essential learning skills"
+        }
+      ]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -28,91 +94,44 @@ const Permits = () => {
             Academic Programs
           </h1>
           <p className="text-muted-foreground mt-2">
-            Explore our comprehensive educational programs
+            Comprehensive educational programs designed for student success
           </p>
         </div>
 
         <div className="grid gap-6">
-          <div className="bg-card rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              BGCSE Program
-            </h2>
-            <ul className="space-y-4">
-              <li className="flex items-center gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Award className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Core Subjects</h3>
-                  <p className="text-sm text-muted-foreground">Mathematics, English, Science, Agriculture</p>
-                </div>
-              </li>
-              <li className="flex items-center gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Library className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Study Resources</h3>
-                  <p className="text-sm text-muted-foreground">Past papers, Video tutorials, Study guides</p>
-                </div>
-              </li>
-            </ul>
-          </div>
+          {programs.map((program, index) => (
+            <motion.div
+              key={program.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <h2 className="text-xl font-semibold mb-2">{program.title}</h2>
+              <p className="text-muted-foreground mb-4">{program.description}</p>
+              
+              <div className="grid gap-4">
+                {program.features.map((feature, featureIndex) => (
+                  <div key={featureIndex} className="flex items-start gap-4">
+                    <div className="bg-primary/10 p-3 rounded-lg">
+                      <feature.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">{feature.title}</h3>
+                      <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-          <div className="bg-card rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              JCE Program
-            </h2>
-            <ul className="space-y-4">
-              <li className="flex items-center gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Award className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Core Subjects</h3>
-                  <p className="text-sm text-muted-foreground">Basic Mathematics, English, Integrated Science</p>
-                </div>
-              </li>
-              <li className="flex items-center gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Library className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Learning Materials</h3>
-                  <p className="text-sm text-muted-foreground">Interactive content, Practice tests, Study notes</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-card rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              PSLE Program
-            </h2>
-            <ul className="space-y-4">
-              <li className="flex items-center gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Award className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Core Subjects</h3>
-                  <p className="text-sm text-muted-foreground">Mathematics, English, Science, Setswana</p>
-                </div>
-              </li>
-              <li className="flex items-center gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Library className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Learning Tools</h3>
-                  <p className="text-sm text-muted-foreground">Educational games, Visual aids, Practice exercises</p>
-                </div>
-              </li>
-            </ul>
-          </div>
+              <Button 
+                className="w-full mt-4"
+                onClick={() => navigate(`/${program.title.split(' ')[0].toLowerCase()}-courses`)}
+              >
+                Explore Courses
+              </Button>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
     </div>
