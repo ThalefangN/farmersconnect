@@ -1,4 +1,3 @@
-<lov-code>
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star, School, Calculator, Languages, Beaker, Globe, BookOpen, Computer } from "lucide-react";
@@ -99,4 +98,147 @@ const PSLECourses = () => {
     },
     {
       title: "Basic English",
-      description: "Fundamental English
+      description: "Fundamental English language skills",
+      videos: [
+        { 
+          title: "Alphabet Sounds", 
+          duration: "12:20",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        },
+        { 
+          title: "Basic Vocabulary", 
+          duration: "15:10",
+          url: "https://youtu.be/QpDyxlCclMk?si=IWk1hAfa3UKFmlz2"
+        }
+      ],
+      notes: [
+        { title: "English Basics", url: "/notes/english-basics.pdf" },
+        { title: "Vocabulary List", url: "/notes/vocabulary.pdf" }
+      ],
+      documents: [
+        { title: "Learning Guide", url: "/docs/english-guide.pdf" },
+        { title: "Practice Book", url: "/docs/practice-book.pdf" }
+      ]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-background p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6 max-w-4xl mx-auto"
+      >
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">PSLE Courses</h1>
+            <p className="text-muted-foreground">
+              Prepare for your Primary School Leaving Examination with our comprehensive courses
+            </p>
+          </div>
+          <School className="h-12 w-12 text-primary" />
+        </div>
+
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Premium Courses</h2>
+            <div className="grid gap-6">
+              {courses.map((course, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className={`overflow-hidden transition-all duration-300 ${course.color}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-4 flex-1">
+                          <div className="flex items-center space-x-4">
+                            <div className="p-2 rounded-lg bg-primary/10">
+                              <course.icon className="h-6 w-6 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-semibold">{course.title}</h3>
+                              <div className="flex items-center mt-1">
+                                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                                <span className="text-sm text-muted-foreground ml-1">{course.rating}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-muted-foreground">{course.description}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-semibold">P{course.price.toFixed(2)}</span>
+                            <Button onClick={() => setSelectedCourse(course)}>
+                              Enroll Now
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Free Courses</h2>
+            <div className="grid gap-6">
+              {freeCourses.map((course, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="overflow-hidden transition-all duration-300 bg-accent/50 hover:bg-accent">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-4 flex-1">
+                          <div className="flex items-center space-x-4">
+                            <div className="p-2 rounded-lg bg-primary/10">
+                              <School className="h-6 w-6 text-primary" />
+                            </div>
+                            <h2 className="text-xl font-semibold">{course.title}</h2>
+                          </div>
+                          <p className="text-muted-foreground">{course.description}</p>
+                          <Button 
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => setSelectedFreeCourse(course)}
+                          >
+                            Start Learning
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {selectedCourse && (
+        <PaymentModal
+          isOpen={!!selectedCourse}
+          onClose={() => setSelectedCourse(null)}
+          courseName={selectedCourse.title}
+          price={selectedCourse.price}
+        />
+      )}
+
+      {selectedFreeCourse && (
+        <FreeCourse
+          isOpen={!!selectedFreeCourse}
+          onClose={() => setSelectedFreeCourse(null)}
+          course={selectedFreeCourse}
+        />
+      )}
+    </div>
+  );
+};
+
+export default PSLECourses;
