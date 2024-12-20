@@ -13,19 +13,19 @@ const Services = () => {
       title: "Online Courses",
       description: "Access our wide range of online courses and learning materials",
       icon: BookOpen,
-      path: "/driving-services"
+      path: "/jce-courses"
     },
     {
       title: "Academic Programs",
       description: "Browse and enroll in academic programs and certifications",
       icon: GraduationCap,
-      path: "/permits"
+      path: "/bgcse-courses"
     },
     {
       title: "Digital Library",
       description: "Access our extensive collection of digital learning resources",
       icon: Library,
-      path: "/vehicle-registration"
+      path: "/past-exams"
     },
     {
       title: "Student Support",

@@ -1,8 +1,37 @@
 import { motion } from "framer-motion";
-import { Sprout } from "lucide-react";
+import { Sprout, Tool, Seedling, MapPin } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Resources = () => {
+  const navigate = useNavigate();
+
+  const resources = [
+    {
+      title: "Farming Equipment",
+      description: "Access and share agricultural machinery and tools",
+      icon: Tool,
+      details: "Browse available tractors, harvesters, irrigation systems, and more",
+      path: "/resources/equipment"
+    },
+    {
+      title: "Seeds and Plants",
+      description: "Exchange quality seeds and seedlings",
+      icon: Seedling,
+      details: "Find certified seeds, share successful varieties, and connect with seed suppliers",
+      path: "/resources/seeds"
+    },
+    {
+      title: "Land Resources",
+      description: "Discover available farming land",
+      icon: MapPin,
+      details: "Explore arable land for lease or purchase, soil quality information, and water sources",
+      path: "/resources/land"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
       <div className="p-4 space-y-6">
@@ -17,25 +46,47 @@ const Resources = () => {
           </div>
           
           <div className="bg-white rounded-lg p-6 shadow-md">
-            <p className="text-gray-600">
-              Share and access farming resources and equipment with other farmers in your area.
+            <p className="text-gray-600 text-lg">
+              Connect with other farmers to share and access essential farming resources. 
+              Our platform facilitates efficient resource allocation and community collaboration.
             </p>
           </div>
 
-          {/* Placeholder for resources */}
-          <div className="grid gap-4">
-            <div className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
-              <h3 className="font-semibold text-green-800">Farming Equipment</h3>
-              <p className="text-sm text-gray-600">Available tools and machinery</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
-              <h3 className="font-semibold text-green-800">Seeds and Plants</h3>
-              <p className="text-sm text-gray-600">Sharing seeds and seedlings</p>
-            </div>
-            <div className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
-              <h3 className="font-semibold text-green-800">Land Resources</h3>
-              <p className="text-sm text-gray-600">Available farming land</p>
-            </div>
+          <div className="grid gap-6">
+            {resources.map((resource, index) => (
+              <motion.div
+                key={resource.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card 
+                  className="hover:shadow-lg transition-all cursor-pointer"
+                  onClick={() => navigate(resource.path)}
+                >
+                  <CardHeader>
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-green-100 p-3 rounded-lg">
+                        <resource.icon className="h-6 w-6 text-green-700" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl text-green-800">{resource.title}</CardTitle>
+                        <CardDescription className="text-green-600">{resource.description}</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">{resource.details}</p>
+                    <Button 
+                      className="mt-4 w-full bg-green-600 hover:bg-green-700"
+                      onClick={() => navigate(resource.path)}
+                    >
+                      Explore {resource.title}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
