@@ -33,19 +33,19 @@ const ServiceCard = ({ title, description, icon: Icon, path }: ServiceCardProps)
 
   return (
     <Card 
-      className={`hover:bg-accent transition-colors cursor-pointer ${
+      className={`hover:bg-green-50 transition-colors cursor-pointer border-green-100 ${
         !isOnline ? "opacity-50 cursor-not-allowed" : ""
       }`}
       onClick={handleClick}
     >
       <CardHeader>
         <div className="flex items-start space-x-4">
-          <div className="bg-primary/10 p-3 rounded-lg">
-            <Icon className="h-6 w-6 text-primary" />
+          <div className="bg-green-100 p-3 rounded-lg">
+            <Icon className="h-6 w-6 text-green-700" />
           </div>
           <div className="space-y-1">
-            <CardTitle className="text-lg">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
+            <CardTitle className="text-lg text-green-800">{title}</CardTitle>
+            <CardDescription className="text-green-600">{description}</CardDescription>
           </div>
         </div>
       </CardHeader>
