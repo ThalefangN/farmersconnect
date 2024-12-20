@@ -36,6 +36,20 @@ const PROTECTED_ROUTES = [
   '/verify',
   '/add-course',
   '/report-issue',
+  '/digital-id',
+  '/profile',
+  '/notifications',
+  '/services',
+  '/permits',
+  '/vehicle-registration',
+  '/road-tax',
+];
+
+// Routes accessible offline
+const OFFLINE_ACCESSIBLE_ROUTES = [
+  '/bgcse-courses',
+  '/jce-courses',
+  '/psle-courses',
 ];
 
 const AppContent = () => {
@@ -46,7 +60,7 @@ const AppContent = () => {
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (!isOnline) {
+      if (!isOnline && !OFFLINE_ACCESSIBLE_ROUTES.includes(location.pathname)) {
         e.preventDefault();
         e.returnValue = '';
         return '';
@@ -54,11 +68,11 @@ const AppContent = () => {
     };
 
     const handlePopState = (e: PopStateEvent) => {
-      if (!isOnline) {
+      if (!isOnline && !OFFLINE_ACCESSIBLE_ROUTES.includes(location.pathname)) {
         e.preventDefault();
         toast({
           title: "Navigation Restricted",
-          description: "You're offline. Please connect to the internet to navigate.",
+          description: "You're offline. Only online courses are accessible.",
           variant: "destructive",
         });
         window.history.pushState(null, '', window.location.pathname);
@@ -69,16 +83,16 @@ const AppContent = () => {
     window.addEventListener('popstate', handlePopState);
 
     // Prevent back navigation when offline
-    if (!isOnline) {
+    if (!isOnline && !OFFLINE_ACCESSIBLE_ROUTES.includes(location.pathname)) {
       window.history.pushState(null, '', window.location.pathname);
     }
 
     // Check if current route is protected and user is offline
     if (!isOnline && PROTECTED_ROUTES.includes(location.pathname)) {
-      navigate('/home');
+      navigate('/bgcse-courses');
       toast({
         title: "Access Restricted",
-        description: "This feature requires an internet connection.",
+        description: "Only online courses are accessible while offline.",
         variant: "destructive",
       });
     }

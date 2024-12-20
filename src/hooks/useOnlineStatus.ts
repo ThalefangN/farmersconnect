@@ -16,6 +16,10 @@ export const useOnlineStatus = () => {
     const handleOffline = () => {
       setIsOnline(false);
       localStorage.setItem("isOnline", "false");
+      
+      // Show a message when going offline
+      const event = new CustomEvent('offlineStatusChange', { detail: { isOnline: false } });
+      window.dispatchEvent(event);
     };
 
     window.addEventListener("online", handleOnline);
