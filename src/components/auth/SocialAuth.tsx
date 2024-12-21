@@ -8,6 +8,7 @@ export const SocialAuth = () => {
 
   const handleSocialLogin = async (provider: 'facebook' | 'google') => {
     try {
+      console.log(`Attempting ${provider} login...`);
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -17,11 +18,19 @@ export const SocialAuth = () => {
 
       if (error) {
         console.error(`${provider} login error:`, error);
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
+        if (error.message.includes("provider is not enabled")) {
+          toast({
+            title: "Provider Not Enabled",
+            description: `${provider} login is not enabled. Please contact the administrator.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error(`Unexpected error during ${provider} login:`, error);
