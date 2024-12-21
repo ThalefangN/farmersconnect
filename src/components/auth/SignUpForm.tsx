@@ -58,6 +58,7 @@ export const SignUpForm = () => {
             location: formData.location,
             farming_type: formData.farmingType,
           },
+          emailRedirectTo: `${window.location.origin}/signin`,
         },
       });
 
@@ -72,9 +73,21 @@ export const SignUpForm = () => {
       }
 
       console.log("Signup successful:", data);
+      
+      // Check if email confirmation is required
+      if (data?.user?.identities?.length === 0) {
+        toast({
+          title: "Error",
+          description: "This email is already registered. Please sign in instead.",
+          variant: "destructive",
+        });
+        navigate("/signin");
+        return;
+      }
+
       toast({
         title: "Success",
-        description: "Account created successfully! Please verify your email before signing in.",
+        description: "Account created successfully! Please check your email to verify your account before signing in.",
       });
       
       navigate("/signin");

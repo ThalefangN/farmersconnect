@@ -44,7 +44,7 @@ const SignIn = () => {
         console.log("Email not verified");
         toast({
           title: "Email Not Verified",
-          description: "Please check your email and verify your account before signing in.",
+          description: "Please check your email and verify your account before signing in. Need a new verification link? Click 'Resend' below.",
           variant: "destructive",
         });
         return;
@@ -66,6 +66,40 @@ const SignIn = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!formData.email) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: formData.email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/signin`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Verification email has been resent. Please check your inbox.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -125,6 +159,14 @@ const SignIn = () => {
           >
             {loading ? "Signing In..." : "Sign In"}
           </Button>
+
+          <button
+            type="button"
+            onClick={handleResendVerification}
+            className="w-full text-sm text-green-700 hover:underline"
+          >
+            Resend verification email
+          </button>
         </form>
 
         <SocialAuth />
