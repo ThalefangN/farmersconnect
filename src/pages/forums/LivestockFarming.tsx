@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import ForumPost from "@/components/ForumPost";
+import { uploadImage } from "@/utils/fileUpload";
 
 const LivestockFarming = () => {
   const navigate = useNavigate();
@@ -17,70 +18,71 @@ const LivestockFarming = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadPosts = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/signin');
+        return;
+      }
+      setCurrentUser(user);
+
+      const { data: postsData, error: postsError } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles:user_id (
+            full_name
+          ),
+          likes:likes (
+            id
+          ),
+          comments:comments (
+            id
+          )
+        `)
+        .eq('category', 'livestock')
+        .order('created_at', { ascending: false });
+
+      if (postsError) throw postsError;
+
+      const postsWithLikes = await Promise.all(
+        (postsData || []).map(async (post) => {
+          const { data: userLike } = await supabase
+            .from('likes')
+            .select('id')
+            .eq('post_id', post.id)
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          return {
+            ...post,
+            isLiked: !!userLike,
+            likesCount: post.likes?.length || 0,
+            commentsCount: post.comments?.length || 0,
+          };
+        })
+      );
+
+      setPosts(postsWithLikes);
+    } catch (error) {
+      console.error('Error loading posts:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load posts. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          navigate('/signin');
-          return;
-        }
-        setCurrentUser(user);
-
-        const { data: postsData, error: postsError } = await supabase
-          .from('posts')
-          .select(`
-            *,
-            profiles:user_id (
-              full_name
-            ),
-            likes:likes (
-              id
-            ),
-            comments:comments (
-              id
-            )
-          `)
-          .eq('category', 'livestock')
-          .order('created_at', { ascending: false });
-
-        if (postsError) throw postsError;
-
-        const postsWithLikes = await Promise.all(
-          (postsData || []).map(async (post) => {
-            const { data: userLike } = await supabase
-              .from('likes')
-              .select('id')
-              .eq('post_id', post.id)
-              .eq('user_id', user.id)
-              .single();
-
-            return {
-              ...post,
-              isLiked: !!userLike,
-              likesCount: post.likes?.length || 0,
-              commentsCount: post.comments?.length || 0,
-            };
-          })
-        );
-
-        setPosts(postsWithLikes);
-      } catch (error) {
-        console.error('Error loading posts:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load posts. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadPosts();
 
-    // Subscribe to realtime updates
     const channel = supabase
       .channel('public:posts')
       .on(
@@ -102,22 +104,48 @@ const LivestockFarming = () => {
     };
   }, [navigate, toast]);
 
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPost.trim()) return;
 
     try {
+      setIsLoading(true);
+      let imageUrl = null;
+      
+      if (selectedFile) {
+        imageUrl = await uploadImage(selectedFile);
+      }
+
       const { error } = await supabase
         .from('posts')
         .insert({
           content: newPost.trim(),
           category: 'livestock',
-          user_id: currentUser.id
+          user_id: currentUser.id,
+          image_url: imageUrl
         });
 
       if (error) throw error;
 
       setNewPost("");
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      await loadPosts();
+      
       toast({
         title: "Success",
         description: "Post created successfully",
@@ -129,6 +157,8 @@ const LivestockFarming = () => {
         description: "Failed to create post. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -164,11 +194,23 @@ const LivestockFarming = () => {
                 className="min-h-[100px]"
               />
               <div className="flex justify-between items-center">
-                <Button variant="outline" type="button">
-                  <ImageIcon className="mr-2 h-4 w-4" />
-                  Add Image
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleFileSelect}
+                  className="flex items-center space-x-2"
+                >
+                  <ImageIcon className="h-4 w-4" />
+                  <span>{selectedFile ? selectedFile.name : 'Add Image'}</span>
                 </Button>
-                <Button type="submit">
+                <Button type="submit" disabled={isLoading}>
                   <Send className="mr-2 h-4 w-4" />
                   Post
                 </Button>
