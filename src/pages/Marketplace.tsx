@@ -19,12 +19,18 @@ const Marketplace = () => {
       setIsLoading(true);
       const imageUrl = await uploadImage(file, 'marketplace');
       
-      // Here you would typically save the post with the image URL
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) {
+        throw new Error('User not authenticated');
+      }
+
       const { error } = await supabase
         .from('posts')
         .insert({
           image_url: imageUrl,
-          category: 'marketplace'
+          category: 'marketplace',
+          content: 'New marketplace item', // Required field
+          user_id: user.data.user.id // Required field
         });
 
       if (error) throw error;
