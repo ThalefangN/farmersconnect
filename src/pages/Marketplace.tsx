@@ -1,12 +1,49 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, Leaf, Wrench, Package } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { uploadImage } from "@/utils/fileUpload";
 
 const Marketplace = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      setIsLoading(true);
+      const imageUrl = await uploadImage(file, 'marketplace');
+      
+      // Here you would typically save the post with the image URL
+      const { error } = await supabase
+        .from('posts')
+        .insert({
+          image_url: imageUrl,
+          category: 'marketplace'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error handling image upload:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const categories = [
     {
@@ -80,6 +117,7 @@ const Marketplace = () => {
                     <Button 
                       className="mt-4 w-full bg-green-600 hover:bg-green-700"
                       onClick={() => navigate(category.path)}
+                      disabled={isLoading}
                     >
                       Browse {category.title}
                     </Button>
