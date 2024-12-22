@@ -1,42 +1,139 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Leaf, MessageSquare, Send, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Leaf, Send, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
+import ForumPost from "@/components/ForumPost";
 
 const CropCultivation = () => {
   const navigate = useNavigate();
   const [newPost, setNewPost] = useState("");
+  const [posts, setPosts] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Placeholder data for forum posts
-  const forumPosts = [
-    {
-      id: 1,
-      author: "Maria Gardens",
-      content: "What's the best time to plant maize in the central region? Looking for advice from experienced farmers.",
-      timestamp: "1 hour ago",
-      likes: 15,
-      replies: 7,
-      image: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2"
-    },
-    {
-      id: 2,
-      author: "Peter Fields",
-      content: "Has anyone tried companion planting with their vegetables? What combinations work best?",
-      timestamp: "3 hours ago",
-      likes: 10,
-      replies: 4,
-      image: "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8"
-    }
-  ];
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          navigate('/signin');
+          return;
+        }
+        setCurrentUser(user);
 
-  const handleSubmitPost = (e: React.FormEvent) => {
+        const { data: postsData, error: postsError } = await supabase
+          .from('posts')
+          .select(`
+            *,
+            profiles:user_id (
+              full_name
+            ),
+            likes:likes (
+              id
+            ),
+            comments:comments (
+              id
+            )
+          `)
+          .eq('category', 'crops')
+          .order('created_at', { ascending: false });
+
+        if (postsError) throw postsError;
+
+        const postsWithLikes = await Promise.all(
+          (postsData || []).map(async (post) => {
+            const { data: userLike } = await supabase
+              .from('likes')
+              .select('id')
+              .eq('post_id', post.id)
+              .eq('user_id', user.id)
+              .single();
+
+            return {
+              ...post,
+              isLiked: !!userLike,
+              likesCount: post.likes?.length || 0,
+              commentsCount: post.comments?.length || 0,
+            };
+          })
+        );
+
+        setPosts(postsWithLikes);
+      } catch (error) {
+        console.error('Error loading posts:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load posts. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPosts();
+
+    // Subscribe to realtime updates
+    const channel = supabase
+      .channel('public:posts')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'posts',
+          filter: `category=eq.crops`
+        },
+        () => {
+          loadPosts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [navigate, toast]);
+
+  const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("New post:", newPost);
-    setNewPost("");
+    if (!newPost.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .insert({
+          content: newPost.trim(),
+          category: 'crops',
+          user_id: currentUser.id
+        });
+
+      if (error) throw error;
+
+      setNewPost("");
+      toast({
+        title: "Success",
+        description: "Post created successfully",
+      });
+    } catch (error) {
+      console.error('Error creating post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeletePost = (postId: string) => {
+    setPosts(posts.filter(post => post.id !== postId));
   };
 
   return (
@@ -57,11 +154,11 @@ const CropCultivation = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-semibold text-green-800 mb-4">Start a Discussion</h2>
+          <Card className="bg-white p-6 shadow-md">
+            <h2 className="text-xl font-semibold text-green-800 mb-4">Share Your Thoughts</h2>
             <form onSubmit={handleSubmitPost} className="space-y-4">
               <Textarea
-                placeholder="Share your thoughts, questions, or experiences about crop farming..."
+                placeholder="Share your thoughts, questions, or experiences..."
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
                 className="min-h-[100px]"
@@ -77,39 +174,30 @@ const CropCultivation = () => {
                 </Button>
               </div>
             </form>
-          </div>
+          </Card>
 
-          <div className="space-y-4">
-            {forumPosts.map((post) => (
-              <Card key={post.id} className="p-4">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-green-800">{post.author}</h3>
-                      <p className="text-sm text-gray-500">{post.timestamp}</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-700">{post.content}</p>
-                  {post.image && (
-                    <img 
-                      src={post.image} 
-                      alt="Post attachment" 
-                      className="rounded-lg w-full h-48 object-cover"
-                    />
-                  )}
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <Button variant="ghost" size="sm">
-                      👍 {post.likes}
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MessageSquare className="h-4 w-4 mr-1" />
-                      {post.replies} Replies
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-4">Loading posts...</div>
+          ) : (
+            <div className="space-y-4">
+              {posts.map((post) => (
+                <ForumPost
+                  key={post.id}
+                  id={post.id}
+                  content={post.content}
+                  authorId={post.user_id}
+                  authorName={post.profiles?.full_name}
+                  createdAt={post.created_at}
+                  imageUrl={post.image_url}
+                  likesCount={post.likesCount}
+                  commentsCount={post.commentsCount}
+                  isLiked={post.isLiked}
+                  currentUserId={currentUser?.id}
+                  onDelete={() => handleDeletePost(post.id)}
+                />
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
       <BottomNav />
