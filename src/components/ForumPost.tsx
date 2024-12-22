@@ -71,10 +71,29 @@ const ForumPost = ({
 
   const handleDelete = async () => {
     try {
-      await supabase
+      // Start a transaction by deleting likes first
+      const { error: likesError } = await supabase
+        .from('likes')
+        .delete()
+        .eq('post_id', id);
+
+      if (likesError) throw likesError;
+
+      // Then delete comments
+      const { error: commentsError } = await supabase
+        .from('comments')
+        .delete()
+        .eq('post_id', id);
+
+      if (commentsError) throw commentsError;
+
+      // Finally delete the post
+      const { error: postError } = await supabase
         .from('posts')
         .delete()
-        .match({ id });
+        .eq('id', id);
+
+      if (postError) throw postError;
       
       onDelete?.();
       toast({
