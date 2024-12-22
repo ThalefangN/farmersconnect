@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, ThumbsUp, Trash2, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
+import PostHeader from "./forum/PostHeader";
+import PostActions from "./forum/PostActions";
+import CommentSection from "./forum/CommentSection";
 
 interface ForumPostProps {
   id: string;
@@ -35,19 +34,26 @@ const ForumPost = ({
   onDelete,
   currentUserId
 }: ForumPostProps) => {
-  const [isCommenting, setIsCommenting] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState<any[]>([]);
   const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
   const { toast } = useToast();
 
   const handleLike = async () => {
     try {
       if (isLiked) {
-        await supabase
+        const { data } = await supabase
           .from('likes')
-          .delete()
-          .match({ post_id: id, user_id: currentUserId });
+          .select('id')
+          .eq('post_id', id)
+          .eq('user_id', currentUserId)
+          .maybeSingle();
+
+        if (data) {
+          await supabase
+            .from('likes')
+            .delete()
+            .eq('id', data.id);
+        }
       } else {
         await supabase
           .from('likes')
@@ -110,21 +116,18 @@ const ForumPost = ({
     }
   };
 
-  const handleComment = async () => {
-    if (!newComment.trim()) return;
-
+  const handleAddComment = async (content: string) => {
     try {
       const { error } = await supabase
         .from('comments')
         .insert({
           post_id: id,
           user_id: currentUserId,
-          content: newComment.trim()
+          content: content.trim()
         });
 
       if (error) throw error;
 
-      setNewComment("");
       loadComments();
       toast({
         title: "Success",
@@ -155,24 +158,13 @@ const ForumPost = ({
     >
       <Card className="p-4">
         <div className="space-y-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-semibold text-green-800">{authorName}</h3>
-              <p className="text-sm text-gray-500">
-                {format(new Date(createdAt), 'MMM d, yyyy h:mm a')}
-              </p>
-            </div>
-            {currentUserId === authorId && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleDelete}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <PostHeader
+            authorName={authorName}
+            createdAt={createdAt}
+            authorId={authorId}
+            currentUserId={currentUserId}
+            onDelete={handleDelete}
+          />
 
           <p className="text-gray-700">{content}</p>
 
@@ -184,52 +176,19 @@ const ForumPost = ({
             />
           )}
 
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLike}
-              className={isLiked ? "text-green-600" : ""}
-            >
-              <ThumbsUp className="h-4 w-4 mr-1" />
-              {likesCount}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={toggleComments}>
-              <MessageSquare className="h-4 w-4 mr-1" />
-              {commentsCount} Comments
-            </Button>
-          </div>
+          <PostActions
+            likesCount={likesCount}
+            commentsCount={commentsCount}
+            isLiked={isLiked}
+            onLike={handleLike}
+            onToggleComments={toggleComments}
+          />
 
           {showComments && (
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Textarea
-                  placeholder="Add a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="flex-1"
-                />
-                <Button onClick={handleComment}>
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {comments.map((comment) => (
-                <Card key={comment.id} className="p-3">
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <h4 className="font-medium text-sm">
-                        {comment.profiles?.full_name}
-                      </h4>
-                      <span className="text-xs text-gray-500">
-                        {format(new Date(comment.created_at), 'MMM d, yyyy')}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-700">{comment.content}</p>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            <CommentSection
+              comments={comments}
+              onAddComment={handleAddComment}
+            />
           )}
         </div>
       </Card>
