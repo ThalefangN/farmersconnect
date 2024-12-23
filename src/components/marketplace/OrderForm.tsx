@@ -49,7 +49,8 @@ const OrderForm = ({ isOpen, onClose, product, selectedQuantity }: OrderFormProp
           total_amount: totalAmount,
           delivery_address: formData.location,
           whatsapp_number: formData.whatsappNumber,
-          status: 'pending'
+          status: 'pending',
+          delivery_type: 'standard' // Adding the required delivery_type field
         });
 
       if (orderError) throw orderError;

@@ -12,7 +12,17 @@ import { useState, useEffect } from "react";
 
 interface Order {
   id: string;
+  product_id: string;
+  buyer_id: string;
+  seller_id: string;
+  quantity: number;
+  total_amount: number;
+  status: string;
+  whatsapp_number: string;
+  delivery_address: string;
+  created_at: string;
   product: {
+    id: string;
     title: string;
     price: number;
     unit_type: string;
@@ -20,12 +30,6 @@ interface Order {
   buyer: {
     full_name: string;
   };
-  quantity: number;
-  total_amount: number;
-  status: string;
-  whatsapp_number: string;
-  delivery_address: string;
-  created_at: string;
 }
 
 const Notifications = () => {
@@ -50,7 +54,7 @@ const Notifications = () => {
         .from('orders')
         .select(`
           *,
-          product:products(title, price, unit_type),
+          product:products(id, title, price, unit_type),
           buyer:profiles!buyer_id(full_name)
         `)
         .or(`seller_id.eq.${userId},buyer_id.eq.${userId}`)
@@ -75,13 +79,12 @@ const Notifications = () => {
       if (orderError) throw orderError;
 
       if (action === 'approve') {
-        // Update product quantity
         const { error: productError } = await supabase
           .from('products')
           .update({
             quantity: supabase.raw(`quantity - ${order.quantity}`)
           })
-          .eq('id', order.product.id);
+          .eq('id', order.product_id);
 
         if (productError) throw productError;
       }
