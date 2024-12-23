@@ -100,6 +100,7 @@ export type Database = {
           status: string
           total_amount: number
           updated_at: string
+          whatsapp_number: string | null
         }
         Insert: {
           buyer_id: string
@@ -113,6 +114,7 @@ export type Database = {
           status?: string
           total_amount: number
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Update: {
           buyer_id?: string
@@ -126,6 +128,7 @@ export type Database = {
           status?: string
           total_amount?: number
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Relationships: [
           {
