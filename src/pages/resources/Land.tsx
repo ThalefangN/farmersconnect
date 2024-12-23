@@ -35,14 +35,15 @@ const LandPage = () => {
           setCurrentUser(user);
           
           const { data: landData, error } = await supabase
-            .from('land')
+            .from('equipment')
             .select(`
               *,
-              owner:profiles!land_owner_id_fkey (
+              owner:profiles!equipment_owner_id_fkey (
                 full_name,
                 phone_text
               )
-            `);
+            `)
+            .eq('type', 'land');
 
           if (error) throw error;
 
@@ -50,7 +51,7 @@ const LandPage = () => {
             id: item.id,
             name: item.name,
             description: item.description,
-            location: item.location,
+            location: item.location || 'Location not specified',
             owner: {
               name: item.owner.full_name,
               phone: item.owner.phone_text

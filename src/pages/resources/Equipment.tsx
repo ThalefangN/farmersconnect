@@ -32,48 +32,49 @@ const Equipment = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  useEffect(() => {
-    const loadEquipment = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          setCurrentUser(user);
-          
-          const { data: equipmentData, error } = await supabase
-            .from('equipment')
-            .select(`
-              *,
-              owner:profiles!equipment_owner_id_fkey (
-                full_name,
-                phone_text
-              )
-            `);
+  const loadEquipment = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUser(user);
+        
+        const { data: equipmentData, error } = await supabase
+          .from('equipment')
+          .select(`
+            *,
+            owner:profiles!equipment_owner_id_fkey (
+              full_name,
+              phone_text
+            )
+          `)
+          .neq('type', 'seeds'); // Exclude seeds from equipment list
 
-          if (error) throw error;
+        if (error) throw error;
 
-          setEquipment(equipmentData.map((item: any) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            type: item.type as 'rent' | 'sale',
-            status: item.status,
-            owner: {
-              name: item.owner.full_name,
-              phone: item.owner.phone_text
-            }
-          })));
-        }
-      } catch (error) {
-        console.error('Error loading equipment:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load equipment listings",
-          variant: "destructive",
-        });
+        setEquipment(equipmentData.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          type: item.type as 'rent' | 'sale',
+          status: item.status,
+          owner: {
+            name: item.owner.full_name,
+            phone: item.owner.phone_text
+          }
+        })));
       }
-    };
+    } catch (error) {
+      console.error('Error loading equipment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load equipment listings",
+        variant: "destructive",
+      });
+    }
+  };
 
+  useEffect(() => {
     loadEquipment();
 
     const channel = supabase
@@ -97,15 +98,18 @@ const Equipment = () => {
     setShowInquiryDialog(true);
   };
 
-  const handleListSubmit = async (formData: FormData) => {
+  const handleListSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    
     try {
       const { error } = await supabase
         .from('equipment')
         .insert({
-          name: formData.get('name'),
-          description: formData.get('description'),
-          price: formData.get('price'),
-          type: formData.get('type'),
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+          price: formData.get('price') as string,
+          type: formData.get('type') as string,
           status: 'Available',
           owner_id: currentUser.id
         });
@@ -117,6 +121,7 @@ const Equipment = () => {
         description: "Your equipment has been listed successfully.",
       });
       setShowListDialog(false);
+      loadEquipment();
     } catch (error) {
       console.error('Error listing equipment:', error);
       toast({
