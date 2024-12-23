@@ -79,11 +79,21 @@ const Notifications = () => {
       if (orderError) throw orderError;
 
       if (action === 'approve') {
-        const decrementQuery = `quantity - ${order.quantity}`;
+        // Get current product quantity first
+        const { data: productData, error: fetchError } = await supabase
+          .from('products')
+          .select('quantity')
+          .eq('id', order.product_id)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        const newQuantity = productData.quantity - order.quantity;
+
         const { error: productError } = await supabase
           .from('products')
           .update({ 
-            quantity: decrementQuery
+            quantity: newQuantity
           })
           .eq('id', order.product_id);
 
