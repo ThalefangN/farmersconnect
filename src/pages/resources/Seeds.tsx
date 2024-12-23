@@ -13,7 +13,9 @@ interface Seed {
   id: string;
   name: string;
   description: string | null;
-  type: 'sale';
+  type: string;
+  status: string;
+  owner_id: string;
 }
 
 const Seeds = () => {
@@ -32,17 +34,13 @@ const Seeds = () => {
         setCurrentUser(user);
         
         const { data: seedsData, error } = await supabase
-          .from('seeds')
-          .select('*');
+          .from('equipment')
+          .select('*')
+          .eq('type', 'seeds');
 
         if (error) throw error;
 
-        setSeeds(seedsData.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          type: item.type,
-        })));
+        setSeeds(seedsData);
       }
     } catch (error) {
       console.error('Error loading seeds:', error);
@@ -57,11 +55,13 @@ const Seeds = () => {
   const handleListSubmit = async (formData: FormData) => {
     try {
       const { error } = await supabase
-        .from('seeds')
+        .from('equipment')
         .insert({
-          name: formData.get('name'),
-          description: formData.get('description'),
-          type: 'sale',
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+          type: 'seeds',
+          price: '0',
+          status: 'Available',
           owner_id: currentUser.id
         });
 
@@ -72,6 +72,7 @@ const Seeds = () => {
         description: "Your seed has been listed successfully.",
       });
       setShowListDialog(false);
+      loadSeeds();
     } catch (error) {
       console.error('Error listing seed:', error);
       toast({

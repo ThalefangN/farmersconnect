@@ -3,15 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 interface Equipment {
-  id: number;
+  id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: string;
-  availability: string;
   type: 'rent' | 'sale';
+  status: string;
   owner: {
-    name: string;
-    phone?: string;
+    name: string | null;
+    phone?: string | null;
   };
 }
 
@@ -41,13 +41,13 @@ const EquipmentList = ({ equipment, onRent }: EquipmentListProps) => {
               <p className="text-sm">Price: {item.price}</p>
               <p className="text-sm">Owner: {item.owner.name}</p>
               <p className={`text-sm ${
-                item.availability === "Available" ? "text-green-600" : "text-red-600"
+                item.status === "Available" ? "text-green-600" : "text-red-600"
               }`}>
-                Status: {item.availability}
+                Status: {item.status}
               </p>
               <Button
                 onClick={() => onRent(item)}
-                disabled={item.availability !== "Available"}
+                disabled={item.status !== "Available"}
                 className="w-full"
               >
                 {item.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
