@@ -1,37 +1,16 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ShoppingBag, Share2, Plus, Minus, Loader2 } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Share2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
-import PaymentModal from "@/components/PaymentModal";
-import MarketplacePaymentConfirmation from "@/components/payment/MarketplacePaymentConfirmation";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-
-interface Product {
-  id: string;
-  title: string;
-  description: string | null;
-  price: number;
-  quantity: number;
-  unit_type: string;
-  location: string;
-  image_url: string | null;
-  user_id: string;
-  seller?: {
-    full_name: string | null;
-  };
-}
+import ProductCard from "@/components/marketplace/ProductCard";
 
 const Products = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['products'],
@@ -51,34 +30,9 @@ const Products = () => {
       }
 
       console.log('Products fetched:', data);
-      return data as Product[];
+      return data;
     }
   });
-
-  const handleQuantityChange = (productId: string, change: number) => {
-    setQuantities(prev => {
-      const currentQuantity = prev[productId] || 1;
-      const newQuantity = Math.max(1, Math.min(
-        currentQuantity + change,
-        products?.find(p => p.id === productId)?.quantity || 1
-      ));
-      return { ...prev, [productId]: newQuantity };
-    });
-  };
-
-  const handlePurchase = (product: Product) => {
-    const quantity = quantities[product.id] || 1;
-    if (quantity > (product.quantity || 0)) {
-      toast({
-        title: "Error",
-        description: "Selected quantity exceeds available stock",
-        variant: "destructive",
-      });
-      return;
-    }
-    setSelectedProduct(product);
-    setIsPaymentModalOpen(true);
-  };
 
   if (error) {
     toast({
@@ -134,93 +88,13 @@ const Products = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <Card className="overflow-hidden">
-                    {product.image_url && (
-                      <img 
-                        src={product.image_url} 
-                        alt={product.title}
-                        className="w-full h-48 object-cover"
-                      />
-                    )}
-                    <CardHeader>
-                      <CardTitle className="text-xl text-green-800">{product.title}</CardTitle>
-                      <CardDescription className="text-green-600">{product.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 mb-4">
-                        <p className="text-gray-600">
-                          <strong>Price:</strong> BWP {product.price} per {product.unit_type}
-                        </p>
-                        <p className="text-gray-600">
-                          <strong>Available:</strong> {product.quantity} {product.unit_type}
-                        </p>
-                        <p className="text-gray-600">
-                          <strong>Seller:</strong> {product.seller?.full_name || "Anonymous"}
-                        </p>
-                        <p className="text-gray-600">
-                          <strong>Location:</strong> {product.location}
-                        </p>
-                        
-                        <div className="flex items-center space-x-4 mt-4">
-                          <span className="text-gray-600"><strong>Quantity:</strong></span>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleQuantityChange(product.id, -1)}
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="w-8 text-center">
-                              {quantities[product.id] || 1}
-                            </span>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleQuantityChange(product.id, 1)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <p className="text-gray-600 font-semibold mt-2">
-                          <strong>Total:</strong> BWP {product.price * (quantities[product.id] || 1)}
-                        </p>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button 
-                          className="flex-1 bg-green-600 hover:bg-green-700"
-                          onClick={() => handlePurchase(product)}
-                        >
-                          Purchase
-                        </Button>
-                        <Button variant="outline" className="flex-1">
-                          Contact Seller
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <ProductCard product={product} />
                 </motion.div>
               ))}
             </div>
           )}
         </motion.div>
       </div>
-
-      {selectedProduct && (
-        <PaymentModal
-          isOpen={isPaymentModalOpen}
-          onClose={() => {
-            setIsPaymentModalOpen(false);
-            setSelectedProduct(null);
-          }}
-          courseName={`${selectedProduct.title} (${quantities[selectedProduct.id] || 1} ${selectedProduct.unit_type})`}
-          price={selectedProduct.price * (quantities[selectedProduct.id] || 1)}
-          confirmationComponent={MarketplacePaymentConfirmation}
-        />
-      )}
-      
       <BottomNav />
     </div>
   );
