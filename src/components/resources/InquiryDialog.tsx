@@ -12,9 +12,10 @@ interface InquiryDialogProps {
   onClose: () => void;
   itemTitle: string;
   itemType: 'rent' | 'sale';
+  equipmentId?: string;
 }
 
-const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType }: InquiryDialogProps) => {
+const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: InquiryDialogProps) => {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -37,10 +38,10 @@ const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType }: InquiryDialogPr
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Store the request in the database
       const { error } = await supabase
         .from('equipment_requests')
         .insert({
+          equipment_id: equipmentId,
           user_id: user.id,
           full_name: formData.fullName,
           phone: formData.phone,

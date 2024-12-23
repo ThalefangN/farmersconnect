@@ -11,15 +11,15 @@ import InquiryDialog from "@/components/resources/InquiryDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Equipment {
-  id: number;
+  id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: string;
-  availability: string;
   type: 'rent' | 'sale';
+  status: string;
   owner: {
-    name: string;
-    phone?: string;
+    name: string | null;
+    phone?: string | null;
   };
 }
 
@@ -56,8 +56,8 @@ const Equipment = () => {
             name: item.name,
             description: item.description,
             price: item.price,
-            availability: item.status,
-            type: item.type,
+            type: item.type as 'rent' | 'sale',
+            status: item.status,
             owner: {
               name: item.owner.full_name,
               phone: item.owner.phone_text
@@ -76,7 +76,6 @@ const Equipment = () => {
 
     loadEquipment();
 
-    // Subscribe to real-time updates
     const channel = supabase
       .channel('equipment_changes')
       .on(
@@ -98,10 +97,7 @@ const Equipment = () => {
     setShowInquiryDialog(true);
   };
 
-  const handleListSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    
+  const handleListSubmit = async (formData: FormData) => {
     try {
       const { error } = await supabase
         .from('equipment')
@@ -191,6 +187,7 @@ const Equipment = () => {
           }}
           itemTitle={selectedEquipment.name}
           itemType={selectedEquipment.type}
+          equipmentId={selectedEquipment.id}
         />
       )}
 
