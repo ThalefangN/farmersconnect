@@ -47,7 +47,7 @@ const Equipment = () => {
               phone_text
             )
           `)
-          .neq('type', 'seeds'); // Exclude seeds from equipment list
+          .neq('type', 'seeds');
 
         if (error) throw error;
 
@@ -91,7 +91,7 @@ const Equipment = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast]);
+  }, []);
 
   const handleRent = (equipment: Equipment) => {
     setSelectedEquipment(equipment);
@@ -100,16 +100,24 @@ const Equipment = () => {
 
   const handleListSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const name = formData.get('name') as string;
+    const description = formData.get('description') as string;
+    const price = formData.get('price') as string;
+    const type = formData.get('type') as string;
+
+    console.log('Submitting equipment:', { name, description, price, type });
+
     try {
       const { error } = await supabase
         .from('equipment')
         .insert({
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
-          price: formData.get('price') as string,
-          type: formData.get('type') as string,
+          name,
+          description,
+          price,
+          type: type || 'rent',
           status: 'Available',
           owner_id: currentUser.id
         });
