@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,6 +18,7 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [type, setType] = useState("rent");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,6 +48,7 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
     setName("");
     setDescription("");
     setPrice("");
+    setType("rent");
   };
 
   return (
@@ -88,7 +91,18 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
               required
             />
           </div>
-          <input type="hidden" name="type" value="equipment" />
+          <div>
+            <Label htmlFor="type">Listing Type</Label>
+            <Select name="type" value={type} onValueChange={setType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="rent">For Rent</SelectItem>
+                <SelectItem value="sale">For Sale</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Button type="submit" className="w-full">Submit Listing</Button>
         </form>
       </DialogContent>
