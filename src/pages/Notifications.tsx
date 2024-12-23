@@ -79,10 +79,11 @@ const Notifications = () => {
       if (orderError) throw orderError;
 
       if (action === 'approve') {
+        const decrementQuery = `quantity - ${order.quantity}`;
         const { error: productError } = await supabase
           .from('products')
-          .update({
-            quantity: supabase.raw(`quantity - ${order.quantity}`)
+          .update({ 
+            quantity: decrementQuery
           })
           .eq('id', order.product_id);
 
