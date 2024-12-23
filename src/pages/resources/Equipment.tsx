@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Wrench, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -7,67 +7,128 @@ import BottomNav from "@/components/BottomNav";
 import RequestsDialog from "@/components/resources/RequestsDialog";
 import EquipmentList from "@/components/resources/EquipmentList";
 import ListEquipmentDialog from "@/components/resources/ListEquipmentDialog";
+import InquiryDialog from "@/components/resources/InquiryDialog";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Equipment {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  availability: string;
+  type: 'rent' | 'sale';
+  owner: {
+    name: string;
+    phone?: string;
+  };
+}
 
 const Equipment = () => {
   const { toast } = useToast();
   const [showListDialog, setShowListDialog] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
+  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  const [equipment] = useState([
-    {
-      id: 1,
-      name: "Tractor",
-      description: "Heavy-duty farming tractor",
-      price: "500/day",
-      availability: "Available",
-    },
-    {
-      id: 2,
-      name: "Harvester",
-      description: "Grain harvesting machine",
-      price: "400/day",
-      availability: "In Use",
-    },
-    {
-      id: 3,
-      name: "Plough",
-      description: "3-furrow plough",
-      price: "200/day",
-      availability: "Available",
-    },
-  ]);
+  useEffect(() => {
+    const loadEquipment = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setCurrentUser(user);
+          
+          const { data: equipmentData, error } = await supabase
+            .from('equipment')
+            .select(`
+              *,
+              owner:profiles!equipment_owner_id_fkey (
+                full_name,
+                phone_text
+              )
+            `);
 
-  const mockRequests = [
-    {
-      id: "1",
-      requesterName: "James Smith",
-      date: "2024-02-20",
-      status: "pending" as const,
-      message: "I would like to rent the tractor for 3 days starting next week."
-    },
-    {
-      id: "2",
-      requesterName: "Mary Johnson",
-      date: "2024-02-19",
-      status: "approved" as const,
-      message: "Requesting the irrigation system for my farm."
-    }
-  ];
+          if (error) throw error;
 
-  const handleRent = (equipmentName: string) => {
-    toast({
-      title: "Request Sent",
-      description: `Your request to rent the ${equipmentName} has been sent.`,
-    });
+          setEquipment(equipmentData.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            availability: item.status,
+            type: item.type,
+            owner: {
+              name: item.owner.full_name,
+              phone: item.owner.phone_text
+            }
+          })));
+        }
+      } catch (error) {
+        console.error('Error loading equipment:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load equipment listings",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadEquipment();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('equipment_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'equipment' },
+        () => {
+          loadEquipment();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast]);
+
+  const handleRent = (equipment: Equipment) => {
+    setSelectedEquipment(equipment);
+    setShowInquiryDialog(true);
   };
 
-  const handleListSubmit = (event: React.FormEvent) => {
+  const handleListSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    toast({
-      title: "Equipment Listed",
-      description: "Your equipment has been listed successfully.",
-    });
-    setShowListDialog(false);
+    const formData = new FormData(event.target as HTMLFormElement);
+    
+    try {
+      const { error } = await supabase
+        .from('equipment')
+        .insert({
+          name: formData.get('name'),
+          description: formData.get('description'),
+          price: formData.get('price'),
+          type: formData.get('type'),
+          status: 'Available',
+          owner_id: currentUser.id
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Equipment Listed",
+        description: "Your equipment has been listed successfully.",
+      });
+      setShowListDialog(false);
+    } catch (error) {
+      console.error('Error listing equipment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to list equipment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -118,8 +179,20 @@ const Equipment = () => {
       <RequestsDialog
         isOpen={showRequests}
         onClose={() => setShowRequests(false)}
-        requests={mockRequests}
+        requests={[]}
       />
+
+      {selectedEquipment && (
+        <InquiryDialog
+          isOpen={showInquiryDialog}
+          onClose={() => {
+            setShowInquiryDialog(false);
+            setSelectedEquipment(null);
+          }}
+          itemTitle={selectedEquipment.name}
+          itemType={selectedEquipment.type}
+        />
+      )}
 
       <BottomNav />
     </div>
