@@ -153,7 +153,6 @@ const Seeds = () => {
       <RequestsDialog
         isOpen={showRequests}
         onClose={() => setShowRequests(false)}
-        requests={[]}
       />
 
       {selectedSeed && (

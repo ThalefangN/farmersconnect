@@ -125,7 +125,6 @@ const LandPage = () => {
       <RequestsDialog
         isOpen={showRequests}
         onClose={() => setShowRequests(false)}
-        requests={[]}
       />
 
       {selectedLand && (
