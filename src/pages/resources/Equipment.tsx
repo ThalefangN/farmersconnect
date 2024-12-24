@@ -22,6 +22,7 @@ interface Equipment {
     name: string | null;
     phone?: string | null;
   };
+  owner_id: string;
 }
 
 const Equipment = () => {
@@ -52,18 +53,7 @@ const Equipment = () => {
 
         if (error) throw error;
 
-        // Filter out equipment that was approved more than 48 hours ago
-        const filteredEquipment = equipmentData.filter((item: any) => {
-          if (item.status === 'Approved') {
-            const approvalDate = new Date(item.updated_at);
-            const now = new Date();
-            const hoursDiff = (now.getTime() - approvalDate.getTime()) / (1000 * 60 * 60);
-            return hoursDiff <= 48;
-          }
-          return true;
-        });
-
-        setEquipment(filteredEquipment.map((item: any) => ({
+        setEquipment(equipmentData.map((item: any) => ({
           id: item.id,
           name: item.name,
           description: item.description,
@@ -74,7 +64,8 @@ const Equipment = () => {
           owner: {
             name: item.owner.full_name,
             phone: item.owner.phone_text
-          }
+          },
+          owner_id: item.owner_id
         })));
       }
     } catch (error) {
@@ -109,50 +100,6 @@ const Equipment = () => {
   const handleRent = (equipment: Equipment) => {
     setSelectedEquipment(equipment);
     setShowInquiryDialog(true);
-  };
-
-  const handleListSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-
-    const name = formData.get('name') as string;
-    const description = formData.get('description') as string;
-    const price = formData.get('price') as string;
-    const type = formData.get('type') as string;
-    const location = formData.get('location') as string;
-    const imageUrl = formData.get('image_url') as string;
-
-    try {
-      const { error } = await supabase
-        .from('equipment')
-        .insert({
-          name,
-          description,
-          price,
-          type: type || 'rent',
-          status: 'Available',
-          owner_id: currentUser.id,
-          image_url: imageUrl,
-          location
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Equipment Listed",
-        description: "Your equipment has been listed successfully.",
-      });
-      setShowListDialog(false);
-      loadEquipment();
-    } catch (error) {
-      console.error('Error listing equipment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to list equipment. Please try again.",
-        variant: "destructive",
-      });
-    }
   };
 
   return (
@@ -197,13 +144,11 @@ const Equipment = () => {
       <ListEquipmentDialog
         isOpen={showListDialog}
         onClose={() => setShowListDialog(false)}
-        onSubmit={handleListSubmit}
       />
 
       <RequestsDialog
         isOpen={showRequests}
         onClose={() => setShowRequests(false)}
-        requests={[]}
       />
 
       {selectedEquipment && (

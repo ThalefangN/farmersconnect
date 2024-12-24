@@ -19,15 +19,22 @@ interface Equipment {
     name: string | null;
     phone?: string | null;
   };
+  owner_id: string;
 }
 
 const Equipment = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const { toast } = useToast();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadEquipment = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setCurrentUserId(user.id);
+        }
+
         const { data, error } = await supabase
           .from('equipment')
           .select(`
@@ -53,7 +60,8 @@ const Equipment = () => {
           owner: {
             name: item.owner.full_name,
             phone: item.owner.phone_text
-          }
+          },
+          owner_id: item.owner_id
         })));
       } catch (error) {
         console.error('Error loading equipment:', error);
@@ -67,7 +75,6 @@ const Equipment = () => {
 
     loadEquipment();
 
-    // Subscribe to realtime changes
     const channel = supabase
       .channel('equipment_changes')
       .on(
@@ -98,7 +105,11 @@ const Equipment = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {equipment.map((item) => (
-            <EquipmentCard key={item.id} equipment={item} />
+            <EquipmentCard 
+              key={item.id} 
+              equipment={item} 
+              currentUserId={currentUserId || undefined}
+            />
           ))}
         </div>
       </motion.div>
