@@ -17,6 +17,7 @@ interface Equipment {
   price: string;
   type: 'rent' | 'sale';
   status: string;
+  image_url?: string | null;
   owner: {
     name: string | null;
     phone?: string | null;
@@ -51,13 +52,25 @@ const Equipment = () => {
 
         if (error) throw error;
 
-        setEquipment(equipmentData.map((item: any) => ({
+        // Filter out equipment that was approved more than 48 hours ago
+        const filteredEquipment = equipmentData.filter((item: any) => {
+          if (item.status === 'Approved') {
+            const approvalDate = new Date(item.updated_at);
+            const now = new Date();
+            const hoursDiff = (now.getTime() - approvalDate.getTime()) / (1000 * 60 * 60);
+            return hoursDiff <= 48;
+          }
+          return true;
+        });
+
+        setEquipment(filteredEquipment.map((item: any) => ({
           id: item.id,
           name: item.name,
           description: item.description,
           price: item.price,
           type: item.type as 'rent' | 'sale',
           status: item.status,
+          image_url: item.image_url,
           owner: {
             name: item.owner.full_name,
             phone: item.owner.phone_text
@@ -107,8 +120,8 @@ const Equipment = () => {
     const description = formData.get('description') as string;
     const price = formData.get('price') as string;
     const type = formData.get('type') as string;
-
-    console.log('Submitting equipment:', { name, description, price, type });
+    const location = formData.get('location') as string;
+    const imageUrl = formData.get('image_url') as string;
 
     try {
       const { error } = await supabase
@@ -119,7 +132,9 @@ const Equipment = () => {
           price,
           type: type || 'rent',
           status: 'Available',
-          owner_id: currentUser.id
+          owner_id: currentUser.id,
+          image_url: imageUrl,
+          location
         });
 
       if (error) throw error;
