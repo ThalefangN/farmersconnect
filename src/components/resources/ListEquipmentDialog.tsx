@@ -8,14 +8,14 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { uploadImage } from "@/utils/fileUpload";
 import { Loader2, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ListEquipmentDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }
 
-const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogProps) => {
+const ListEquipmentDialog = ({ isOpen, onClose }: ListEquipmentDialogProps) => {
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -58,19 +58,38 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
     try {
       setIsUploading(true);
       
-      // Add image URL to form if image is selected
-      if (image) {
-        const imageUrl = await uploadImage(image, 'equipment');
-        const formElement = e.target as HTMLFormElement;
-        const imageInput = document.createElement('input');
-        imageInput.type = 'hidden';
-        imageInput.name = 'image_url';
-        imageInput.value = imageUrl;
-        formElement.appendChild(imageInput);
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
       }
 
-      await onSubmit(e);
-      
+      let imageUrl = null;
+      if (image) {
+        imageUrl = await uploadImage(image, 'equipment');
+      }
+
+      // Insert equipment data
+      const { error: insertError } = await supabase
+        .from('equipment')
+        .insert({
+          name,
+          description,
+          price,
+          type,
+          location,
+          status: 'Available',
+          owner_id: user.id,
+          image_url: imageUrl
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "Success",
+        description: "Equipment listed successfully",
+      });
+
       // Reset form
       setName("");
       setDescription("");
@@ -78,6 +97,7 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
       setType("rent");
       setLocation("");
       setImage(null);
+      onClose();
     } catch (error) {
       console.error('Error submitting equipment:', error);
       toast({
@@ -107,7 +127,6 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
             <Label htmlFor="equipment-name">Equipment Name *</Label>
             <Input 
               id="equipment-name"
-              name="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter equipment name"
@@ -118,7 +137,6 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
             <Label htmlFor="description">Description</Label>
             <Textarea 
               id="description"
-              name="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe your equipment"
@@ -128,7 +146,6 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
             <Label htmlFor="location">Location *</Label>
             <Input 
               id="location"
-              name="location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Enter location"
@@ -139,7 +156,6 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
             <Label htmlFor="price">Price {type === 'rent' ? '(per day)' : ''}</Label>
             <Input 
               id="price"
-              name="price"
               type="text"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
@@ -149,7 +165,7 @@ const ListEquipmentDialog = ({ isOpen, onClose, onSubmit }: ListEquipmentDialogP
           </div>
           <div>
             <Label htmlFor="type">Listing Type</Label>
-            <Select name="type" value={type} onValueChange={setType}>
+            <Select value={type} onValueChange={setType}>
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>

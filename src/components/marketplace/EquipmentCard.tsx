@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Tag } from "lucide-react";
+import { Calendar, MapPin, Tag, Trash2 } from "lucide-react";
 import InquiryDialog from "@/components/resources/InquiryDialog";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Equipment {
   id: string;
@@ -17,14 +19,66 @@ interface Equipment {
     name: string | null;
     phone?: string | null;
   };
+  owner_id: string;
 }
 
 interface EquipmentCardProps {
   equipment: Equipment;
+  onDelete?: () => void;
+  currentUserId?: string;
 }
 
-const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
+const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProps) => {
   const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+
+      // Check if equipment has any pending requests
+      const { data: requests, error: requestsError } = await supabase
+        .from('equipment_requests')
+        .select('id, status')
+        .eq('equipment_id', equipment.id);
+
+      if (requestsError) throw requestsError;
+
+      if (requests && requests.some(req => req.status === 'pending' || req.status === 'approved')) {
+        toast({
+          title: "Cannot Delete",
+          description: "This equipment has pending or approved requests and cannot be deleted.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Delete the equipment
+      const { error: deleteError } = await supabase
+        .from('equipment')
+        .delete()
+        .eq('id', equipment.id);
+
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Success",
+        description: "Equipment deleted successfully",
+      });
+
+      if (onDelete) onDelete();
+    } catch (error) {
+      console.error('Error deleting equipment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete equipment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <>
@@ -66,7 +120,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
               </span>
             </div>
             
-            <div className="pt-4">
+            <div className="pt-4 space-y-2">
               <Button
                 onClick={() => setShowInquiryDialog(true)}
                 disabled={equipment.status !== "Available"}
@@ -74,6 +128,18 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
               >
                 {equipment.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
               </Button>
+
+              {currentUserId === equipment.owner_id && (
+                <Button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  variant="destructive"
+                  className="w-full"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {isDeleting ? 'Deleting...' : 'Delete Equipment'}
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
