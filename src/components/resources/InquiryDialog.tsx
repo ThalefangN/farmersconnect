@@ -17,7 +17,7 @@ interface InquiryDialogProps {
   onClose: () => void;
   itemTitle: string;
   itemType: 'rent' | 'sale';
-  equipmentId: string;
+  equipmentId?: string; // Made optional with ?
 }
 
 const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: InquiryDialogProps) => {
@@ -47,23 +47,26 @@ const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: In
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase
-        .from('equipment_requests')
-        .insert({
-          equipment_id: equipmentId,
-          user_id: user.id,
-          full_name: formData.fullName,
-          phone: formData.phone,
-          phone_number: formData.whatsappNumber,
-          location: formData.location,
-          message: formData.message,
-          rental_days: itemType === 'rent' ? parseInt(formData.rentalDays) : null,
-          preferred_delivery_date: formData.deliveryDate?.toISOString(),
-          payment_method: formData.paymentMethod,
-          status: 'pending'
-        });
+      // Only insert into equipment_requests if it's an equipment inquiry
+      if (equipmentId) {
+        const { error } = await supabase
+          .from('equipment_requests')
+          .insert({
+            equipment_id: equipmentId,
+            user_id: user.id,
+            full_name: formData.fullName,
+            phone: formData.phone,
+            phone_number: formData.whatsappNumber,
+            location: formData.location,
+            message: formData.message,
+            rental_days: itemType === 'rent' ? parseInt(formData.rentalDays) : null,
+            preferred_delivery_date: formData.deliveryDate?.toISOString(),
+            payment_method: formData.paymentMethod,
+            status: 'pending'
+          });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       toast({
         title: "Request Sent",
