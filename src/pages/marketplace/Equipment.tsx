@@ -1,43 +1,88 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Wrench } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import BottomNav from "@/components/BottomNav";
+import { supabase } from "@/integrations/supabase/client";
+import EquipmentCard from "@/components/marketplace/EquipmentCard";
+
+interface Equipment {
+  id: string;
+  name: string;
+  description: string | null;
+  price: string;
+  type: 'rent' | 'sale';
+  status: string;
+  location: string;
+  image_url: string | null;
+  owner: {
+    name: string | null;
+    phone?: string | null;
+  };
+}
 
 const Equipment = () => {
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
   const { toast } = useToast();
-  const [equipment] = useState([
-    {
-      id: 1,
-      name: "Tractor",
-      description: "Heavy-duty farming tractor",
-      price: "500/day",
-      availability: "Available",
-    },
-    {
-      id: 2,
-      name: "Harvester",
-      description: "Grain harvesting machine",
-      price: "400/day",
-      availability: "In Use",
-    },
-    {
-      id: 3,
-      name: "Plough",
-      description: "3-furrow plough",
-      price: "200/day",
-      availability: "Available",
-    },
-  ]);
 
-  const handleRent = (equipmentName: string) => {
-    toast({
-      title: "Request Sent",
-      description: `Your request to rent the ${equipmentName} has been sent.`,
-    });
-  };
+  useEffect(() => {
+    const loadEquipment = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('equipment')
+          .select(`
+            *,
+            owner:profiles!equipment_owner_id_fkey (
+              full_name,
+              phone_text
+            )
+          `)
+          .eq('status', 'Available');
+
+        if (error) throw error;
+
+        setEquipment(data.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          type: item.type,
+          status: item.status,
+          location: item.location,
+          image_url: item.image_url,
+          owner: {
+            name: item.owner.full_name,
+            phone: item.owner.phone_text
+          }
+        })));
+      } catch (error) {
+        console.error('Error loading equipment:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load equipment listings",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadEquipment();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('equipment_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'equipment' },
+        () => {
+          loadEquipment();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast]);
 
   return (
     <div className="container mx-auto p-4 pb-20">
@@ -53,29 +98,7 @@ const Equipment = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {equipment.map((item) => (
-            <Card key={item.id} className="overflow-hidden">
-              <CardHeader>
-                <CardTitle>{item.name}</CardTitle>
-                <CardDescription>{item.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p className="text-sm">Price: {item.price}</p>
-                  <p className={`text-sm ${
-                    item.availability === "Available" ? "text-green-600" : "text-red-600"
-                  }`}>
-                    Status: {item.availability}
-                  </p>
-                  <Button
-                    onClick={() => handleRent(item.name)}
-                    disabled={item.availability !== "Available"}
-                    className="w-full"
-                  >
-                    Rent Equipment
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <EquipmentCard key={item.id} equipment={item} />
           ))}
         </div>
       </motion.div>

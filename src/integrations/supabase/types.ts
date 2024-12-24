@@ -103,7 +103,11 @@ export type Database = {
           id: string
           location: string
           message: string | null
+          payment_method: string | null
           phone: string
+          phone_number: string | null
+          preferred_delivery_date: string | null
+          rental_days: number | null
           status: string
           updated_at: string
           user_id: string | null
@@ -115,7 +119,11 @@ export type Database = {
           id?: string
           location: string
           message?: string | null
+          payment_method?: string | null
           phone: string
+          phone_number?: string | null
+          preferred_delivery_date?: string | null
+          rental_days?: number | null
           status?: string
           updated_at?: string
           user_id?: string | null
@@ -127,7 +135,11 @@ export type Database = {
           id?: string
           location?: string
           message?: string | null
+          payment_method?: string | null
           phone?: string
+          phone_number?: string | null
+          preferred_delivery_date?: string | null
+          rental_days?: number | null
           status?: string
           updated_at?: string
           user_id?: string | null
@@ -347,6 +359,7 @@ export type Database = {
           full_name: string | null
           id: string
           location: string | null
+          notification_preferences: Json | null
           phone_text: string | null
           profile_photo_url: string | null
           updated_at: string
@@ -357,6 +370,7 @@ export type Database = {
           full_name?: string | null
           id: string
           location?: string | null
+          notification_preferences?: Json | null
           phone_text?: string | null
           profile_photo_url?: string | null
           updated_at?: string
@@ -367,6 +381,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           location?: string | null
+          notification_preferences?: Json | null
           phone_text?: string | null
           profile_photo_url?: string | null
           updated_at?: string

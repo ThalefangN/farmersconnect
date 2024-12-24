@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,15 +17,19 @@ interface InquiryDialogProps {
   onClose: () => void;
   itemTitle: string;
   itemType: 'rent' | 'sale';
-  equipmentId?: string;
+  equipmentId: string;
 }
 
 const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: InquiryDialogProps) => {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
+    whatsappNumber: "",
     location: "",
-    message: ""
+    message: "",
+    rentalDays: "",
+    deliveryDate: null as Date | null,
+    paymentMethod: ""
   });
   const { toast } = useToast();
 
@@ -45,8 +54,12 @@ const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: In
           user_id: user.id,
           full_name: formData.fullName,
           phone: formData.phone,
+          phone_number: formData.whatsappNumber,
           location: formData.location,
           message: formData.message,
+          rental_days: itemType === 'rent' ? parseInt(formData.rentalDays) : null,
+          preferred_delivery_date: formData.deliveryDate?.toISOString(),
+          payment_method: formData.paymentMethod,
           status: 'pending'
         });
 
@@ -56,7 +69,16 @@ const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: In
         title: "Request Sent",
         description: `Your ${itemType} request has been sent successfully. The owner will contact you soon.`,
       });
-      setFormData({ fullName: "", phone: "", location: "", message: "" });
+      setFormData({
+        fullName: "",
+        phone: "",
+        whatsappNumber: "",
+        location: "",
+        message: "",
+        rentalDays: "",
+        deliveryDate: null,
+        paymentMethod: ""
+      });
       onClose();
     } catch (error) {
       console.error('Error submitting request:', error);
@@ -97,6 +119,15 @@ const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: In
             />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="whatsappNumber">WhatsApp Number (Optional)</Label>
+            <Input
+              id="whatsappNumber"
+              value={formData.whatsappNumber}
+              onChange={(e) => setFormData(prev => ({ ...prev, whatsappNumber: e.target.value }))}
+              placeholder="Enter your WhatsApp number"
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="location">Location *</Label>
             <Input
               id="location"
@@ -105,13 +136,59 @@ const InquiryDialog = ({ isOpen, onClose, itemTitle, itemType, equipmentId }: In
               placeholder="Enter your location"
             />
           </div>
+          {itemType === 'rent' && (
+            <div className="space-y-2">
+              <Label htmlFor="rentalDays">Number of Days *</Label>
+              <Input
+                id="rentalDays"
+                type="number"
+                value={formData.rentalDays}
+                onChange={(e) => setFormData(prev => ({ ...prev, rentalDays: e.target.value }))}
+                placeholder="Enter number of days"
+              />
+            </div>
+          )}
           <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
+            <Label>Preferred Delivery Date *</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !formData.deliveryDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formData.deliveryDate ? format(formData.deliveryDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={formData.deliveryDate}
+                  onSelect={(date) => setFormData(prev => ({ ...prev, deliveryDate: date }))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="paymentMethod">Payment Method *</Label>
+            <Input
+              id="paymentMethod"
+              value={formData.paymentMethod}
+              onChange={(e) => setFormData(prev => ({ ...prev, paymentMethod: e.target.value }))}
+              placeholder="Enter payment method"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="message">Additional Notes</Label>
             <Textarea
               id="message"
               value={formData.message}
               onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-              placeholder="Enter additional details or questions..."
+              placeholder="Enter any additional details or questions..."
               className="min-h-[100px]"
             />
           </div>
