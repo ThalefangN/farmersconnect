@@ -13,7 +13,7 @@ interface ContactDetailsProps {
   };
 }
 
-const ContactDetailsDialog = ({ isOpen, onClose, ownerDetails }: ContactDetailsProps) => {
+export default function ContactDetailsDialog({ isOpen, onClose, ownerDetails }: ContactDetailsProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -41,6 +41,4 @@ const ContactDetailsDialog = ({ isOpen, onClose, ownerDetails }: ContactDetailsP
       </DialogContent>
     </Dialog>
   );
-};
-
-export default ContactDetailsDialog;
+}

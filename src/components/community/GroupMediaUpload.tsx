@@ -30,6 +30,9 @@ export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) 
     try {
       setIsLoading(true);
 
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       // Upload file to storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
@@ -49,6 +52,7 @@ export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) 
         .from('group_messages')
         .insert({
           group_id: groupId,
+          user_id: user.id,
           content: description,
           media_url: publicUrl,
           message_type: file.type.startsWith('image/') ? 'image' : 'video'
