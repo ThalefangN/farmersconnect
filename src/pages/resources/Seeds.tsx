@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Leaf, Share2 } from "lucide-react";
+import { Leaf, Share2, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import BottomNav from "@/components/BottomNav";
@@ -13,8 +13,12 @@ interface Seed {
   id: string;
   name: string;
   description: string | null;
-  type: string;
-  status: string;
+  location: string;
+  image_url: string | null;
+  owner: {
+    name: string | null;
+    phone?: string | null;
+  };
   owner_id: string;
 }
 
@@ -35,7 +39,13 @@ const Seeds = () => {
         
         const { data: seedsData, error } = await supabase
           .from('equipment')
-          .select('*')
+          .select(`
+            *,
+            owner:profiles!equipment_owner_id_fkey (
+              full_name,
+              phone_text
+            )
+          `)
           .eq('type', 'seeds');
 
         if (error) throw error;
@@ -52,32 +62,29 @@ const Seeds = () => {
     }
   };
 
-  const handleListSubmit = async (formData: FormData) => {
+  useEffect(() => {
+    loadSeeds();
+  }, []);
+
+  const handleDelete = async (seedId: string) => {
     try {
       const { error } = await supabase
         .from('equipment')
-        .insert({
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
-          type: 'seeds',
-          price: '0',
-          status: 'Available',
-          owner_id: currentUser.id
-        });
+        .delete()
+        .eq('id', seedId);
 
       if (error) throw error;
 
       toast({
-        title: "Seed Listed",
-        description: "Your seed has been listed successfully.",
+        title: "Success",
+        description: "Seed listing deleted successfully",
       });
-      setShowListDialog(false);
       loadSeeds();
     } catch (error) {
-      console.error('Error listing seed:', error);
+      console.error('Error deleting seed:', error);
       toast({
         title: "Error",
-        description: "Failed to list seed. Please try again.",
+        description: "Failed to delete seed listing",
         variant: "destructive",
       });
     }
@@ -107,7 +114,7 @@ const Seeds = () => {
         <div className="bg-white rounded-lg p-6 shadow-md mb-6">
           <h2 className="text-xl font-semibold text-green-800 mb-4">List Your Seeds</h2>
           <p className="text-gray-600 mb-4">
-            Help fellow farmers by sharing your seeds. List your seeds for sale within the community.
+            Help fellow farmers by sharing your seeds. List your seeds for sharing within the community.
           </p>
           <Button 
             className="w-full bg-green-600 hover:bg-green-700"
@@ -127,16 +134,37 @@ const Seeds = () => {
               transition={{ duration: 0.3 }}
             >
               <div className="bg-white rounded-lg p-4 shadow-md">
-                <h3 className="font-medium">{seed.name}</h3>
-                <p className="text-sm text-gray-600">{seed.description}</p>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium text-lg">{seed.name}</h3>
+                    <p className="text-sm text-gray-600">{seed.description}</p>
+                    <p className="text-sm text-gray-600 mt-2">Location: {seed.location}</p>
+                    {seed.image_url && (
+                      <img
+                        src={seed.image_url}
+                        alt={seed.name}
+                        className="mt-2 rounded-lg w-full h-48 object-cover"
+                      />
+                    )}
+                  </div>
+                  {currentUser?.id === seed.owner_id && (
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleDelete(seed.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
                 <Button
                   onClick={() => {
                     setSelectedSeed(seed);
                     setShowInquiryDialog(true);
                   }}
-                  className="mt-2"
+                  className="mt-4 w-full"
                 >
-                  Inquire
+                  Request Seeds
                 </Button>
               </div>
             </motion.div>
@@ -147,7 +175,6 @@ const Seeds = () => {
       <ListSeedsDialog
         isOpen={showListDialog}
         onClose={() => setShowListDialog(false)}
-        onSubmit={handleListSubmit}
       />
 
       <RequestsDialog
@@ -163,7 +190,8 @@ const Seeds = () => {
             setSelectedSeed(null);
           }}
           itemTitle={selectedSeed.name}
-          itemType="sale"
+          itemType="seeds"
+          equipmentId={selectedSeed.id}
         />
       )}
 

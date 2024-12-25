@@ -1,20 +1,69 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { uploadImage } from "@/utils/fileUpload";
+import { supabase } from "@/integrations/supabase/client";
+import SeedForm from "./seeds/SeedForm";
 
 interface ListSeedsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (formData: FormData) => void;
 }
 
-const ListSeedsDialog = ({ isOpen, onClose, onSubmit }: ListSeedsDialogProps) => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    onSubmit(formData);
+const ListSeedsDialog = ({ isOpen, onClose }: ListSeedsDialogProps) => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (formData: {
+    name: string;
+    description: string;
+    location: string;
+    image: File | null;
+  }) => {
+    try {
+      setIsLoading(true);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      let imageUrl = null;
+      if (formData.image) {
+        imageUrl = await uploadImage(formData.image, 'seeds');
+      }
+
+      const { error: insertError } = await supabase
+        .from('equipment')
+        .insert({
+          name: formData.name,
+          description: formData.description,
+          type: 'seeds',
+          price: '0',
+          location: formData.location,
+          status: 'Available',
+          owner_id: user.id,
+          image_url: imageUrl
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "Success",
+        description: "Seeds listed successfully",
+      });
+
+      onClose();
+    } catch (error) {
+      console.error('Error submitting seeds:', error);
+      toast({
+        title: "Error",
+        description: "Failed to list seeds. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -23,22 +72,7 @@ const ListSeedsDialog = ({ isOpen, onClose, onSubmit }: ListSeedsDialogProps) =>
         <DialogHeader>
           <DialogTitle>List Your Seeds</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Seed Name</Label>
-            <Input id="name" name="name" placeholder="Enter seed name" required />
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea 
-              id="description" 
-              name="description" 
-              placeholder="Describe your seeds" 
-              required 
-            />
-          </div>
-          <Button type="submit" className="w-full">Submit Listing</Button>
-        </form>
+        <SeedForm onSubmit={handleSubmit} isLoading={isLoading} />
       </DialogContent>
     </Dialog>
   );
