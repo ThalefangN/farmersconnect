@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
 import { CreateGroupDialog } from "@/components/community/CreateGroupDialog";
-import { GroupMediaUpload } from "@/components/community/GroupMediaUpload";
 import { GroupList } from "@/components/community/GroupList";
+import { GroupDiscussion } from "@/components/community/GroupDiscussion";
 import { supabase } from "@/integrations/supabase/client";
 import type { Group } from "@/types/groups";
 
@@ -16,10 +16,8 @@ const Groups = () => {
   const { toast } = useToast();
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [showJoinDialog, setShowJoinDialog] = useState(false);
-  const [location, setLocation] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchGroups();
@@ -55,8 +53,40 @@ const Groups = () => {
   };
 
   const handleJoinGroup = async (group: Group) => {
-    setSelectedGroup(group);
-    setShowJoinDialog(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please sign in to join groups",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("group_members")
+        .insert({
+          group_id: group.id,
+          user_id: user.id,
+          role: "member",
+          status: "pending"
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Join request sent successfully",
+      });
+    } catch (error) {
+      console.error("Error joining group:", error);
+      toast({
+        title: "Error",
+        description: "Failed to join group",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteGroup = async (groupId: string) => {
@@ -83,10 +113,6 @@ const Groups = () => {
     }
   };
 
-  const handleViewDiscussion = (group: Group) => {
-    setSelectedGroup(group);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
       <motion.div
@@ -95,39 +121,52 @@ const Groups = () => {
         className="p-4 space-y-6"
       >
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/community")}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => {
+              if (selectedGroup) {
+                setSelectedGroup(null);
+              } else {
+                navigate("/community");
+              }
+            }}
+          >
             <ArrowLeft className="h-6 w-6 text-green-700" />
           </Button>
           <div className="flex items-center space-x-2">
             <MessageSquare className="h-6 w-6 text-green-700" />
-            <h1 className="text-2xl font-bold text-green-800">Local Groups</h1>
+            <h1 className="text-2xl font-bold text-green-800">
+              {selectedGroup ? 'Group Discussion' : 'Local Groups'}
+            </h1>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-6 shadow-md">
-          <p className="text-gray-600 text-lg">
-            Join or create local farming groups to connect with farmers in your area.
-            Share knowledge, resources, and support each other.
-          </p>
-          <CreateGroupDialog />
-        </div>
+        {!selectedGroup ? (
+          <>
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <p className="text-gray-600 text-lg">
+                Join or create local farming groups to connect with farmers in your area.
+                Share knowledge, resources, and support each other.
+              </p>
+              <CreateGroupDialog />
+            </div>
 
-        {selectedGroup && (
-          <GroupMediaUpload
-            groupId={selectedGroup.id}
-            onSuccess={() => setSelectedGroup(null)}
+            <GroupList
+              groups={groups}
+              onJoinGroup={handleJoinGroup}
+              onDeleteGroup={handleDeleteGroup}
+              onViewDiscussion={setSelectedGroup}
+              currentUserId={currentUserId}
+            />
+          </>
+        ) : (
+          <GroupDiscussion 
+            groupId={selectedGroup.id} 
+            currentUserId={currentUserId}
           />
         )}
-
-        <GroupList
-          groups={groups}
-          onJoinGroup={handleJoinGroup}
-          onDeleteGroup={handleDeleteGroup}
-          onViewDiscussion={handleViewDiscussion}
-          currentUserId={currentUserId}
-        />
       </motion.div>
-
       <BottomNav />
     </div>
   );
