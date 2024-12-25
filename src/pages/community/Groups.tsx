@@ -8,6 +8,7 @@ import BottomNav from "@/components/BottomNav";
 import { CreateGroupDialog } from "@/components/community/CreateGroupDialog";
 import { GroupList } from "@/components/community/GroupList";
 import { GroupDiscussion } from "@/components/community/GroupDiscussion";
+import { GroupPolicyDialog } from "@/components/community/GroupPolicyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Group } from "@/types/groups";
 
@@ -18,6 +19,8 @@ const Groups = () => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
+  const [showPolicyDialog, setShowPolicyDialog] = useState(false);
+  const [selectedGroupForJoin, setSelectedGroupForJoin] = useState<Group | null>(null);
 
   useEffect(() => {
     fetchGroups();
@@ -28,6 +31,25 @@ const Groups = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setCurrentUserId(user.id);
+      // Check if user has any joined groups and set the first one as selected
+      const { data: memberGroups } = await supabase
+        .from("group_members")
+        .select("group_id")
+        .eq("user_id", user.id)
+        .eq("status", "approved")
+        .single();
+
+      if (memberGroups) {
+        const { data: group } = await supabase
+          .from("groups")
+          .select("*")
+          .eq("id", memberGroups.group_id)
+          .single();
+
+        if (group) {
+          setSelectedGroup(group);
+        }
+      }
     }
   };
 
@@ -78,24 +100,12 @@ const Groups = () => {
           description: "You are already a member of this group",
           variant: "default",
         });
+        setSelectedGroup(group);
         return;
       }
 
-      const { error } = await supabase
-        .from("group_members")
-        .insert({
-          group_id: group.id,
-          user_id: user.id,
-          role: "member",
-          status: "pending"
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Join request sent successfully",
-      });
+      setSelectedGroupForJoin(group);
+      setShowPolicyDialog(true);
     } catch (error) {
       console.error("Error joining group:", error);
       toast({
@@ -103,6 +113,54 @@ const Groups = () => {
         description: "Failed to join group",
         variant: "destructive",
       });
+    }
+  };
+
+  const handlePolicyConfirm = async (enableNotifications: boolean) => {
+    if (!selectedGroupForJoin || !currentUserId) return;
+
+    try {
+      const { error } = await supabase
+        .from("group_members")
+        .insert({
+          group_id: selectedGroupForJoin.id,
+          user_id: currentUserId,
+          role: "member",
+          status: "approved"
+        });
+
+      if (error) throw error;
+
+      if (enableNotifications) {
+        // Update user's notification preferences
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({
+            notification_preferences: {
+              group_posts: true
+            }
+          })
+          .eq("id", currentUserId);
+
+        if (updateError) throw updateError;
+      }
+
+      toast({
+        title: "Success",
+        description: "You have successfully joined the group",
+      });
+
+      setSelectedGroup(selectedGroupForJoin);
+    } catch (error) {
+      console.error("Error confirming group join:", error);
+      toast({
+        title: "Error",
+        description: "Failed to join group",
+        variant: "destructive",
+      });
+    } finally {
+      setShowPolicyDialog(false);
+      setSelectedGroupForJoin(null);
     }
   };
 
@@ -185,6 +243,14 @@ const Groups = () => {
         )}
       </motion.div>
       <BottomNav />
+      <GroupPolicyDialog
+        isOpen={showPolicyDialog}
+        onClose={() => {
+          setShowPolicyDialog(false);
+          setSelectedGroupForJoin(null);
+        }}
+        onConfirm={handlePolicyConfirm}
+      />
     </div>
   );
 };
