@@ -43,7 +43,14 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Type assertion to ensure message_type is one of the allowed values
+      const typedMessages = (data || []).map(message => ({
+        ...message,
+        message_type: validateMessageType(message.message_type)
+      }));
+      
+      setMessages(typedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
@@ -54,6 +61,12 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper function to validate message_type
+  const validateMessageType = (type: string): 'text' | 'image' | 'video' | 'audio' => {
+    const validTypes = ['text', 'image', 'video', 'audio'];
+    return validTypes.includes(type) ? type as 'text' | 'image' | 'video' | 'audio' : 'text';
   };
 
   useEffect(() => {
