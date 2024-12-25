@@ -477,11 +477,73 @@ export type Database = {
           },
         ]
       }
+      mentorship_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          program_id: string | null
+          read_at: string | null
+          receiver_id: string | null
+          sender_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          program_id?: string | null
+          read_at?: string | null
+          receiver_id?: string | null
+          sender_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          program_id?: string | null
+          read_at?: string | null
+          receiver_id?: string | null
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_program"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_messages_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentorship_programs: {
         Row: {
+          availability: string | null
           created_at: string
           created_by: string
           description: string
+          experience_years: number | null
+          farming_specialization: string | null
           id: string
           image_url: string | null
           price: number
@@ -490,9 +552,12 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          availability?: string | null
           created_at?: string
           created_by: string
           description: string
+          experience_years?: number | null
+          farming_specialization?: string | null
           id?: string
           image_url?: string | null
           price: number
@@ -501,9 +566,12 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          availability?: string | null
           created_at?: string
           created_by?: string
           description?: string
+          experience_years?: number | null
+          farming_specialization?: string | null
           id?: string
           image_url?: string | null
           price?: number

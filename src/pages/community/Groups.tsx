@@ -64,6 +64,23 @@ const Groups = () => {
         return;
       }
 
+      // First check if user is already a member
+      const { data: existingMembership } = await supabase
+        .from("group_members")
+        .select("*")
+        .eq("group_id", group.id)
+        .eq("user_id", user.id)
+        .single();
+
+      if (existingMembership) {
+        toast({
+          title: "Already a member",
+          description: "You are already a member of this group",
+          variant: "default",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from("group_members")
         .insert({
