@@ -32,19 +32,29 @@ const Groups = () => {
     if (user) {
       setCurrentUserId(user.id);
       // Check if user has any joined groups and set the first one as selected
-      const { data: memberGroups } = await supabase
+      const { data: memberGroups, error: memberError } = await supabase
         .from("group_members")
         .select("group_id")
         .eq("user_id", user.id)
         .eq("status", "approved")
-        .single();
+        .maybeSingle();
+
+      if (memberError) {
+        console.error("Error fetching member groups:", memberError);
+        return;
+      }
 
       if (memberGroups) {
-        const { data: group } = await supabase
+        const { data: group, error: groupError } = await supabase
           .from("groups")
           .select("*")
           .eq("id", memberGroups.group_id)
           .single();
+
+        if (groupError) {
+          console.error("Error fetching group:", groupError);
+          return;
+        }
 
         if (group) {
           setSelectedGroup(group);
@@ -92,7 +102,7 @@ const Groups = () => {
         .select("*")
         .eq("group_id", group.id)
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (existingMembership) {
         toast({
