@@ -1,5 +1,5 @@
 # Welcome
-.
+# Product of Tlhalefang Ntshilane
 
 **Use your preferred IDE**
 
