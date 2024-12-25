@@ -61,6 +61,7 @@ export type Database = {
           name: string
           owner_id: string
           price: string
+          price_numeric: number | null
           status: string
           type: string
           updated_at: string
@@ -74,6 +75,7 @@ export type Database = {
           name: string
           owner_id: string
           price: string
+          price_numeric?: number | null
           status?: string
           type: string
           updated_at?: string
@@ -87,6 +89,7 @@ export type Database = {
           name?: string
           owner_id?: string
           price?: string
+          price_numeric?: number | null
           status?: string
           type?: string
           updated_at?: string
@@ -208,7 +211,9 @@ export type Database = {
       }
       events: {
         Row: {
+          capacity: number | null
           created_at: string
+          current_registrations: number | null
           date: string
           description: string
           id: string
@@ -220,7 +225,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          capacity?: number | null
           created_at?: string
+          current_registrations?: number | null
           date: string
           description: string
           id?: string
@@ -232,7 +239,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          capacity?: number | null
           created_at?: string
+          current_registrations?: number | null
           date?: string
           description?: string
           id?: string
