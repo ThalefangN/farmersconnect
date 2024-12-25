@@ -1,87 +1,70 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Leaf, Share2, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import BottomNav from "@/components/BottomNav";
-import RequestsDialog from "@/components/resources/RequestsDialog";
-import ListSeedsDialog from "@/components/resources/ListSeedsDialog";
-import InquiryDialog from "@/components/resources/InquiryDialog";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Seed {
-  id: string;
-  name: string;
-  description: string | null;
-  location: string;
-  image_url: string | null;
-  owner: {
-    name: string | null;
-    phone?: string | null;
-  };
-  owner_id: string;
-}
+import { ListSeedsDialog } from "@/components/resources/ListSeedsDialog";
+import { InquiryDialog } from "@/components/resources/InquiryDialog";
+import { ContactDetailsDialog } from "@/components/resources/ContactDetailsDialog";
+import BottomNav from "@/components/BottomNav";
+import type { Seed } from "@/types/seeds";
 
 const Seeds = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [showListDialog, setShowListDialog] = useState(false);
-  const [showRequests, setShowRequests] = useState(false);
-  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
-  const [selectedSeed, setSelectedSeed] = useState<Seed | null>(null);
   const [seeds, setSeeds] = useState<Seed[]>([]);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-
-  const loadSeeds = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUser(user);
-        
-        const { data: seedsData, error } = await supabase
-          .from('equipment')
-          .select(`
-            *,
-            owner:profiles!equipment_owner_id_fkey (
-              full_name,
-              phone_text
-            )
-          `)
-          .eq('type', 'seeds');
-
-        if (error) throw error;
-
-        setSeeds(seedsData);
-      }
-    } catch (error) {
-      console.error('Error loading seeds:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load seeds listings",
-        variant: "destructive",
-      });
-    }
-  };
+  const [selectedSeed, setSelectedSeed] = useState<Seed | null>(null);
+  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+  const [showContactDialog, setShowContactDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showListDialog, setShowListDialog] = useState(false);
 
   useEffect(() => {
-    loadSeeds();
+    fetchSeeds();
   }, []);
+
+  const fetchSeeds = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("seeds")
+        .select(`
+          *,
+          owner:profiles(full_name, phone_text)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setSeeds(data as Seed[]);
+    } catch (error) {
+      console.error("Error fetching seeds:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load seeds. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleDelete = async (seedId: string) => {
     try {
       const { error } = await supabase
-        .from('equipment')
+        .from("seeds")
         .delete()
-        .eq('id', seedId);
+        .eq("id", seedId);
 
       if (error) throw error;
 
+      setSeeds(seeds.filter((seed) => seed.id !== seedId));
       toast({
         title: "Success",
         description: "Seed listing deleted successfully",
       });
-      loadSeeds();
     } catch (error) {
-      console.error('Error deleting seed:', error);
+      console.error("Error deleting seed:", error);
       toast({
         title: "Error",
         description: "Failed to delete seed listing",
@@ -90,109 +73,116 @@ const Seeds = () => {
     }
   };
 
+  const handleInquiry = (seed: Seed) => {
+    setSelectedSeed(seed);
+    setShowInquiryDialog(true);
+  };
+
+  const handleViewContact = (seed: Seed) => {
+    setSelectedSeed(seed);
+    setShowContactDialog(true);
+  };
+
   return (
-    <div className="container mx-auto p-4 pb-20">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Leaf className="h-6 w-6" />
-            <h1 className="text-2xl font-bold">Seeds and Plants</h1>
-          </div>
-          <Button 
-            onClick={() => setShowRequests(true)}
-            variant="outline"
-            className="ml-2"
-          >
-            View Requests
-          </Button>
-        </div>
-
-        <div className="bg-white rounded-lg p-6 shadow-md mb-6">
-          <h2 className="text-xl font-semibold text-green-800 mb-4">List Your Seeds</h2>
-          <p className="text-gray-600 mb-4">
-            Help fellow farmers by sharing your seeds. List your seeds for sharing within the community.
-          </p>
-          <Button 
-            className="w-full bg-green-600 hover:bg-green-700"
-            onClick={() => setShowListDialog(true)}
-          >
-            <Share2 className="mr-2 h-4 w-4" />
-            List Your Seeds
-          </Button>
-        </div>
-
-        <div className="grid gap-4">
-          {seeds.map((seed) => (
-            <motion.div
-              key={seed.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
+      <div className="p-4 space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/resources")}
             >
-              <div className="bg-white rounded-lg p-4 shadow-md">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-lg">{seed.name}</h3>
-                    <p className="text-sm text-gray-600">{seed.description}</p>
-                    <p className="text-sm text-gray-600 mt-2">Location: {seed.location}</p>
-                    {seed.image_url && (
-                      <img
-                        src={seed.image_url}
-                        alt={seed.name}
-                        className="mt-2 rounded-lg w-full h-48 object-cover"
-                      />
+              <ArrowLeft className="h-6 w-6" />
+            </Button>
+            <Button
+              onClick={() => setShowListDialog(true)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              List Seeds
+            </Button>
+          </div>
+
+          <div className="grid gap-4">
+            {seeds.map((seed) => (
+              <motion.div
+                key={seed.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div className="bg-white rounded-lg shadow-md p-4">
+                  {seed.image_url && (
+                    <img
+                      src={seed.image_url}
+                      alt={seed.name}
+                      className="w-full h-48 object-cover rounded-md mb-4"
+                    />
+                  )}
+                  <h3 className="text-lg font-semibold">{seed.name}</h3>
+                  <p className="text-gray-600">{seed.description}</p>
+                  <p className="text-green-600 font-semibold mt-2">
+                    Price: BWP {seed.price}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Location: {seed.location}
+                  </p>
+                  <div className="mt-4 flex gap-2">
+                    <Button
+                      onClick={() => handleInquiry(seed)}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      Make Inquiry
+                    </Button>
+                    <Button
+                      onClick={() => handleViewContact(seed)}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Contact Details
+                    </Button>
+                    {seed.owner_id === (supabase.auth.getUser()?.data?.user?.id || null) && (
+                      <Button
+                        onClick={() => handleDelete(seed.id)}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        Delete
+                      </Button>
                     )}
                   </div>
-                  {currentUser?.id === seed.owner_id && (
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => handleDelete(seed.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
                 </div>
-                <Button
-                  onClick={() => {
-                    setSelectedSeed(seed);
-                    setShowInquiryDialog(true);
-                  }}
-                  className="mt-4 w-full"
-                >
-                  Request Seeds
-                </Button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
 
       <ListSeedsDialog
-        isOpen={showListDialog}
-        onClose={() => setShowListDialog(false)}
-      />
-
-      <RequestsDialog
-        isOpen={showRequests}
-        onClose={() => setShowRequests(false)}
+        open={showListDialog}
+        onOpenChange={setShowListDialog}
+        onSuccess={fetchSeeds}
       />
 
       {selectedSeed && (
-        <InquiryDialog
-          isOpen={showInquiryDialog}
-          onClose={() => {
-            setShowInquiryDialog(false);
-            setSelectedSeed(null);
-          }}
-          itemTitle={selectedSeed.name}
-          itemType="seeds"
-          equipmentId={selectedSeed.id}
-        />
+        <>
+          <InquiryDialog
+            open={showInquiryDialog}
+            onOpenChange={setShowInquiryDialog}
+            type="seeds"
+            item={selectedSeed}
+          />
+          <ContactDetailsDialog
+            open={showContactDialog}
+            onOpenChange={setShowContactDialog}
+            ownerName={selectedSeed.owner.full_name}
+            phoneNumber={selectedSeed.owner.phone_text}
+          />
+        </>
       )}
 
       <BottomNav />
