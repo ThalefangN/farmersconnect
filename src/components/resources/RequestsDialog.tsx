@@ -19,8 +19,15 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
   const { data: requests, refetch } = useQuery({
     queryKey: ['equipment-requests', equipmentId],
     queryFn: async () => {
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+      
+      // Validate equipmentId
+      if (!equipmentId) {
+        console.error("No equipment ID provided");
+        return [];
+      }
 
       const { data, error } = await supabase
         .from('equipment_requests')
@@ -31,10 +38,14 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
         .eq('equipment_id', equipmentId)
         .eq('equipment.owner_id', user.id);
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching requests:', error);
+        throw error;
+      }
+
+      return data || [];
     },
-    enabled: isOpen,
+    enabled: isOpen && !!equipmentId, // Only run query if dialog is open and equipmentId exists
   });
 
   const handleAction = async (requestId: string, action: 'approve' | 'reject') => {
