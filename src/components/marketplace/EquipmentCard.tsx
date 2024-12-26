@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Tag, Trash2 } from "lucide-react";
+import { Calendar, MapPin, Tag, Trash2, Eye } from "lucide-react";
 import InquiryDialog from "@/components/resources/InquiryDialog";
+import RequestsDialog from "@/components/resources/RequestsDialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -30,6 +31,7 @@ interface EquipmentCardProps {
 
 const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProps) => {
   const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+  const [showRequestsDialog, setShowRequestsDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
@@ -80,6 +82,8 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
     }
   };
 
+  const isOwner = currentUserId === equipment.owner_id;
+
   return (
     <>
       <Card className="overflow-hidden">
@@ -121,24 +125,35 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
             </div>
             
             <div className="pt-4 space-y-2">
-              <Button
-                onClick={() => setShowInquiryDialog(true)}
-                disabled={equipment.status !== "Available"}
-                className="w-full bg-green-600 hover:bg-green-700"
-              >
-                {equipment.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
-              </Button>
-
-              {currentUserId === equipment.owner_id && (
+              {!isOwner && (
                 <Button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  variant="destructive"
-                  className="w-full"
+                  onClick={() => setShowInquiryDialog(true)}
+                  disabled={equipment.status !== "Available"}
+                  className="w-full bg-green-600 hover:bg-green-700"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  {isDeleting ? 'Deleting...' : 'Delete Equipment'}
+                  {equipment.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
                 </Button>
+              )}
+
+              {isOwner && (
+                <>
+                  <Button
+                    onClick={() => setShowRequestsDialog(true)}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Requests
+                  </Button>
+                  <Button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {isDeleting ? 'Deleting...' : 'Delete Equipment'}
+                  </Button>
+                </>
               )}
             </div>
           </div>
@@ -150,6 +165,12 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
         onClose={() => setShowInquiryDialog(false)}
         itemTitle={equipment.name}
         itemType={equipment.type}
+        equipmentId={equipment.id}
+      />
+
+      <RequestsDialog
+        isOpen={showRequestsDialog}
+        onClose={() => setShowRequestsDialog(false)}
         equipmentId={equipment.id}
       />
     </>

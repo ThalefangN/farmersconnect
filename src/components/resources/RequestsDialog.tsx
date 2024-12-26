@@ -28,6 +28,7 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
           *,
           equipment:equipment(name, type, price, owner_id)
         `)
+        .eq('equipment_id', equipmentId)
         .eq('equipment.owner_id', user.id);
 
       if (error) throw error;
