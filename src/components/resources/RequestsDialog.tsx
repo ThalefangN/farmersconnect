@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Check, X } from "lucide-react";
 
 interface RequestsDialogProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
         .from('equipment_requests')
         .select(`
           *,
-          equipment:equipment(name, owner_id)
+          equipment:equipment(name, type, price, owner_id)
         `)
         .eq('equipment.owner_id', user.id);
 
@@ -43,6 +44,17 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
         .eq('id', requestId);
 
       if (error) throw error;
+
+      if (action === 'approve') {
+        // Update equipment status to indicate it's being rented/sold
+        const request = requests?.find(r => r.id === requestId);
+        if (request) {
+          await supabase
+            .from('equipment')
+            .update({ status: 'Not Available' })
+            .eq('id', request.equipment_id);
+        }
+      }
 
       toast({
         title: "Success",
@@ -83,9 +95,8 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
                 <p className="text-sm text-gray-600">
                   {format(new Date(request.created_at), 'PPP')}
                 </p>
-                <p className="text-sm text-gray-600">Phone: {request.phone_number}</p>
+                <p className="text-sm text-gray-600">Phone: {request.phone_number || request.phone}</p>
                 <p className="text-sm text-gray-600">Location: {request.location}</p>
-                <p className="text-gray-700">{request.message}</p>
                 {request.rental_days && (
                   <p className="text-sm text-gray-600">Rental Days: {request.rental_days}</p>
                 )}
@@ -94,28 +105,38 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
                     Preferred Delivery: {format(new Date(request.preferred_delivery_date), 'PPP')}
                   </p>
                 )}
-                <div className="flex gap-2 pt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleAction(request.id, 'approve')}
-                    disabled={request.status !== 'pending'}
-                  >
-                    Approve
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleAction(request.id, 'reject')}
-                    disabled={request.status !== 'pending'}
-                  >
-                    Reject
-                  </Button>
-                </div>
+                {request.payment_method && (
+                  <p className="text-sm text-gray-600">Payment Method: {request.payment_method}</p>
+                )}
+                {request.message && (
+                  <p className="text-gray-700">{request.message}</p>
+                )}
+                {request.status === 'pending' && (
+                  <div className="flex gap-2 pt-2">
+                    <Button 
+                      onClick={() => handleAction(request.id, 'approve')}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      Approve
+                    </Button>
+                    <Button 
+                      onClick={() => handleAction(request.id, 'reject')}
+                      variant="destructive"
+                      className="flex-1"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Reject
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
+            {requests?.length === 0 && (
+              <div className="text-center text-gray-500 py-8">
+                No requests found
+              </div>
+            )}
           </div>
         </ScrollArea>
         <Button onClick={onClose}>Close</Button>

@@ -69,27 +69,29 @@ const EquipmentForm = ({ onSubmit, isLoading }: EquipmentFormProps) => {
         />
       </div>
       <div>
-        <Label htmlFor="price">Price {type === 'rent' ? '(per day)' : ''}</Label>
-        <Input 
-          id="price"
-          type="text"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder={`Enter ${type === 'rent' ? 'rental price per day' : 'selling price'}`}
-          required
-        />
-      </div>
-      <div>
         <Label htmlFor="type">Listing Type</Label>
         <Select value={type} onValueChange={setType}>
           <SelectTrigger>
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="rent">For Rent</SelectItem>
+            <SelectItem value="rent">For Rent (per day)</SelectItem>
             <SelectItem value="sale">For Sale</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+      <div>
+        <Label htmlFor="price">
+          {type === 'rent' ? 'Daily Rental Price (BWP)' : 'Selling Price (BWP)'}
+        </Label>
+        <Input 
+          id="price"
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          placeholder={type === 'rent' ? 'Enter daily rental price' : 'Enter selling price'}
+          required
+        />
       </div>
       <div>
         <Label htmlFor="image">Equipment Image</Label>

@@ -6,10 +6,18 @@ import { useState } from "react";
 interface PhoneInputProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-const PhoneInput = ({ value, onChange }: PhoneInputProps) => {
+const PhoneInput = ({ value, onChange, placeholder = "Phone number" }: PhoneInputProps) => {
   const [countryCode, setCountryCode] = useState("+267"); // Botswana
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Remove any non-numeric characters except +
+    const numericValue = inputValue.replace(/[^\d+]/g, '');
+    onChange(numericValue);
+  };
 
   return (
     <div className="flex space-x-2">
@@ -25,9 +33,9 @@ const PhoneInput = ({ value, onChange }: PhoneInputProps) => {
         <Input
           type="tel"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={handleInputChange}
           className="pl-10"
-          placeholder="Phone number"
+          placeholder={placeholder}
         />
       </div>
     </div>
