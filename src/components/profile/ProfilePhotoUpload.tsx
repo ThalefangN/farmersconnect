@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload } from "lucide-react";
 import { uploadImage } from "@/utils/fileUpload";
 import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfilePhotoUploadProps {
   currentPhotoUrl: string | null;
@@ -22,8 +23,9 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
     setIsUploading(true);
 
     try {
-      console.log('Uploading profile photo for user:', userId);
+      console.log('Starting profile photo upload for user:', userId);
       const imageUrl = await uploadImage(file, 'profile_photos');
+      console.log('Image uploaded successfully:', imageUrl);
       
       const { error } = await supabase
         .from('profiles')
@@ -31,17 +33,18 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
         .eq('id', userId);
 
       if (error) {
-        console.error('Error updating profile photo:', error);
+        console.error('Error updating profile photo in database:', error);
         throw error;
       }
 
+      console.log('Profile photo updated in database');
       onPhotoUpdated(imageUrl);
       toast({
         title: "Success",
         description: "Profile photo updated successfully",
       });
     } catch (error) {
-      console.error('Error uploading profile photo:', error);
+      console.error('Error in photo upload process:', error);
       toast({
         title: "Error",
         description: "Failed to upload profile photo. Please try again.",
@@ -54,12 +57,17 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative">
-        <img
-          src={currentPhotoUrl || "/placeholder.svg"}
-          alt="Profile"
-          className="w-32 h-32 rounded-full object-cover"
-        />
+      <div className="relative w-32 h-32">
+        <Avatar className="w-32 h-32">
+          <AvatarImage
+            src={currentPhotoUrl || "/placeholder.svg"}
+            alt="Profile"
+            className="object-cover"
+          />
+          <AvatarFallback>
+            {userId.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
         <input
           type="file"
           accept="image/*"
