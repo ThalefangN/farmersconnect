@@ -34,6 +34,16 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
       return;
     }
 
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Please upload an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
 
     try {
@@ -71,8 +81,8 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-32 h-32 group">
-        <Avatar className="w-32 h-32 border-2 border-gray-200">
+      <div className="relative w-32 h-32 group cursor-pointer">
+        <Avatar className="w-32 h-32 border-2 border-gray-200 transition-all duration-200 hover:border-primary">
           <AvatarImage
             src={currentPhotoUrl || "/placeholder.svg"}
             alt="Profile"
@@ -82,7 +92,7 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
             {userId.slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-full">
           <Camera className="w-6 h-6 text-white" />
         </div>
         <input
@@ -98,7 +108,7 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
         <Button 
           variant="outline" 
           disabled={isUploading}
-          className="cursor-pointer"
+          className="cursor-pointer hover:bg-primary/10 transition-colors"
         >
           {isUploading ? (
             <>
