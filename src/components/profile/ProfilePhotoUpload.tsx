@@ -22,6 +22,7 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
     setIsUploading(true);
 
     try {
+      console.log('Uploading profile photo for user:', userId);
       const imageUrl = await uploadImage(file, 'profile_photos');
       
       const { error } = await supabase
@@ -29,7 +30,10 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
         .update({ profile_photo_url: imageUrl })
         .eq('id', userId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating profile photo:', error);
+        throw error;
+      }
 
       onPhotoUpdated(imageUrl);
       toast({
@@ -40,7 +44,7 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
       console.error('Error uploading profile photo:', error);
       toast({
         title: "Error",
-        description: "Failed to upload profile photo",
+        description: "Failed to upload profile photo. Please try again.",
         variant: "destructive",
       });
     } finally {

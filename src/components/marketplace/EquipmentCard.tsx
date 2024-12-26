@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Tag, Trash2, Eye } from "lucide-react";
-import InquiryDialog from "@/components/resources/InquiryDialog";
-import RequestsDialog from "@/components/resources/RequestsDialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import RequestsDialog from "@/components/resources/RequestsDialog";
 
 interface Equipment {
   id: string;
@@ -30,9 +29,8 @@ interface EquipmentCardProps {
 }
 
 const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProps) => {
-  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
-  const [showRequestsDialog, setShowRequestsDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showRequestsDialog, setShowRequestsDialog] = useState(false);
   const { toast } = useToast();
 
   const handleDelete = async () => {
@@ -106,7 +104,6 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
         )}
         <CardHeader>
           <CardTitle>{equipment.name}</CardTitle>
-          <CardDescription>{equipment.description}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -133,18 +130,8 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
             </div>
             
             <div className="pt-4 space-y-2">
-              {!isOwner && (
-                <Button
-                  onClick={() => setShowInquiryDialog(true)}
-                  disabled={equipment.status !== "Available"}
-                  className="w-full bg-green-600 hover:bg-green-700"
-                >
-                  {equipment.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
-                </Button>
-              )}
-
               {isOwner && (
-                <>
+                <div className="space-y-2">
                   <Button
                     onClick={() => setShowRequestsDialog(true)}
                     className="w-full bg-blue-600 hover:bg-blue-700"
@@ -161,20 +148,12 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
                     <Trash2 className="h-4 w-4 mr-2" />
                     {isDeleting ? 'Deleting...' : 'Delete Equipment'}
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </div>
         </CardContent>
       </Card>
-
-      <InquiryDialog
-        isOpen={showInquiryDialog}
-        onClose={() => setShowInquiryDialog(false)}
-        itemTitle={equipment.name}
-        itemType={equipment.type}
-        equipmentId={equipment.id}
-      />
 
       <RequestsDialog
         isOpen={showRequestsDialog}
