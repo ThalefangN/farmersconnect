@@ -16,55 +16,62 @@ interface RequestsDialogProps {
 const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) => {
   const { toast } = useToast();
 
+  // Only fetch requests if we have an equipmentId and the dialog is open
   const { data: requests, refetch } = useQuery({
     queryKey: ['equipment-requests', equipmentId],
     queryFn: async () => {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      
-      // Validate equipmentId
-      if (!equipmentId) {
-        console.error("No equipment ID provided");
-        return [];
-      }
+      try {
+        console.log('Fetching requests for equipment:', equipmentId);
+        
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Not authenticated");
+        
+        const { data, error } = await supabase
+          .from('equipment_requests')
+          .select(`
+            *,
+            equipment:equipment(name, type, price, owner_id)
+          `)
+          .eq('equipment_id', equipmentId)
+          .eq('equipment.owner_id', user.id);
 
-      const { data, error } = await supabase
-        .from('equipment_requests')
-        .select(`
-          *,
-          equipment:equipment(name, type, price, owner_id)
-        `)
-        .eq('equipment_id', equipmentId)
-        .eq('equipment.owner_id', user.id);
+        if (error) {
+          console.error('Error fetching requests:', error);
+          throw error;
+        }
 
-      if (error) {
-        console.error('Error fetching requests:', error);
+        console.log('Fetched requests:', data);
+        return data || [];
+      } catch (error) {
+        console.error('Error in queryFn:', error);
         throw error;
       }
-
-      return data || [];
     },
     enabled: isOpen && !!equipmentId, // Only run query if dialog is open and equipmentId exists
   });
 
   const handleAction = async (requestId: string, action: 'approve' | 'reject') => {
     try {
-      const { error } = await supabase
+      console.log('Handling action:', action, 'for request:', requestId);
+      
+      const { error: updateError } = await supabase
         .from('equipment_requests')
         .update({ status: action === 'approve' ? 'approved' : 'rejected' })
         .eq('id', requestId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
       if (action === 'approve') {
         // Update equipment status to indicate it's being rented/sold
         const request = requests?.find(r => r.id === requestId);
         if (request) {
-          await supabase
+          const { error: equipmentError } = await supabase
             .from('equipment')
             .update({ status: 'Not Available' })
             .eq('id', request.equipment_id);
+
+          if (equipmentError) throw equipmentError;
         }
       }
 
@@ -144,7 +151,7 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
                 )}
               </div>
             ))}
-            {requests?.length === 0 && (
+            {!requests?.length && (
               <div className="text-center text-gray-500 py-8">
                 No requests found
               </div>

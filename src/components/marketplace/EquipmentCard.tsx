@@ -38,6 +38,7 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
+      console.log('Attempting to delete equipment:', equipment.id);
 
       // Check if equipment has any pending requests
       const { data: requests, error: requestsError } = await supabase
@@ -45,7 +46,10 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
         .select('id, status')
         .eq('equipment_id', equipment.id);
 
-      if (requestsError) throw requestsError;
+      if (requestsError) {
+        console.error('Error checking requests:', requestsError);
+        throw requestsError;
+      }
 
       if (requests && requests.some(req => req.status === 'pending' || req.status === 'approved')) {
         toast({
@@ -62,7 +66,10 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
         .delete()
         .eq('id', equipment.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('Error deleting equipment:', deleteError);
+        throw deleteError;
+      }
 
       toast({
         title: "Success",
@@ -83,6 +90,7 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
   };
 
   const isOwner = currentUserId === equipment.owner_id;
+  console.log('Equipment owner check:', { currentUserId, ownerId: equipment.owner_id, isOwner });
 
   return (
     <>
