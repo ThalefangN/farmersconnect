@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
-import { Card } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 import { GroupMediaUpload } from "./GroupMediaUpload";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { MessageItem } from "./discussion/MessageItem";
 
-interface Message {
+export interface Message {
   id: string;
   content: string;
   media_url: string | null;
@@ -44,7 +42,6 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
 
       if (error) throw error;
       
-      // Type assertion to ensure message_type is one of the allowed values
       const typedMessages = (data || []).map(message => ({
         ...message,
         message_type: validateMessageType(message.message_type)
@@ -63,40 +60,12 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
     }
   };
 
-  // Helper function to validate message_type
   const validateMessageType = (type: string): 'text' | 'image' | 'video' | 'audio' => {
     const validTypes = ['text', 'image', 'video', 'audio'];
     return validTypes.includes(type) ? type as 'text' | 'image' | 'video' | 'audio' : 'text';
   };
 
-  useEffect(() => {
-    fetchMessages();
-
-    // Subscribe to new messages
-    const channel = supabase
-      .channel('group_messages_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'group_messages',
-          filter: `group_id=eq.${groupId}`
-        },
-        () => {
-          fetchMessages();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [groupId]);
-
-  const handleDeleteMessage = async (messageId: string, userId: string) => {
-    if (userId !== currentUserId) return;
-
+  const handleDeleteMessage = async (messageId: string) => {
     try {
       const { error } = await supabase
         .from('group_messages')
@@ -121,42 +90,29 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
     }
   };
 
-  const renderMedia = (message: Message) => {
-    if (!message.media_url) return null;
+  useEffect(() => {
+    fetchMessages();
 
-    switch (message.message_type) {
-      case 'image':
-        return (
-          <img
-            src={message.media_url}
-            alt="Shared image"
-            className="max-w-full h-auto rounded-lg"
-          />
-        );
-      case 'video':
-        return (
-          <video
-            controls
-            className="max-w-full rounded-lg"
-          >
-            <source src={message.media_url} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        );
-      case 'audio':
-        return (
-          <audio
-            controls
-            className="w-full"
-          >
-            <source src={message.media_url} type="audio/webm" />
-            Your browser does not support the audio element.
-          </audio>
-        );
-      default:
-        return null;
-    }
-  };
+    const channel = supabase
+      .channel('group_messages_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'group_messages',
+          filter: `group_id=eq.${groupId}`
+        },
+        () => {
+          fetchMessages();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [groupId]);
 
   if (isLoading) {
     return (
@@ -172,29 +128,12 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
       
       <div className="space-y-4">
         {messages.map((message) => (
-          <Card key={message.id} className="p-4">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <p className="font-medium">{message.profiles?.full_name || 'Unknown User'}</p>
-                <p className="text-sm text-gray-500">
-                  {format(new Date(message.created_at), 'MMM d, yyyy HH:mm')}
-                </p>
-              </div>
-              {message.user_id === currentUserId && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteMessage(message.id, message.user_id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-            {message.content && (
-              <p className="text-gray-700 mb-2">{message.content}</p>
-            )}
-            {renderMedia(message)}
-          </Card>
+          <MessageItem
+            key={message.id}
+            message={message}
+            currentUserId={currentUserId}
+            onDelete={handleDeleteMessage}
+          />
         ))}
       </div>
     </div>
