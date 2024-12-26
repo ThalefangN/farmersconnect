@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Camera } from "lucide-react";
 import { uploadImage } from "@/utils/fileUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -17,9 +17,23 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
   const { toast } = useToast();
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || !event.target.files[0]) return;
+    if (!event.target.files || !event.target.files[0]) {
+      console.log('No file selected');
+      return;
+    }
 
     const file = event.target.files[0];
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "File size must be less than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
 
     try {
@@ -57,17 +71,20 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-32 h-32">
-        <Avatar className="w-32 h-32">
+      <div className="relative w-32 h-32 group">
+        <Avatar className="w-32 h-32 border-2 border-gray-200">
           <AvatarImage
             src={currentPhotoUrl || "/placeholder.svg"}
             alt="Profile"
             className="object-cover"
           />
-          <AvatarFallback>
+          <AvatarFallback className="bg-primary/10">
             {userId.slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+          <Camera className="w-6 h-6 text-white" />
+        </div>
         <input
           type="file"
           accept="image/*"
