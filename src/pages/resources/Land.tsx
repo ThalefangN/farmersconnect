@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Share2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { MapPin, Plus, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import BottomNav from "@/components/BottomNav";
-import RequestsDialog from "@/components/resources/RequestsDialog";
-import InquiryDialog from "@/components/resources/InquiryDialog";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import InquiryDialog from "@/components/resources/InquiryDialog";
+import ContactDetailsDialog from "@/components/resources/ContactDetailsDialog";
+import RequestsDialog from "@/components/resources/RequestsDialog";
+import ListLandDialog from "@/components/resources/ListLandDialog";
+import BottomNav from "@/components/BottomNav";
 
 interface Land {
   id: string;
@@ -17,15 +19,18 @@ interface Land {
     name: string | null;
     phone?: string | null;
   };
+  image_url?: string | null;
 }
 
 const LandPage = () => {
   const { toast } = useToast();
   const [showRequests, setShowRequests] = useState(false);
   const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+  const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedLand, setSelectedLand] = useState<Land | null>(null);
   const [landList, setLandList] = useState<Land[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [showListDialog, setShowListDialog] = useState(false);
 
   useEffect(() => {
     const loadLand = async () => {
@@ -52,6 +57,7 @@ const LandPage = () => {
             name: item.name,
             description: item.description,
             location: item.location || 'Location not specified',
+            image_url: item.image_url,
             owner: {
               name: item.owner.full_name,
               phone: item.owner.phone_text
@@ -69,6 +75,27 @@ const LandPage = () => {
     };
 
     loadLand();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('equipment_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'equipment',
+          filter: 'type=eq.land'
+        },
+        () => {
+          loadLand();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [toast]);
 
   const handleInquiry = (land: Land) => {
@@ -76,51 +103,86 @@ const LandPage = () => {
     setShowInquiryDialog(true);
   };
 
-  return (
-    <div className="container mx-auto p-4 pb-20">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-6 w-6" />
-            <h1 className="text-2xl font-bold">Available Land</h1>
-          </div>
-          <Button 
-            onClick={() => setShowRequests(true)}
-            variant="outline"
-            className="ml-2"
-          >
-            View Requests
-          </Button>
-        </div>
+  const handleViewContact = (land: Land) => {
+    setSelectedLand(land);
+    setShowContactDialog(true);
+  };
 
-        <div className="grid gap-4">
-          {landList.map((land) => (
-            <motion.div
-              key={land.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+  const checkOwnership = async (ownerId: string): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    return user?.id === ownerId;
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
+      <div className="p-4 space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-6 w-6" />
+              <h1 className="text-2xl font-bold">Available Land</h1>
+            </div>
+            <Button
+              onClick={() => setShowListDialog(true)}
+              className="bg-green-600 hover:bg-green-700"
             >
-              <div className="bg-white rounded-lg p-6 shadow-md">
-                <h2 className="text-xl font-semibold text-green-800 mb-2">{land.name}</h2>
-                <p className="text-gray-600 mb-4">{land.description}</p>
-                <p className="text-gray-600 mb-4">Location: {land.location}</p>
-                <Button 
-                  className="w-full bg-green-600 hover:bg-green-700"
-                  onClick={() => handleInquiry(land)}
-                >
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Inquire About This Land
-                </Button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+              <Plus className="mr-2 h-4 w-4" />
+              List Land
+            </Button>
+          </div>
+
+          <div className="grid gap-4">
+            {landList.map((land) => (
+              <motion.div
+                key={land.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-lg shadow-md p-4"
+              >
+                {land.image_url && (
+                  <img
+                    src={land.image_url}
+                    alt={land.name}
+                    className="w-full h-48 object-cover rounded-md mb-4"
+                  />
+                )}
+                <h3 className="text-lg font-semibold">{land.name}</h3>
+                <p className="text-gray-600">{land.description}</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Location: {land.location}
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    onClick={() => handleInquiry(land)}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Make Inquiry
+                  </Button>
+                  <Button
+                    onClick={() => handleViewContact(land)}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Contact Details
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {showListDialog && (
+        <ListLandDialog
+          isOpen={showListDialog}
+          onClose={() => setShowListDialog(false)}
+        />
+      )}
 
       <RequestsDialog
         isOpen={showRequests}
@@ -128,15 +190,29 @@ const LandPage = () => {
       />
 
       {selectedLand && (
-        <InquiryDialog
-          isOpen={showInquiryDialog}
-          onClose={() => {
-            setShowInquiryDialog(false);
-            setSelectedLand(null);
-          }}
-          itemTitle={selectedLand.name}
-          itemType="sale"
-        />
+        <>
+          {showInquiryDialog && (
+            <InquiryDialog
+              isOpen={showInquiryDialog}
+              onClose={() => setShowInquiryDialog(false)}
+              itemTitle={selectedLand.name}
+              itemType="sale"
+              equipmentId={selectedLand.id}
+            />
+          )}
+          {showContactDialog && (
+            <ContactDetailsDialog
+              isOpen={showContactDialog}
+              onClose={() => setShowContactDialog(false)}
+              ownerDetails={{
+                name: selectedLand.owner.name || '',
+                phone: selectedLand.owner.phone || '',
+                email: '',
+                location: selectedLand.location
+              }}
+            />
+          )}
+        </>
       )}
 
       <BottomNav />
