@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import PhoneInput from "@/components/PhoneInput";
 import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface InquiryDialogProps {
   isOpen: boolean;
@@ -111,119 +112,121 @@ const InquiryDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] h-[90vh]">
         <DialogHeader>
           <DialogTitle>Request {itemType === 'rent' ? 'Rental' : 'Purchase'}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            Requesting: {itemTitle}
-          </p>
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name *</Label>
-            <Input
-              id="fullName"
-              value={formData.fullName}
-              onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-              placeholder="Enter your full name"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number *</Label>
-            <PhoneInput
-              value={formData.phone}
-              onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="whatsappNumber">WhatsApp Number (Optional)</Label>
-            <PhoneInput
-              value={formData.whatsappNumber}
-              onChange={(value) => setFormData(prev => ({ ...prev, whatsappNumber: value }))}
-              placeholder="WhatsApp number"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="location">Location *</Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-              placeholder="Enter your location"
-            />
-          </div>
-          {itemType === 'rent' && (
+        <ScrollArea className="h-full pr-4">
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Requesting: {itemTitle}
+            </p>
             <div className="space-y-2">
-              <Label htmlFor="rentalDays">Number of Days *</Label>
+              <Label htmlFor="fullName">Full Name *</Label>
               <Input
-                id="rentalDays"
-                type="number"
-                value={formData.rentalDays}
-                onChange={(e) => setFormData(prev => ({ ...prev, rentalDays: e.target.value }))}
-                placeholder="Enter number of days"
+                id="fullName"
+                value={formData.fullName}
+                onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                placeholder="Enter your full name"
               />
-              {totalAmount > 0 && (
-                <p className="text-sm text-green-600 font-medium mt-1">
-                  Total Amount: BWP {totalAmount.toFixed(2)}
-                </p>
-              )}
             </div>
-          )}
-          <div className="space-y-2">
-            <Label>Preferred Delivery Date *</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formData.deliveryDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.deliveryDate ? format(formData.deliveryDate, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={formData.deliveryDate}
-                  onSelect={(date) => setFormData(prev => ({ ...prev, deliveryDate: date }))}
-                  initialFocus
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number *</Label>
+              <PhoneInput
+                value={formData.phone}
+                onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="whatsappNumber">WhatsApp Number (Optional)</Label>
+              <PhoneInput
+                value={formData.whatsappNumber}
+                onChange={(value) => setFormData(prev => ({ ...prev, whatsappNumber: value }))}
+                placeholder="WhatsApp number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location *</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                placeholder="Enter your location"
+              />
+            </div>
+            {itemType === 'rent' && (
+              <div className="space-y-2">
+                <Label htmlFor="rentalDays">Number of Days *</Label>
+                <Input
+                  id="rentalDays"
+                  type="number"
+                  value={formData.rentalDays}
+                  onChange={(e) => setFormData(prev => ({ ...prev, rentalDays: e.target.value }))}
+                  placeholder="Enter number of days"
                 />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <PaymentMethodSelector
-            value={formData.paymentMethod}
-            onChange={(value) => setFormData(prev => ({ ...prev, paymentMethod: value }))}
-          />
-          <div className="space-y-2">
-            <Label htmlFor="message">Additional Notes</Label>
-            <Textarea
-              id="message"
-              value={formData.message}
-              onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-              placeholder="Enter any additional details or questions..."
-              className="min-h-[100px]"
+                {totalAmount > 0 && (
+                  <p className="text-sm text-green-600 font-medium mt-1">
+                    Total Amount: BWP {totalAmount.toFixed(2)}
+                  </p>
+                )}
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Preferred Delivery Date *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formData.deliveryDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.deliveryDate ? format(formData.deliveryDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.deliveryDate}
+                    onSelect={(date) => setFormData(prev => ({ ...prev, deliveryDate: date }))}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <PaymentMethodSelector
+              value={formData.paymentMethod}
+              onChange={(value) => setFormData(prev => ({ ...prev, paymentMethod: value }))}
             />
+            <div className="space-y-2">
+              <Label htmlFor="message">Additional Notes</Label>
+              <Textarea
+                id="message"
+                value={formData.message}
+                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                placeholder="Enter any additional details or questions..."
+                className="min-h-[100px]"
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button onClick={handleSubmit} className="flex-1" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Submitting...</span>
+                  </div>
+                ) : (
+                  "Submit Request"
+                )}
+              </Button>
+              <Button onClick={onClose} variant="outline" className="flex-1">
+                Cancel
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={handleSubmit} className="flex-1" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Submitting...</span>
-                </div>
-              ) : (
-                "Submit Request"
-              )}
-            </Button>
-            <Button onClick={onClose} variant="outline" className="flex-1">
-              Cancel
-            </Button>
-          </div>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

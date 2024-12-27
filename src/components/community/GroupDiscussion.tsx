@@ -4,6 +4,7 @@ import { GroupMediaUpload } from "./GroupMediaUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { MessageItem } from "./discussion/MessageItem";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface Message {
   id: string;
@@ -123,19 +124,21 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-gradient-to-b from-purple-50 to-white rounded-lg shadow-lg p-6">
       <GroupMediaUpload groupId={groupId} onSuccess={fetchMessages} />
       
-      <div className="space-y-4">
-        {messages.map((message) => (
-          <MessageItem
-            key={message.id}
-            message={message}
-            currentUserId={currentUserId}
-            onDelete={handleDeleteMessage}
-          />
-        ))}
-      </div>
+      <ScrollArea className="h-[calc(100vh-300px)]">
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <MessageItem
+              key={message.id}
+              message={message}
+              currentUserId={currentUserId}
+              onDelete={handleDeleteMessage}
+            />
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 }

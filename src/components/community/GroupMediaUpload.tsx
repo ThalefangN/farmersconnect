@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, X, Mic, Square } from "lucide-react";
+import { Upload, X, Mic, Square, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +13,7 @@ interface GroupMediaUploadProps {
 
 export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [description, setDescription] = useState("");
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -60,8 +60,8 @@ export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) 
     }
   };
 
-  const handleUpload = async () => {
-    if (!file) return;
+  const handleSendMessage = async () => {
+    if (!message.trim() && !file) return;
 
     try {
       setIsLoading(true);
@@ -69,19 +69,28 @@ export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Upload file to storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('group_media')
-        .upload(fileName, file);
+      let mediaUrl = null;
+      let messageType = 'text';
 
-      if (uploadError) throw uploadError;
+      if (file) {
+        // Upload file to storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('group_media')
+          .upload(fileName, file);
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('group_media')
-        .getPublicUrl(fileName);
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('group_media')
+          .getPublicUrl(fileName);
+
+        mediaUrl = publicUrl;
+        messageType = file.type.startsWith('audio/') ? 'audio' : 
+                     file.type.startsWith('video/') ? 'video' : 'image';
+      }
 
       // Create message in database
       const { error: messageError } = await supabase
@@ -89,27 +98,26 @@ export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) 
         .insert({
           group_id: groupId,
           user_id: user.id,
-          content: description,
-          media_url: publicUrl,
-          message_type: file.type.startsWith('audio/') ? 'audio' : 
-                       file.type.startsWith('video/') ? 'video' : 'image'
+          content: message,
+          media_url: mediaUrl,
+          message_type: messageType
         });
 
       if (messageError) throw messageError;
 
       toast({
         title: "Success",
-        description: "Media uploaded successfully",
+        description: "Message sent successfully",
       });
 
       setFile(null);
-      setDescription("");
+      setMessage("");
       onSuccess();
     } catch (error) {
-      console.error('Error uploading media:', error);
+      console.error('Error sending message:', error);
       toast({
         title: "Error",
-        description: "Failed to upload media",
+        description: "Failed to send message",
         variant: "destructive",
       });
     } finally {
@@ -118,7 +126,14 @@ export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) 
   };
 
   return (
-    <div className="space-y-4 p-4 bg-white rounded-lg shadow">
+    <div className="space-y-4 bg-white rounded-lg shadow p-4">
+      <Textarea
+        placeholder="Write a message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="min-h-[100px] resize-none"
+      />
+      
       <div className="flex items-center gap-2">
         <Input
           type="file"
@@ -155,25 +170,21 @@ export function GroupMediaUpload({ groupId, onSuccess }: GroupMediaUploadProps) 
             <X className="h-4 w-4" />
           </Button>
         )}
+        <Button
+          onClick={handleSendMessage}
+          disabled={isLoading || (!message.trim() && !file)}
+          className="bg-purple-600 hover:bg-purple-700 text-white"
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <Send className="h-4 w-4 mr-2" />
+              Send
+            </>
+          )}
+        </Button>
       </div>
-
-      {file && (
-        <>
-          <Textarea
-            placeholder="Add a description..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <Button
-            onClick={handleUpload}
-            disabled={isLoading}
-            className="w-full bg-green-600 hover:bg-green-700"
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            {isLoading ? "Uploading..." : "Upload"}
-          </Button>
-        </>
-      )}
     </div>
   );
 }

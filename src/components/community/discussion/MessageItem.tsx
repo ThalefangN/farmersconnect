@@ -1,89 +1,70 @@
-import { useState } from "react";
 import { format } from "date-fns";
-import { Card } from "@/components/ui/card";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Trash2, ThumbsUp, Heart, Laugh } from "lucide-react";
-import { MessageReactions } from "./MessageReactions";
-import { MessageComments } from "./MessageComments";
-import type { Message } from "../GroupDiscussion";
+import { Message } from "../GroupDiscussion";
 
 interface MessageItemProps {
   message: Message;
   currentUserId?: string;
-  onDelete: (messageId: string) => Promise<void>;
+  onDelete: (messageId: string) => void;
 }
 
 export function MessageItem({ message, currentUserId, onDelete }: MessageItemProps) {
-  const [showComments, setShowComments] = useState(false);
-
-  const renderMedia = () => {
-    if (!message.media_url) return null;
-
-    switch (message.message_type) {
-      case 'image':
-        return (
-          <img
-            src={message.media_url}
-            alt="Shared image"
-            className="max-w-full h-auto rounded-lg"
-          />
-        );
-      case 'video':
-        return (
-          <video controls className="max-w-full rounded-lg">
-            <source src={message.media_url} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        );
-      case 'audio':
-        return (
-          <audio controls className="w-full">
-            <source src={message.media_url} type="audio/webm" />
-            Your browser does not support the audio element.
-          </audio>
-        );
-      default:
-        return null;
-    }
-  };
+  const isOwner = currentUserId === message.user_id;
+  const formattedDate = format(new Date(message.created_at), 'PPp');
 
   return (
-    <Card key={message.id} className="p-4">
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <p className="font-medium">{message.profiles?.full_name || 'Unknown User'}</p>
-          <p className="text-sm text-gray-500">
-            {format(new Date(message.created_at), 'MMM d, yyyy HH:mm')}
-          </p>
+    <div className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
+      <div className={`max-w-[80%] ${isOwner ? 'bg-purple-100' : 'bg-white'} rounded-lg shadow p-4`}>
+        <div className="flex justify-between items-start gap-2">
+          <div>
+            <p className="font-medium text-sm text-purple-800">
+              {message.profiles?.full_name || 'Anonymous'}
+            </p>
+            <p className="text-xs text-gray-500">{formattedDate}</p>
+          </div>
+          {isOwner && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(message.id)}
+              className="h-8 w-8 text-red-500 hover:text-red-700"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
-        {message.user_id === currentUserId && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(message.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+
+        {message.content && (
+          <p className="mt-2 text-gray-700 whitespace-pre-wrap">{message.content}</p>
+        )}
+
+        {message.media_url && (
+          <div className="mt-2">
+            {message.message_type === 'image' && (
+              <img
+                src={message.media_url}
+                alt="Shared media"
+                className="max-w-full rounded-lg"
+              />
+            )}
+            {message.message_type === 'video' && (
+              <video
+                src={message.media_url}
+                controls
+                className="max-w-full rounded-lg"
+              />
+            )}
+            {message.message_type === 'audio' && (
+              <audio
+                src={message.media_url}
+                controls
+                className="w-full"
+              />
+            )}
+          </div>
         )}
       </div>
-      {message.content && (
-        <p className="text-gray-700 mb-2">{message.content}</p>
-      )}
-      {renderMedia()}
-      
-      <div className="mt-4 space-y-2">
-        <MessageReactions messageId={message.id} currentUserId={currentUserId} />
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => setShowComments(!showComments)}
-        >
-          {showComments ? 'Hide Comments' : 'Show Comments'}
-        </Button>
-        {showComments && (
-          <MessageComments messageId={message.id} currentUserId={currentUserId} />
-        )}
-      </div>
-    </Card>
+    </div>
   );
 }
