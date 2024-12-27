@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,12 +20,14 @@ const ListLandDialog = ({
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [type, setType] = useState<"rent" | "sale">("sale");
+  const [price, setPrice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !location) {
+    if (!name || !location || !price || !type) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -69,11 +72,12 @@ const ListLandDialog = ({
           name,
           description,
           location,
-          type: 'Land',  // Changed from lowercase 'land' to 'Land'
+          type: 'Land',
           owner_id: user.id,
           image_url: imageUrl,
-          price: '0',
-          status: 'Available'
+          price: price,
+          status: 'Available',
+          price_numeric: parseFloat(price)
         });
 
       if (error) {
@@ -139,6 +143,36 @@ const ListLandDialog = ({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Enter location"
+              required
+            />
+          </div>
+          <div>
+            <Label>Listing Type *</Label>
+            <RadioGroup
+              value={type}
+              onValueChange={(value: "rent" | "sale") => setType(value)}
+              className="flex gap-4 mt-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="sale" id="sale" />
+                <Label htmlFor="sale">For Sale</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rent" id="rent" />
+                <Label htmlFor="rent">For Rent</Label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label htmlFor="price">
+              {type === "rent" ? "Rental Price (per day) *" : "Selling Price *"}
+            </Label>
+            <Input
+              id="price"
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder={`Enter ${type === "rent" ? "rental" : "selling"} price`}
               required
             />
           </div>

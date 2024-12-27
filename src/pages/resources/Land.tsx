@@ -15,6 +15,8 @@ interface Land {
   name: string;
   description: string | null;
   location: string;
+  price: string;
+  type: string;
   owner: {
     name: string | null;
     phone?: string | null;
@@ -48,7 +50,7 @@ const LandPage = () => {
                 phone_text
               )
             `)
-            .eq('type', 'land');
+            .eq('type', 'Land');
 
           if (error) throw error;
 
@@ -57,6 +59,8 @@ const LandPage = () => {
             name: item.name,
             description: item.description,
             location: item.location || 'Location not specified',
+            price: item.price,
+            type: item.type,
             image_url: item.image_url,
             owner: {
               name: item.owner.full_name,
@@ -76,7 +80,6 @@ const LandPage = () => {
 
     loadLand();
 
-    // Subscribe to real-time updates
     const channel = supabase
       .channel('equipment_changes')
       .on(
@@ -85,7 +88,7 @@ const LandPage = () => {
           event: '*',
           schema: 'public',
           table: 'equipment',
-          filter: 'type=eq.land'
+          filter: 'type=eq.Land'
         },
         () => {
           loadLand();
@@ -106,11 +109,6 @@ const LandPage = () => {
   const handleViewContact = (land: Land) => {
     setSelectedLand(land);
     setShowContactDialog(true);
-  };
-
-  const checkOwnership = async (ownerId: string): Promise<boolean> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user?.id === ownerId;
   };
 
   return (
@@ -155,13 +153,17 @@ const LandPage = () => {
                 <p className="text-sm text-gray-500 mt-2">
                   Location: {land.location}
                 </p>
+                <p className="text-green-600 font-medium mt-2">
+                  BWP {land.price}
+                  {land.type === 'rent' ? ' per day' : ''}
+                </p>
                 <div className="mt-4 flex gap-2">
                   <Button
                     onClick={() => handleInquiry(land)}
                     className="flex-1 bg-green-600 hover:bg-green-700"
                   >
                     <Share2 className="mr-2 h-4 w-4" />
-                    Make Inquiry
+                    {land.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
                   </Button>
                   <Button
                     onClick={() => handleViewContact(land)}
@@ -196,8 +198,9 @@ const LandPage = () => {
               isOpen={showInquiryDialog}
               onClose={() => setShowInquiryDialog(false)}
               itemTitle={selectedLand.name}
-              itemType="sale"
+              itemType={selectedLand.type === 'rent' ? 'rent' : 'sale'}
               equipmentId={selectedLand.id}
+              pricePerDay={selectedLand.type === 'rent' ? parseFloat(selectedLand.price) : undefined}
             />
           )}
           {showContactDialog && (

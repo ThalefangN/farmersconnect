@@ -12,6 +12,8 @@ interface LandDetailsProps {
       accessibility: string;
       facilities: string;
       previousCrops: string;
+      price: string;
+      type: string;
     };
   } | null;
   onContactOwner: () => void;
@@ -49,11 +51,18 @@ const LandDetails = ({ isOpen, onClose, selectedLand, onContactOwner }: LandDeta
             <h4 className="font-semibold mb-2">Previous Crops</h4>
             <p>{selectedLand.details.previousCrops}</p>
           </div>
+          <div>
+            <h4 className="font-semibold mb-2">Price</h4>
+            <p className="text-green-600 font-medium">
+              BWP {selectedLand.details.price}
+              {selectedLand.details.type === 'rent' ? ' per day' : ''}
+            </p>
+          </div>
           <Button 
             className="w-full"
             onClick={onContactOwner}
           >
-            Contact Owner
+            {selectedLand.details.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
           </Button>
         </div>
       </DialogContent>
