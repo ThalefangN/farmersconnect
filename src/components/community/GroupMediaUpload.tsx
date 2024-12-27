@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, X, Mic, Square, Send } from "lucide-react";
+import { Upload, X, Mic, Square, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
