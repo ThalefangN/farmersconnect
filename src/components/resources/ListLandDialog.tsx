@@ -34,12 +34,14 @@ const ListLandDialog = ({
     }
 
     try {
+      console.log("Starting land listing submission...");
       setIsSubmitting(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       let imageUrl = null;
       if (image) {
+        console.log("Uploading image...");
         const fileExt = image.name.split('.').pop();
         const filePath = `${Math.random()}.${fileExt}`;
         
@@ -47,30 +49,39 @@ const ListLandDialog = ({
           .from('equipment')
           .upload(filePath, image);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error("Image upload error:", uploadError);
+          throw uploadError;
+        }
         
         const { data: { publicUrl } } = supabase.storage
           .from('equipment')
           .getPublicUrl(filePath);
           
         imageUrl = publicUrl;
+        console.log("Image uploaded successfully:", imageUrl);
       }
 
+      console.log("Inserting land record...");
       const { error } = await supabase
         .from('equipment')
         .insert({
           name,
           description,
           location,
-          type: 'land',
+          type: 'Land',  // Changed from lowercase 'land' to 'Land'
           owner_id: user.id,
           image_url: imageUrl,
           price: '0',
           status: 'Available'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database insertion error:", error);
+        throw error;
+      }
 
+      console.log("Land listed successfully");
       toast({
         title: "Success",
         description: "Land listed successfully",
