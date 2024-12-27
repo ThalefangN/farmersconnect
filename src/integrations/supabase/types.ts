@@ -128,6 +128,7 @@ export type Database = {
           phone: string
           phone_number: string | null
           preferred_delivery_date: string | null
+          quantity: number | null
           rental_days: number | null
           status: string
           updated_at: string
@@ -144,6 +145,7 @@ export type Database = {
           phone: string
           phone_number?: string | null
           preferred_delivery_date?: string | null
+          quantity?: number | null
           rental_days?: number | null
           status?: string
           updated_at?: string
@@ -160,6 +162,7 @@ export type Database = {
           phone?: string
           phone_number?: string | null
           preferred_delivery_date?: string | null
+          quantity?: number | null
           rental_days?: number | null
           status?: string
           updated_at?: string

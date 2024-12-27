@@ -10,28 +10,33 @@ interface RequestsDialogProps {
   isOpen: boolean;
   onClose: () => void;
   equipmentId?: string;
+  userId?: string;
+  type?: 'equipment' | 'seeds' | 'land';
 }
 
-const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) => {
+const RequestsDialog = ({ isOpen, onClose, equipmentId, userId, type }: RequestsDialogProps) => {
   const { toast } = useToast();
 
   const { data: requests, refetch } = useQuery({
-    queryKey: ['equipment-requests', equipmentId],
+    queryKey: ['equipment-requests', equipmentId, userId, type],
     queryFn: async () => {
       try {
-        console.log('Fetching requests for equipment:', equipmentId);
+        console.log('Fetching requests for:', { equipmentId, userId, type });
         
-        // Get current user
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("Not authenticated");
-        
-        const { data, error } = await supabase
+        let query = supabase
           .from('equipment_requests')
           .select(`
             *,
             equipment:equipment(name, type, price, owner_id)
-          `)
-          .eq('equipment_id', equipmentId);
+          `);
+
+        if (equipmentId) {
+          query = query.eq('equipment_id', equipmentId);
+        } else if (userId && type) {
+          query = query.eq('user_id', userId);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           console.error('Error fetching requests:', error);
@@ -45,7 +50,7 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
         throw error;
       }
     },
-    enabled: isOpen && !!equipmentId,
+    enabled: isOpen && (!!equipmentId || !!userId),
   });
 
   const handleAction = async (requestId: string, action: 'approve' | 'reject') => {
@@ -60,7 +65,6 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
       if (updateError) throw updateError;
 
       if (action === 'approve') {
-        // Update equipment status to indicate it's being rented/sold
         const request = requests?.find(r => r.id === requestId);
         if (request) {
           const { error: equipmentError } = await supabase
@@ -87,10 +91,6 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId }: RequestsDialogProps) =
       });
     }
   };
-
-  if (!equipmentId) {
-    return null;
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

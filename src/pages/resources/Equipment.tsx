@@ -35,8 +35,14 @@ const Equipment = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showListDialog, setShowListDialog] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    checkUser();
     fetchEquipment();
 
     const channel = supabase
@@ -57,16 +63,19 @@ const Equipment = () => {
 
   const fetchEquipment = async () => {
     try {
+      console.log('Fetching equipment...');
       const { data, error } = await supabase
         .from("equipment")
         .select(`
           *,
           owner:profiles(full_name, phone_text)
         `)
-        .neq('type', 'seeds')
+        .neq('type', 'Seeds')
+        .neq('type', 'Land')
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+      console.log('Fetched equipment:', data);
       setEquipment(data as Equipment[]);
     } catch (error) {
       console.error("Error fetching equipment:", error);
@@ -114,11 +123,6 @@ const Equipment = () => {
     setShowContactDialog(true);
   };
 
-  const checkOwnership = async (ownerId: string): Promise<boolean> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user?.id === ownerId;
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
       <div className="p-4 space-y-6">
@@ -133,19 +137,23 @@ const Equipment = () => {
               <h1 className="text-2xl font-bold">Farming Equipment</h1>
             </div>
             <div className="flex gap-2">
-              <Button
-                onClick={() => setShowRequests(true)}
-                variant="outline"
-              >
-                View Requests
-              </Button>
-              <Button
-                onClick={() => setShowListDialog(true)}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                List Equipment
-              </Button>
+              {currentUserId && (
+                <>
+                  <Button
+                    onClick={() => setShowRequests(true)}
+                    variant="outline"
+                  >
+                    View Requests
+                  </Button>
+                  <Button
+                    onClick={() => setShowListDialog(true)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    List Equipment
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -186,7 +194,7 @@ const Equipment = () => {
                   >
                     Contact Details
                   </Button>
-                  {checkOwnership(item.owner_id) && (
+                  {currentUserId === item.owner_id && (
                     <Button
                       onClick={() => handleDelete(item.id)}
                       variant="destructive"
@@ -209,10 +217,14 @@ const Equipment = () => {
         />
       )}
 
-      <RequestsDialog
-        isOpen={showRequests}
-        onClose={() => setShowRequests(false)}
-      />
+      {currentUserId && (
+        <RequestsDialog
+          isOpen={showRequests}
+          onClose={() => setShowRequests(false)}
+          userId={currentUserId}
+          type="equipment"
+        />
+      )}
 
       {selectedEquipment && (
         <>

@@ -38,7 +38,6 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
       setIsDeleting(true);
       console.log('Attempting to delete equipment:', equipment.id);
 
-      // Check if equipment has any pending requests
       const { data: requests, error: requestsError } = await supabase
         .from('equipment_requests')
         .select('id, status')
@@ -58,7 +57,6 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
         return;
       }
 
-      // Delete the equipment
       const { error: deleteError } = await supabase
         .from('equipment')
         .delete()
@@ -88,7 +86,6 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
   };
 
   const isOwner = currentUserId === equipment.owner_id;
-  console.log('Equipment owner check:', { currentUserId, ownerId: equipment.owner_id, isOwner });
 
   return (
     <>
@@ -159,6 +156,7 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
         isOpen={showRequestsDialog}
         onClose={() => setShowRequestsDialog(false)}
         equipmentId={equipment.id}
+        type="equipment"
       />
     </>
   );
