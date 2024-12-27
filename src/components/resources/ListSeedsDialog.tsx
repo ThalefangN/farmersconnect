@@ -22,6 +22,7 @@ const ListSeedsDialog = ({ isOpen, onClose }: ListSeedsDialogProps) => {
   }) => {
     try {
       setIsLoading(true);
+      console.log('Starting seed submission process');
       
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -38,7 +39,7 @@ const ListSeedsDialog = ({ isOpen, onClose }: ListSeedsDialogProps) => {
         .insert({
           name: formData.name,
           description: formData.description,
-          type: 'seeds',
+          type: 'Seeds', // Changed from 'seeds' to 'Seeds' to match the constraint
           price: '0',
           location: formData.location,
           status: 'Available',
@@ -46,7 +47,10 @@ const ListSeedsDialog = ({ isOpen, onClose }: ListSeedsDialogProps) => {
           image_url: imageUrl
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Error inserting seed:', insertError);
+        throw insertError;
+      }
 
       toast({
         title: "Success",
