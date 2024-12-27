@@ -10,6 +10,8 @@ export interface Seed {
   updated_at: string;
   image_url: string | null;
   location: string;
+  quantity_per_packet: number;
+  quantity_available: number;
   owner: {
     full_name: string;
     phone_text: string;

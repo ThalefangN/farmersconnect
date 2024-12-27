@@ -11,6 +11,9 @@ interface SeedFormProps {
     description: string;
     location: string;
     image: File | null;
+    price: string;
+    quantityPerPacket: string;
+    quantityAvailable: string;
   }) => Promise<void>;
   isLoading: boolean;
 }
@@ -20,10 +23,21 @@ const SeedForm = ({ onSubmit, isLoading }: SeedFormProps) => {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [price, setPrice] = useState("");
+  const [quantityPerPacket, setQuantityPerPacket] = useState("");
+  const [quantityAvailable, setQuantityAvailable] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit({ name, description, location, image });
+    await onSubmit({ 
+      name, 
+      description, 
+      location, 
+      image,
+      price,
+      quantityPerPacket,
+      quantityAvailable
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +65,39 @@ const SeedForm = ({ onSubmit, isLoading }: SeedFormProps) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Describe your seeds"
+        />
+      </div>
+      <div>
+        <Label htmlFor="price">Price (BWP) *</Label>
+        <Input 
+          id="price"
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          placeholder="Enter price per packet"
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="quantity-per-packet">Seeds per Packet *</Label>
+        <Input 
+          id="quantity-per-packet"
+          type="number"
+          value={quantityPerPacket}
+          onChange={(e) => setQuantityPerPacket(e.target.value)}
+          placeholder="Enter number of seeds per packet"
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="quantity-available">Number of Packets Available *</Label>
+        <Input 
+          id="quantity-available"
+          type="number"
+          value={quantityAvailable}
+          onChange={(e) => setQuantityAvailable(e.target.value)}
+          placeholder="Enter number of packets available"
+          required
         />
       </div>
       <div>

@@ -33,7 +33,7 @@ const Seeds = () => {
           *,
           owner:profiles(full_name, phone_text)
         `)
-        .eq('type', 'seeds')
+        .eq('type', 'Seeds')
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -56,7 +56,7 @@ const Seeds = () => {
         .from("equipment")
         .delete()
         .eq("id", seedId)
-        .eq('type', 'seeds');
+        .eq('type', 'Seeds');
 
       if (error) throw error;
 
@@ -132,18 +132,27 @@ const Seeds = () => {
                 )}
                 <h3 className="text-lg font-semibold">{seed.name}</h3>
                 <p className="text-gray-600">{seed.description}</p>
-                <p className="text-green-600 font-semibold mt-2">
-                  Price: BWP {seed.price}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Location: {seed.location}
-                </p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-green-600 font-semibold">
+                    Price: BWP {seed.price} per packet
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Seeds per packet: {seed.quantity_per_packet}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Available packets: {seed.quantity_available}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Location: {seed.location}
+                  </p>
+                </div>
                 <div className="mt-4 flex gap-2">
                   <Button
                     onClick={() => handleInquiry(seed)}
                     className="flex-1 bg-green-600 hover:bg-green-700"
+                    disabled={seed.quantity_available === 0}
                   >
-                    Make Inquiry
+                    {seed.quantity_available === 0 ? "Out of Stock" : "Make Inquiry"}
                   </Button>
                   <Button
                     onClick={() => handleViewContact(seed)}

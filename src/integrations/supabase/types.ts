@@ -62,6 +62,10 @@ export type Database = {
           owner_id: string
           price: string
           price_numeric: number | null
+          price_per_month: number | null
+          quantity_available: number | null
+          quantity_per_packet: number | null
+          rental_months: number | null
           status: string
           type: string
           updated_at: string
@@ -76,6 +80,10 @@ export type Database = {
           owner_id: string
           price: string
           price_numeric?: number | null
+          price_per_month?: number | null
+          quantity_available?: number | null
+          quantity_per_packet?: number | null
+          rental_months?: number | null
           status?: string
           type: string
           updated_at?: string
@@ -90,6 +98,10 @@ export type Database = {
           owner_id?: string
           price?: string
           price_numeric?: number | null
+          price_per_month?: number | null
+          quantity_available?: number | null
+          quantity_per_packet?: number | null
+          rental_months?: number | null
           status?: string
           type?: string
           updated_at?: string

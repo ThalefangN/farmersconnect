@@ -19,6 +19,9 @@ const ListSeedsDialog = ({ isOpen, onClose }: ListSeedsDialogProps) => {
     description: string;
     location: string;
     image: File | null;
+    price: string;
+    quantityPerPacket: string;
+    quantityAvailable: string;
   }) => {
     try {
       setIsLoading(true);
@@ -39,12 +42,15 @@ const ListSeedsDialog = ({ isOpen, onClose }: ListSeedsDialogProps) => {
         .insert({
           name: formData.name,
           description: formData.description,
-          type: 'Seeds', // Changed from 'seeds' to 'Seeds' to match the constraint
-          price: '0',
+          type: 'Seeds',
+          price: formData.price,
+          price_numeric: parseFloat(formData.price),
           location: formData.location,
           status: 'Available',
           owner_id: user.id,
-          image_url: imageUrl
+          image_url: imageUrl,
+          quantity_per_packet: parseInt(formData.quantityPerPacket),
+          quantity_available: parseInt(formData.quantityAvailable)
         });
 
       if (insertError) {
