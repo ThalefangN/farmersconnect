@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Plus, Share2 } from "lucide-react";
+import { MapPin, Plus, Share2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,7 @@ interface Land {
     phone?: string | null;
   };
   image_url?: string | null;
+  owner_id: string;
 }
 
 const LandPage = () => {
@@ -31,75 +32,56 @@ const LandPage = () => {
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedLand, setSelectedLand] = useState<Land | null>(null);
   const [landList, setLandList] = useState<Land[]>([]);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showListDialog, setShowListDialog] = useState(false);
 
   useEffect(() => {
-    const loadLand = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          setCurrentUser(user);
-          
-          const { data: landData, error } = await supabase
-            .from('equipment')
-            .select(`
-              *,
-              owner:profiles!equipment_owner_id_fkey (
-                full_name,
-                phone_text
-              )
-            `)
-            .eq('type', 'Land');
-
-          if (error) throw error;
-
-          setLandList(landData.map((item: any) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            location: item.location || 'Location not specified',
-            price: item.price,
-            type: item.type,
-            image_url: item.image_url,
-            owner: {
-              name: item.owner.full_name,
-              phone: item.owner.phone_text
-            }
-          })));
-        }
-      } catch (error) {
-        console.error('Error loading land:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load land listings",
-          variant: "destructive",
-        });
-      }
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
     };
-
+    checkUser();
     loadLand();
+  }, []);
 
-    const channel = supabase
-      .channel('equipment_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'equipment',
-          filter: 'type=eq.Land'
+  const loadLand = async () => {
+    try {
+      const { data: landData, error } = await supabase
+        .from('equipment')
+        .select(`
+          *,
+          owner:profiles!equipment_owner_id_fkey (
+            full_name,
+            phone_text
+          )
+        `)
+        .eq('type', 'Land');
+
+      if (error) throw error;
+
+      setLandList(landData.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        location: item.location || 'Location not specified',
+        price: item.price,
+        type: item.type,
+        image_url: item.image_url,
+        owner: {
+          name: item.owner.full_name,
+          phone: item.owner.phone_text
         },
-        () => {
-          loadLand();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [toast]);
+        owner_id: item.owner_id
+      })));
+    } catch (error) {
+      console.error('Error loading land:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load land listings",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleInquiry = (land: Land) => {
     setSelectedLand(land);
@@ -110,6 +92,13 @@ const LandPage = () => {
     setSelectedLand(land);
     setShowContactDialog(true);
   };
+
+  const handleViewRequests = (land: Land) => {
+    setSelectedLand(land);
+    setShowRequests(true);
+  };
+
+  const isOwner = (ownerId: string) => currentUserId === ownerId;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
@@ -158,20 +147,32 @@ const LandPage = () => {
                   {land.type === 'rent' ? ' per day' : ''}
                 </p>
                 <div className="mt-4 flex gap-2">
-                  <Button
-                    onClick={() => handleInquiry(land)}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    <Share2 className="mr-2 h-4 w-4" />
-                    {land.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
-                  </Button>
-                  <Button
-                    onClick={() => handleViewContact(land)}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Contact Details
-                  </Button>
+                  {isOwner(land.owner_id) ? (
+                    <Button
+                      onClick={() => handleViewRequests(land)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      View Requests
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => handleInquiry(land)}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        <Share2 className="mr-2 h-4 w-4" />
+                        {land.type === 'rent' ? 'Request to Rent' : 'Request to Buy'}
+                      </Button>
+                      <Button
+                        onClick={() => handleViewContact(land)}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        Contact Details
+                      </Button>
+                    </>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -186,13 +187,14 @@ const LandPage = () => {
         />
       )}
 
-      <RequestsDialog
-        isOpen={showRequests}
-        onClose={() => setShowRequests(false)}
-      />
-
       {selectedLand && (
         <>
+          <RequestsDialog
+            isOpen={showRequests}
+            onClose={() => setShowRequests(false)}
+            equipmentId={selectedLand.id}
+            type="land"
+          />
           {showInquiryDialog && (
             <InquiryDialog
               isOpen={showInquiryDialog}
@@ -200,7 +202,6 @@ const LandPage = () => {
               itemTitle={selectedLand.name}
               itemType={selectedLand.type === 'rent' ? 'rent' : 'sale'}
               equipmentId={selectedLand.id}
-              pricePerDay={selectedLand.type === 'rent' ? parseFloat(selectedLand.price) : undefined}
             />
           )}
           {showContactDialog && (

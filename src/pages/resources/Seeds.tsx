@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ListSeedsDialog from "@/components/resources/ListSeedsDialog";
 import InquiryDialog from "@/components/resources/InquiryDialog";
 import ContactDetailsDialog from "@/components/resources/ContactDetailsDialog";
+import RequestsDialog from "@/components/resources/RequestsDialog";
 import BottomNav from "@/components/BottomNav";
 import type { Seed } from "@/types/seeds";
 
@@ -18,10 +19,17 @@ const Seeds = () => {
   const [selectedSeed, setSelectedSeed] = useState<Seed | null>(null);
   const [showInquiryDialog, setShowInquiryDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
+  const [showRequestsDialog, setShowRequestsDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showListDialog, setShowListDialog] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    checkUser();
     fetchSeeds();
   }, []);
 
@@ -85,10 +93,12 @@ const Seeds = () => {
     setShowContactDialog(true);
   };
 
-  const checkOwnership = async (ownerId: string): Promise<boolean> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user?.id === ownerId;
+  const handleViewRequests = (seed: Seed) => {
+    setSelectedSeed(seed);
+    setShowRequestsDialog(true);
   };
+
+  const isOwner = (ownerId: string) => currentUserId === ownerId;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
@@ -147,28 +157,40 @@ const Seeds = () => {
                   </p>
                 </div>
                 <div className="mt-4 flex gap-2">
-                  <Button
-                    onClick={() => handleInquiry(seed)}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                    disabled={seed.quantity_available === 0}
-                  >
-                    {seed.quantity_available === 0 ? "Out of Stock" : "Make Inquiry"}
-                  </Button>
-                  <Button
-                    onClick={() => handleViewContact(seed)}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Contact Details
-                  </Button>
-                  {checkOwnership(seed.owner_id) && (
-                    <Button
-                      onClick={() => handleDelete(seed.id)}
-                      variant="destructive"
-                      className="flex-1"
-                    >
-                      Delete
-                    </Button>
+                  {isOwner(seed.owner_id) ? (
+                    <>
+                      <Button
+                        onClick={() => handleViewRequests(seed)}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Requests
+                      </Button>
+                      <Button
+                        onClick={() => handleDelete(seed.id)}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => handleInquiry(seed)}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        disabled={seed.quantity_available === 0}
+                      >
+                        {seed.quantity_available === 0 ? "Out of Stock" : "Make Inquiry"}
+                      </Button>
+                      <Button
+                        onClick={() => handleViewContact(seed)}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        Contact Details
+                      </Button>
+                    </>
                   )}
                 </div>
               </motion.div>
@@ -186,6 +208,14 @@ const Seeds = () => {
 
       {selectedSeed && (
         <>
+          {showRequestsDialog && (
+            <RequestsDialog
+              isOpen={showRequestsDialog}
+              onClose={() => setShowRequestsDialog(false)}
+              equipmentId={selectedSeed.id}
+              type="seeds"
+            />
+          )}
           {showInquiryDialog && (
             <InquiryDialog
               isOpen={showInquiryDialog}
