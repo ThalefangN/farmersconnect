@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Send, Loader2, Upload } from "lucide-react";
+import { Send, Loader2, Upload, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -23,7 +23,7 @@ export function AIChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: ()
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "File too large",
           description: "Please select an image under 5MB",
@@ -68,7 +68,6 @@ export function AIChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: ()
       setInput('');
       setSelectedImage(null);
 
-      // Call the AI assistant edge function
       const response = await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.functions.supabase.co/farming-assistant`, {
         method: 'POST',
         headers: {
@@ -102,35 +101,49 @@ export function AIChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: ()
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>AI Farming Assistant</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Bot className="h-6 w-6 text-green-600" />
+            AI Farming Assistant
+          </DialogTitle>
+          <DialogDescription>
+            Get expert advice on farming practices in Botswana. Share images of your crops or livestock for more specific guidance.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto space-y-4 p-4 mb-4">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[80%] p-3 rounded-lg ${
-                  message.role === 'user'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
-              >
-                {message.imageUrl && (
-                  <img
-                    src={message.imageUrl}
-                    alt="Uploaded content"
-                    className="max-w-full h-auto rounded-lg mb-2"
-                  />
-                )}
-                <p className="whitespace-pre-wrap">{message.content}</p>
-              </div>
+          {messages.length === 0 ? (
+            <div className="text-center text-gray-500 mt-8">
+              <Bot className="h-12 w-12 mx-auto mb-4 text-green-600" />
+              <p className="text-lg font-medium">Welcome to your AI Farming Assistant</p>
+              <p className="text-sm">Ask questions about farming in Botswana or share images for analysis</p>
             </div>
-          ))}
+          ) : (
+            messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] p-3 rounded-lg ${
+                    message.role === 'user'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-900'
+                  }`}
+                >
+                  {message.imageUrl && (
+                    <img
+                      src={message.imageUrl}
+                      alt="Uploaded content"
+                      className="max-w-full h-auto rounded-lg mb-2"
+                    />
+                  )}
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="border-t p-4 space-y-2">
@@ -176,7 +189,7 @@ export function AIChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: ()
             <Button
               onClick={handleSendMessage}
               disabled={isLoading || (!input.trim() && !selectedImage)}
-              className="self-end"
+              className="self-end bg-green-600 hover:bg-green-700"
             >
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
