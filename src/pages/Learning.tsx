@@ -1,33 +1,36 @@
 import { motion } from "framer-motion";
-import { BookOpen, GraduationCap, Video, Award } from "lucide-react";
+import { BookOpen, GraduationCap, Video, Award, MessageSquareMore } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { AIChatDialog } from "@/components/learning/AIChatDialog";
 
 const Learning = () => {
   const navigate = useNavigate();
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   const resources = [
     {
       title: "Farming Guides",
-      description: "Comprehensive step-by-step tutorials",
+      description: "Comprehensive guides for farming in Botswana",
       icon: BookOpen,
-      details: "Access detailed guides on various farming techniques, crop management, and livestock care",
+      details: "Access detailed guides on farming techniques suitable for Botswana's climate and soil conditions",
       path: "/learning/guides"
     },
     {
       title: "Video Tutorials",
-      description: "Visual learning resources",
+      description: "Visual learning resources for Botswana farming",
       icon: Video,
-      details: "Watch expert demonstrations, practical farming tips, and educational content",
+      details: "Watch expert demonstrations of farming practices adapted for Botswana's agricultural landscape",
       path: "/learning/videos"
     },
     {
       title: "Certification Programs",
       description: "Professional development courses",
       icon: Award,
-      details: "Enroll in certified agricultural programs and enhance your farming expertise",
+      details: "Enroll in certified agricultural programs tailored to Botswana's farming sector",
       path: "/learning/certificates"
     }
   ];
@@ -40,14 +43,23 @@ const Learning = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          <div className="flex items-center space-x-2">
-            <GraduationCap className="h-6 w-6 text-green-700" />
-            <h1 className="text-2xl font-bold text-green-800">Learning Hub</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <GraduationCap className="h-6 w-6 text-green-700" />
+              <h1 className="text-2xl font-bold text-green-800">Learning Hub</h1>
+            </div>
+            <Button
+              onClick={() => setIsAIChatOpen(true)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <MessageSquareMore className="h-5 w-5 mr-2" />
+              AI Assistant
+            </Button>
           </div>
           
           <div className="bg-white rounded-lg p-6 shadow-md">
             <p className="text-gray-600 text-lg">
-              Enhance your farming knowledge through our comprehensive learning resources. 
+              Enhance your farming knowledge with resources specifically designed for agriculture in Botswana. 
               Access expert-curated content and practical farming education.
             </p>
           </div>
@@ -90,6 +102,12 @@ const Learning = () => {
           </div>
         </motion.div>
       </div>
+      
+      <AIChatDialog
+        isOpen={isAIChatOpen}
+        onClose={() => setIsAIChatOpen(false)}
+      />
+      
       <BottomNav />
     </div>
   );

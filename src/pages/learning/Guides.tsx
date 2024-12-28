@@ -15,20 +15,79 @@ const Guides = () => {
 
   const guides = [
     {
-      title: "Sustainable Farming Practices",
-      description: "Comprehensive guide to eco-friendly farming",
-      author: "Dr. Sarah Johnson",
+      title: "Crop Farming in Botswana",
+      description: "Guide to successful crop cultivation in Botswana's climate",
+      author: "Dr. Sarah Motswana",
       duration: "2 hours",
       level: "Intermediate",
-      image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
+      image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
+      content: `
+        # Crop Farming in Botswana
+
+        Botswana's agricultural sector faces unique challenges and opportunities. This guide covers essential practices for successful farming in our climate.
+
+        ## Climate Considerations
+        - Understanding Botswana's rainfall patterns
+        - Dealing with drought conditions
+        - Best planting seasons
+
+        ## Recommended Crops
+        - Sorghum
+        - Maize
+        - Millet
+        - Beans
+        - Groundnuts
+
+        ## Soil Management
+        - Soil types in Botswana
+        - Soil preparation techniques
+        - Fertilization methods
+
+        ## Water Management
+        - Water conservation techniques
+        - Irrigation systems
+        - Rainwater harvesting
+
+        ## Pest Control
+        - Common pests in Botswana
+        - Natural pest control methods
+        - Integrated pest management
+      `
     },
     {
-      title: "Crop Disease Management",
-      description: "Identifying and treating common crop diseases",
-      author: "Prof. Michael Smith",
+      title: "Livestock Farming in Botswana",
+      description: "Essential guide to cattle and small stock farming",
+      author: "Prof. Michael Kgosi",
       duration: "1.5 hours",
       level: "Advanced",
-      image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d"
+      image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d",
+      content: `
+        # Livestock Farming in Botswana
+
+        Livestock farming is a crucial part of Botswana's agricultural sector. This guide provides comprehensive information for successful livestock management.
+
+        ## Cattle Farming
+        - Traditional cattle farming methods
+        - Modern ranching techniques
+        - Breed selection for Botswana's climate
+        - Disease prevention and management
+
+        ## Small Stock Farming
+        - Goat farming
+        - Sheep rearing
+        - Poultry management
+        - Feed management
+
+        ## Grazing Management
+        - Rotational grazing
+        - Sustainable pasture management
+        - Supplementary feeding during dry seasons
+
+        ## Animal Health
+        - Common diseases in Botswana
+        - Vaccination schedules
+        - Basic veterinary care
+      `
     }
   ];
 
@@ -60,8 +119,8 @@ const Guides = () => {
           <div className="bg-white rounded-lg p-6 shadow-md">
             <h2 className="text-xl font-semibold text-green-800 mb-4">Learning Resources</h2>
             <p className="text-gray-600 mb-4">
-              Access comprehensive farming guides written by experts. Learn modern
-              farming techniques and best practices.
+              Access comprehensive farming guides specifically written for Botswana's agricultural context. 
+              Learn modern farming techniques adapted to our local conditions.
             </p>
           </div>
 
