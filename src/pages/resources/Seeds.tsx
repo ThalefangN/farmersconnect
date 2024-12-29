@@ -46,9 +46,18 @@ const Seeds = () => {
 
       if (error) throw error;
 
-      // Type assertion to ensure data matches Seed interface
-      const seedsData = data as unknown as Seed[];
-      setSeeds(seedsData);
+      if (data) {
+        // Ensure the owner property is properly typed
+        const seedsData = data.map(item => ({
+          ...item,
+          owner: {
+            full_name: item.owner?.full_name || null,
+            phone_text: item.owner?.phone_text || null
+          }
+        })) as Seed[];
+        
+        setSeeds(seedsData);
+      }
     } catch (error) {
       console.error("Error fetching seeds:", error);
       toast({
