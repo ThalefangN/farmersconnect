@@ -45,7 +45,10 @@ const Seeds = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setSeeds(data as Seed[]);
+
+      // Type assertion to ensure data matches Seed interface
+      const seedsData = data as unknown as Seed[];
+      setSeeds(seedsData);
     } catch (error) {
       console.error("Error fetching seeds:", error);
       toast({
@@ -230,8 +233,8 @@ const Seeds = () => {
               isOpen={showContactDialog}
               onClose={() => setShowContactDialog(false)}
               ownerDetails={{
-                name: selectedSeed.owner.full_name,
-                phone: selectedSeed.owner.phone_text,
+                name: selectedSeed.owner.full_name || 'N/A',
+                phone: selectedSeed.owner.phone_text || 'N/A',
                 email: "",
                 location: selectedSeed.location
               }}
