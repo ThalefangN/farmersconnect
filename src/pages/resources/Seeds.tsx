@@ -39,7 +39,7 @@ const Seeds = () => {
         .from("equipment")
         .select(`
           *,
-          owner:profiles(full_name, phone_text)
+          owner:profiles!equipment_owner_id_fkey(full_name, phone_text)
         `)
         .eq('type', 'Seeds')
         .order("created_at", { ascending: false });
@@ -47,7 +47,6 @@ const Seeds = () => {
       if (error) throw error;
 
       if (data) {
-        // Ensure the owner property is properly typed
         const seedsData = data.map(item => ({
           ...item,
           owner: {
