@@ -66,6 +66,9 @@ export type Database = {
           quantity_available: number | null
           quantity_per_packet: number | null
           rental_months: number | null
+          request_date: string | null
+          request_status: string | null
+          requester_id: string | null
           status: string
           type: string
           updated_at: string
@@ -84,6 +87,9 @@ export type Database = {
           quantity_available?: number | null
           quantity_per_packet?: number | null
           rental_months?: number | null
+          request_date?: string | null
+          request_status?: string | null
+          requester_id?: string | null
           status?: string
           type: string
           updated_at?: string
@@ -102,6 +108,9 @@ export type Database = {
           quantity_available?: number | null
           quantity_per_packet?: number | null
           rental_months?: number | null
+          request_date?: string | null
+          request_status?: string | null
+          requester_id?: string | null
           status?: string
           type?: string
           updated_at?: string
@@ -110,6 +119,13 @@ export type Database = {
           {
             foreignKeyName: "equipment_owner_id_fkey"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_requester_id_fkey"
+            columns: ["requester_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
