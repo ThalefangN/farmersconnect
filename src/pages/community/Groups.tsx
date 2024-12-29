@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
-import { CreateGroupDialog } from "@/components/community/CreateGroupDialog";
 import { GroupList } from "@/components/community/GroupList";
 import { GroupDiscussion } from "@/components/community/GroupDiscussion";
 import { GroupPolicyDialog } from "@/components/community/GroupPolicyDialog";
+import { GroupHeader } from "@/components/community/GroupHeader";
+import { GroupIntro } from "@/components/community/GroupIntro";
 import { supabase } from "@/integrations/supabase/client";
 import type { Group } from "@/types/groups";
 
@@ -31,30 +30,19 @@ const Groups = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setCurrentUserId(user.id);
-      // Check if user has any joined groups and set the first one as selected
-      const { data: memberGroups, error: memberError } = await supabase
+      const { data: memberGroups } = await supabase
         .from("group_members")
         .select("group_id")
         .eq("user_id", user.id)
         .eq("status", "approved")
         .maybeSingle();
 
-      if (memberError) {
-        console.error("Error fetching member groups:", memberError);
-        return;
-      }
-
       if (memberGroups) {
-        const { data: group, error: groupError } = await supabase
+        const { data: group } = await supabase
           .from("groups")
           .select("*")
           .eq("id", memberGroups.group_id)
           .single();
-
-        if (groupError) {
-          console.error("Error fetching group:", groupError);
-          return;
-        }
 
         if (group) {
           setSelectedGroup(group);
@@ -96,7 +84,6 @@ const Groups = () => {
         return;
       }
 
-      // First check if user is already a member
       const { data: existingMembership } = await supabase
         .from("group_members")
         .select("*")
@@ -142,7 +129,6 @@ const Groups = () => {
       if (error) throw error;
 
       if (enableNotifications) {
-        // Update user's notification preferences
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
@@ -198,6 +184,14 @@ const Groups = () => {
     }
   };
 
+  const handleBack = () => {
+    if (selectedGroup) {
+      setSelectedGroup(null);
+    } else {
+      navigate("/community");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
       <motion.div
@@ -205,38 +199,14 @@ const Groups = () => {
         animate={{ opacity: 1, y: 0 }}
         className="p-4 space-y-6"
       >
-        <div className="flex items-center space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => {
-              if (selectedGroup) {
-                setSelectedGroup(null);
-              } else {
-                navigate("/community");
-              }
-            }}
-          >
-            <ArrowLeft className="h-6 w-6 text-green-700" />
-          </Button>
-          <div className="flex items-center space-x-2">
-            <MessageSquare className="h-6 w-6 text-green-700" />
-            <h1 className="text-2xl font-bold text-green-800">
-              {selectedGroup ? 'Group Discussion' : 'Local Groups'}
-            </h1>
-          </div>
-        </div>
+        <GroupHeader 
+          selectedGroup={selectedGroup} 
+          onBack={handleBack}
+        />
 
         {!selectedGroup ? (
           <>
-            <div className="bg-white rounded-lg p-6 shadow-md">
-              <p className="text-gray-600 text-lg">
-                Join or create local farming groups to connect with farmers in your area.
-                Share knowledge, resources, and support each other.
-              </p>
-              <CreateGroupDialog />
-            </div>
-
+            <GroupIntro />
             <GroupList
               groups={groups}
               onJoinGroup={handleJoinGroup}

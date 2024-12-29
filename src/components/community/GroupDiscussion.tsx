@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { MessageItem } from "./discussion/MessageItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 
 export interface Message {
   id: string;
@@ -66,31 +67,6 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
     return validTypes.includes(type) ? type as 'text' | 'image' | 'video' | 'audio' : 'text';
   };
 
-  const handleDeleteMessage = async (messageId: string) => {
-    try {
-      const { error } = await supabase
-        .from('group_messages')
-        .delete()
-        .eq('id', messageId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Message deleted successfully",
-      });
-
-      setMessages(messages.filter(m => m.id !== messageId));
-    } catch (error) {
-      console.error('Error deleting message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete message",
-        variant: "destructive",
-      });
-    }
-  };
-
   useEffect(() => {
     fetchMessages();
 
@@ -124,21 +100,40 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
   }
 
   return (
-    <div className="space-y-4 bg-gradient-to-b from-purple-50 to-white rounded-lg shadow-lg p-6">
-      <GroupMediaUpload groupId={groupId} onSuccess={fetchMessages} />
+    <Card className="overflow-hidden bg-white shadow-lg">
+      <div className="p-4 border-b">
+        <GroupMediaUpload groupId={groupId} onSuccess={fetchMessages} />
+      </div>
       
-      <ScrollArea className="h-[calc(100vh-300px)]">
+      <ScrollArea className="h-[calc(100vh-300px)] p-4">
         <div className="space-y-4">
           {messages.map((message) => (
             <MessageItem
               key={message.id}
               message={message}
               currentUserId={currentUserId}
-              onDelete={handleDeleteMessage}
+              onDelete={async (messageId) => {
+                try {
+                  const { error } = await supabase
+                    .from('group_messages')
+                    .delete()
+                    .eq('id', messageId);
+
+                  if (error) throw error;
+                  fetchMessages();
+                } catch (error) {
+                  console.error('Error deleting message:', error);
+                  toast({
+                    title: "Error",
+                    description: "Failed to delete message",
+                    variant: "destructive",
+                  });
+                }
+              }}
             />
           ))}
         </div>
       </ScrollArea>
-    </div>
+    </Card>
   );
 }
