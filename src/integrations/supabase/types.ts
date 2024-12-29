@@ -253,6 +253,7 @@ export type Database = {
           organizer_id: string
           time: string
           title: string
+          topic: string | null
           updated_at: string
         }
         Insert: {
@@ -267,6 +268,7 @@ export type Database = {
           organizer_id: string
           time: string
           title: string
+          topic?: string | null
           updated_at?: string
         }
         Update: {
@@ -281,6 +283,7 @@ export type Database = {
           organizer_id?: string
           time?: string
           title?: string
+          topic?: string | null
           updated_at?: string
         }
         Relationships: [
