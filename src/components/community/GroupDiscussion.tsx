@@ -100,38 +100,44 @@ export function GroupDiscussion({ groupId, currentUserId }: GroupDiscussionProps
   }
 
   return (
-    <Card className="overflow-hidden bg-white shadow-lg">
-      <div className="p-4 border-b">
+    <Card className="overflow-hidden bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+      <div className="p-4 border-b dark:border-gray-700">
         <GroupMediaUpload groupId={groupId} onSuccess={fetchMessages} />
       </div>
       
-      <ScrollArea className="h-[calc(100vh-300px)] p-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <MessageItem
-              key={message.id}
-              message={message}
-              currentUserId={currentUserId}
-              onDelete={async (messageId) => {
-                try {
-                  const { error } = await supabase
-                    .from('group_messages')
-                    .delete()
-                    .eq('id', messageId);
+      <ScrollArea className="h-[calc(100vh-300px)] px-4">
+        <div className="space-y-4 py-4">
+          {isLoading ? (
+            <div className="flex justify-center p-4">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : (
+            messages.map((message) => (
+              <MessageItem
+                key={message.id}
+                message={message}
+                currentUserId={currentUserId}
+                onDelete={async (messageId) => {
+                  try {
+                    const { error } = await supabase
+                      .from('group_messages')
+                      .delete()
+                      .eq('id', messageId);
 
-                  if (error) throw error;
-                  fetchMessages();
-                } catch (error) {
-                  console.error('Error deleting message:', error);
-                  toast({
-                    title: "Error",
-                    description: "Failed to delete message",
-                    variant: "destructive",
-                  });
-                }
-              }}
-            />
-          ))}
+                    if (error) throw error;
+                    fetchMessages();
+                  } catch (error) {
+                    console.error('Error deleting message:', error);
+                    toast({
+                      title: "Error",
+                      description: "Failed to delete message",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              />
+            ))
+          )}
         </div>
       </ScrollArea>
     </Card>
