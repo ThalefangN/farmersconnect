@@ -45,7 +45,7 @@ const Notifications = () => {
     checkUser();
   }, []);
 
-  const { data: orders, refetch } = useQuery({
+  const { data: orders, refetch: refetchOrders } = useQuery({
     queryKey: ['orders', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -61,7 +61,27 @@ const Notifications = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Order[];
+      return data;
+    },
+    enabled: !!userId
+  });
+
+  const { data: equipmentRequests } = useQuery({
+    queryKey: ['equipment-requests', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      
+      const { data, error } = await supabase
+        .from('equipment_requests')
+        .select(`
+          *,
+          equipment:equipment(name, type, price, owner_id)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
     },
     enabled: !!userId
   });
@@ -79,7 +99,6 @@ const Notifications = () => {
       if (orderError) throw orderError;
 
       if (action === 'approve') {
-        // Get current product quantity first
         const { data: productData, error: fetchError } = await supabase
           .from('products')
           .select('quantity')
@@ -105,7 +124,7 @@ const Notifications = () => {
         description: `You have ${action === 'approve' ? 'approved' : 'declined'} the order.`,
       });
 
-      refetch();
+      refetchOrders();
     } catch (error) {
       console.error('Error updating order:', error);
       toast({
@@ -132,6 +151,48 @@ const Notifications = () => {
 
         <ScrollArea className="h-[calc(100vh-8rem)]">
           <div className="space-y-4">
+            {/* Equipment Requests */}
+            {equipmentRequests?.map((request) => (
+              <motion.div
+                key={request.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-medium">Equipment Request: {request.equipment.name}</h3>
+                        <Badge 
+                          variant={
+                            request.status === 'pending' ? 'default' :
+                            request.status === 'approved' ? 'success' : 'destructive'
+                          }
+                        >
+                          {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        <p>Type: {request.equipment.type}</p>
+                        <p>Price: BWP {request.equipment.price}</p>
+                        <p>Location: {request.location}</p>
+                        {request.message && (
+                          <p className="mt-2 p-2 bg-muted rounded-md">{request.message}</p>
+                        )}
+                        <div className="flex items-center gap-2 mt-2">
+                          <Clock className="h-4 w-4" />
+                          <span className="text-xs">
+                            {format(new Date(request.created_at), 'PPp')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+
+            {/* Orders */}
             {orders?.map((order) => (
               <motion.div
                 key={order.id}

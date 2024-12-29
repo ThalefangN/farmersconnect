@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Tag, Trash2, Eye } from "lucide-react";
+import { Calendar, MapPin, Tag, Trash2, Eye, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import RequestsDialog from "@/components/resources/RequestsDialog";
+import InquiryDialog from "@/components/resources/InquiryDialog";
 import { Equipment } from "@/types/equipment";
 
 interface EquipmentCardProps {
@@ -16,6 +17,7 @@ interface EquipmentCardProps {
 const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showRequestsDialog, setShowRequestsDialog] = useState(false);
+  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
   const { toast } = useToast();
 
   const handleDelete = async () => {
@@ -74,7 +76,7 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
 
   return (
     <>
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow">
         {equipment.image_url && (
           <div className="w-full h-48 overflow-hidden">
             <img 
@@ -85,7 +87,12 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
           </div>
         )}
         <CardHeader>
-          <CardTitle>{equipment.name}</CardTitle>
+          <CardTitle className="flex justify-between items-center">
+            <span>{equipment.name}</span>
+            <Badge variant={equipment.status === "Available" ? "success" : "destructive"}>
+              {equipment.status}
+            </Badge>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -104,15 +111,11 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Calendar className="h-4 w-4" />
-              <span className={`${
-                equipment.status === "Available" ? "text-green-600" : "text-red-600"
-              }`}>
-                {equipment.status}
-              </span>
+              <span>{equipment.status}</span>
             </div>
             
             <div className="pt-4 space-y-2">
-              {isOwner && (
+              {isOwner ? (
                 <div className="space-y-2">
                   <Button
                     onClick={() => setShowRequestsDialog(true)}
@@ -131,6 +134,15 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
                     {isDeleting ? 'Deleting...' : 'Delete Equipment'}
                   </Button>
                 </div>
+              ) : (
+                <Button
+                  onClick={() => setShowInquiryDialog(true)}
+                  className="w-full"
+                  disabled={equipment.status !== "Available"}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Request Equipment
+                </Button>
               )}
             </div>
           </div>
@@ -142,6 +154,15 @@ const EquipmentCard = ({ equipment, onDelete, currentUserId }: EquipmentCardProp
         onClose={() => setShowRequestsDialog(false)}
         equipmentId={equipment.id}
         type="equipment"
+      />
+
+      <InquiryDialog
+        isOpen={showInquiryDialog}
+        onClose={() => setShowInquiryDialog(false)}
+        itemTitle={equipment.name}
+        itemType={equipment.type}
+        equipmentId={equipment.id}
+        pricePerDay={parseFloat(equipment.price)}
       />
     </>
   );

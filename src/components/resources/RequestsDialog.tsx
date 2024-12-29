@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Check, X } from "lucide-react";
+import { Loader2, Check, X, Phone, MapPin, Calendar } from "lucide-react";
 import { format } from "date-fns";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface RequestsDialogProps {
   isOpen: boolean;
@@ -94,11 +97,11 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId, userId, type }: Requests
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl h-[80vh]">
         <DialogHeader>
           <DialogTitle>Equipment Requests</DialogTitle>
         </DialogHeader>
-        <div className="mt-4">
+        <ScrollArea className="h-full pr-4">
           {!requests ? (
             <div className="flex justify-center p-4">
               <Loader2 className="h-6 w-6 animate-spin" />
@@ -106,56 +109,64 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId, userId, type }: Requests
           ) : (
             <div className="space-y-4">
               {requests.map((request) => (
-                <div
-                  key={request.id}
-                  className="border rounded-lg p-4 space-y-2"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium">{request.full_name}</p>
-                      <p className="text-sm text-gray-500">
-                        {format(new Date(request.created_at), 'PPp')}
-                      </p>
-                    </div>
-                    <span className={`px-2 py-1 rounded-full text-sm ${
-                      request.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : request.status === 'approved'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                    </span>
-                  </div>
-                  
-                  <div className="text-sm text-gray-600">
-                    <p>Phone: {request.phone}</p>
-                    <p>Location: {request.location}</p>
-                    {request.message && (
-                      <p className="mt-2">{request.message}</p>
-                    )}
-                  </div>
+                <Card key={request.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg">{request.full_name}</h3>
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Phone className="h-4 w-4" />
+                            {request.phone}
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <MapPin className="h-4 w-4" />
+                            {request.location}
+                          </div>
+                        </div>
+                        <Badge 
+                          variant={
+                            request.status === 'pending' ? 'default' :
+                            request.status === 'approved' ? 'success' : 'destructive'
+                          }
+                        >
+                          {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                        </Badge>
+                      </div>
 
-                  {request.status === 'pending' && (
-                    <div className="flex gap-2 mt-2">
-                      <Button
-                        onClick={() => handleAction(request.id, 'approve')}
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                      >
-                        <Check className="h-4 w-4 mr-2" />
-                        Approve
-                      </Button>
-                      <Button
-                        onClick={() => handleAction(request.id, 'reject')}
-                        variant="destructive"
-                        className="flex-1"
-                      >
-                        <X className="h-4 w-4 mr-2" />
-                        Reject
-                      </Button>
+                      {request.message && (
+                        <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                          {request.message}
+                        </p>
+                      )}
+
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Calendar className="h-4 w-4" />
+                        {format(new Date(request.created_at), 'PPp')}
+                      </div>
+
+                      {request.status === 'pending' && (
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            onClick={() => handleAction(request.id, 'approve')}
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                          >
+                            <Check className="h-4 w-4 mr-2" />
+                            Approve
+                          </Button>
+                          <Button
+                            onClick={() => handleAction(request.id, 'reject')}
+                            variant="destructive"
+                            className="flex-1"
+                          >
+                            <X className="h-4 w-4 mr-2" />
+                            Reject
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </CardContent>
+                </Card>
               ))}
               {!requests?.length && (
                 <div className="text-center text-gray-500 py-8">
@@ -164,7 +175,7 @@ const RequestsDialog = ({ isOpen, onClose, equipmentId, userId, type }: Requests
               )}
             </div>
           )}
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
