@@ -20,13 +20,16 @@ const Profile = () => {
   useEffect(() => {
     const loadProfile = async () => {
       try {
+        console.log('Loading user profile...');
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
+          console.log('No user found, redirecting to signin');
           navigate('/signin');
           return;
         }
 
         setUserEmail(user.email);
+        console.log('User email set:', user.email);
 
         const { data: profile, error } = await supabase
           .from('profiles')
@@ -34,7 +37,12 @@ const Profile = () => {
           .eq('id', user.id)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching profile:', error);
+          throw error;
+        }
+        
+        console.log('Profile loaded:', profile);
         setUserProfile(profile);
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -65,6 +73,7 @@ const Profile = () => {
   };
 
   const handlePhotoUpdated = (url: string) => {
+    console.log('Profile photo updated:', url);
     setUserProfile(prev => ({ ...prev, profile_photo_url: url }));
   };
 
