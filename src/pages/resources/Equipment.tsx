@@ -68,13 +68,16 @@ const Equipment = () => {
         .from("equipment")
         .select(`
           *,
-          owner:profiles(full_name, phone_text)
+          owner:profiles!equipment_owner_id_fkey(full_name, phone_text)
         `)
         .neq('type', 'Seeds')
         .neq('type', 'Land')
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching equipment:", error);
+        throw error;
+      }
       console.log('Fetched equipment:', data);
       setEquipment(data);
     } catch (error) {
