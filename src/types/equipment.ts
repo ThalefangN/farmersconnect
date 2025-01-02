@@ -8,8 +8,8 @@ export interface Equipment {
   location: string;
   image_url?: string | null;
   owner: {
-    name: string | null;
-    phone?: string | null;
+    full_name: string | null;
+    phone_text?: string | null;
   };
   owner_id: string;
 }

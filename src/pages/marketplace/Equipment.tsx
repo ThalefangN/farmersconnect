@@ -42,7 +42,18 @@ const EquipmentPage = () => {
         if (error) throw error;
 
         console.log('Equipment fetched:', data);
-        setEquipment(data || []);
+        
+        // Type check and transform the data
+        const typedEquipment: Equipment[] = data?.map(item => ({
+          ...item,
+          type: item.type === 'rent' || item.type === 'sale' ? item.type : 'sale', // Default to 'sale' if invalid
+          owner: {
+            full_name: item.owner?.full_name || null,
+            phone_text: item.owner?.phone_text || null
+          }
+        })) || [];
+
+        setEquipment(typedEquipment);
       } catch (error) {
         console.error('Error loading equipment:', error);
         toast({
