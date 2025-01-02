@@ -14,15 +14,15 @@ const GetStarted = () => {
 
   const content = {
     en: {
-      title: "Sebotsa Farmers Hub",
-      description: "Empowering Botswana Farmers through Collaboration and Innovation",
+      title: "Farmers Connect",
+      description: "Empowering Farmers through Collaboration and Innovation",
       joinButton: "Join Sebotsa",
       signInButton: "Sign In",
       communityText: "Join our community of farmers and agricultural experts",
       offlineMessage: "You are currently offline. Some features may be limited."
     },
     tn: {
-      title: "Sebotsa ya Balemi",
+      title: "Farmers Connect",
       description: "Re thusa balemi ba Botswana ka tirisano mmogo le ditlhabololo",
       joinButton: "Tsena mo Sebotsa",
       signInButton: "Tsena",

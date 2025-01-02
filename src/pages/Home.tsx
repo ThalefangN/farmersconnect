@@ -50,9 +50,9 @@ const Home = () => {
           className="space-y-6"
         >
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-bold text-green-800">Sebotsa Farmers Hub</h1>
+            <h1 className="text-3xl font-bold text-green-800">Farmers Connect</h1>
             <p className="text-lg text-green-700">
-              Empowering Botswana Farmers through Collaboration and Innovation
+              Empowering Farmers through Collaboration and Innovation
             </p>
           </div>
 
@@ -65,9 +65,9 @@ const Home = () => {
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-semibold text-green-800 mb-3">About Sebotsa</h2>
+            <h2 className="text-xl font-semibold text-green-800 mb-3">About Farmers Connect</h2>
             <p className="text-gray-600 mb-4">
-              Sebotsa Farmers Hub is your one-stop platform for agricultural collaboration in Botswana. 
+              Farmers Connect is your one-stop platform for agricultural collaboration worldwide. 
               We connect farmers, share resources, and provide essential knowledge to help you succeed 
               in your farming journey.
             </p>

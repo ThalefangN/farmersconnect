@@ -2,9 +2,45 @@ import { Button } from "@/components/ui/button";
 import { Facebook } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const SocialAuth = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        console.log('User signed in:', session.user);
+        // Send welcome email using the edge function
+        try {
+          const response = await fetch('/api/send-welcome-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              to: session.user.email,
+              name: session.user.user_metadata?.full_name || 'Farmer'
+            }),
+          });
+          
+          if (!response.ok) {
+            console.error('Failed to send welcome email');
+          }
+        } catch (error) {
+          console.error('Error sending welcome email:', error);
+        }
+
+        navigate('/home');
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const handleSocialLogin = async (provider: 'facebook' | 'google') => {
     try {
@@ -13,6 +49,10 @@ export const SocialAuth = () => {
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
 
