@@ -115,11 +115,13 @@ const Events = () => {
               >
                 <Card className="overflow-hidden">
                   {event.image_url && (
-                    <img 
-                      src={event.image_url} 
-                      alt={event.title}
-                      className="w-full h-48 object-cover"
-                    />
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={event.image_url} 
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   )}
                   <CardHeader>
                     <CardTitle className="text-xl text-green-800">{event.title}</CardTitle>

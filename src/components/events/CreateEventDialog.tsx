@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
+import { uploadImage } from "@/utils/fileUpload";
 
 interface CreateEventDialogProps {
   isOpen: boolean;
@@ -21,8 +22,16 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [topic, setTopic] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +40,11 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      let imageUrl = null;
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile, 'events');
+      }
 
       const { error } = await supabase
         .from('events')
@@ -41,7 +55,8 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
           time,
           location,
           topic,
-          organizer_id: user.id
+          organizer_id: user.id,
+          image_url: imageUrl
         });
 
       if (error) throw error;
@@ -67,7 +82,7 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Create New Event</DialogTitle>
         </DialogHeader>
@@ -127,6 +142,28 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
               onChange={(e) => setTopic(e.target.value)}
               required
             />
+          </div>
+          <div>
+            <Label htmlFor="image">Event Image</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="flex-1"
+              />
+              {imageFile && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setImageFile(null)}
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
           <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? (

@@ -117,30 +117,32 @@ const EquipmentPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 pb-20">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <EquipmentHeader
-          onViewRequests={() => setShowRequestsDialog(true)}
-          onListEquipment={() => setShowListDialog(true)}
-          currentUserId={currentUserId}
-        />
-
-        {equipment.length === 0 ? (
-          <div className="text-center py-10">
-            <p className="text-gray-600">No equipment listings available.</p>
-          </div>
-        ) : (
-          <EquipmentGrid
-            equipment={equipment}
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      <div className="container mx-auto px-4 py-6 pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <EquipmentHeader
+            onViewRequests={() => setShowRequestsDialog(true)}
+            onListEquipment={() => setShowListDialog(true)}
             currentUserId={currentUserId}
-            onDelete={handleDelete}
           />
-        )}
-      </motion.div>
+
+          {equipment.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-gray-600">No equipment listings available.</p>
+            </div>
+          ) : (
+            <EquipmentGrid
+              equipment={equipment}
+              currentUserId={currentUserId}
+              onDelete={handleDelete}
+            />
+          )}
+        </motion.div>
+      </div>
 
       <ListEquipmentDialog
         isOpen={showListDialog}
