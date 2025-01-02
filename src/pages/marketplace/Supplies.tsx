@@ -1,40 +1,47 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Package, Share2 } from "lucide-react";
+import { ArrowLeft, Package, Share2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import ProductCard from "@/components/marketplace/ProductCard";
 
 const Supplies = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const supplies = [
-    {
-      title: "Organic Fertilizer",
-      description: "100% natural compost",
-      price: "M200/50kg",
-      seller: "Green Earth Supplies",
-      location: "Palapye",
-      image: "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a4"
-    },
-    {
-      title: "Pesticide Pack",
-      description: "Eco-friendly pest control",
-      price: "M350/pack",
-      seller: "Farm Solutions Ltd",
-      location: "Mahalapye",
-      image: "https://images.unsplash.com/photo-1517646331032-9e8563c520a1"
-    }
-  ];
+  const { data: supplies, isLoading, error } = useQuery({
+    queryKey: ['supplies'],
+    queryFn: async () => {
+      console.log('Fetching supplies...');
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          seller:profiles(full_name)
+        `)
+        .eq('unit_type', 'supply')
+        .order('created_at', { ascending: false });
 
-  const handlePurchase = (supply: string) => {
+      if (error) {
+        console.error('Error fetching supplies:', error);
+        throw error;
+      }
+
+      console.log('Supplies fetched:', data);
+      return data;
+    }
+  });
+
+  if (error) {
     toast({
-      title: "Order Initiated",
-      description: `Your order for ${supply} has been initiated. The seller will contact you soon.`,
+      title: "Error",
+      description: "Failed to load supplies. Please try again later.",
+      variant: "destructive",
     });
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
@@ -60,52 +67,33 @@ const Supplies = () => {
               Sell your farming supplies to local farmers. List fertilizers,
               pesticides, and other agricultural supplies.
             </p>
-            <Button className="w-full bg-green-600 hover:bg-green-700">
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700"
+              onClick={() => navigate("/marketplace/supplies/new")}
+            >
               <Share2 className="mr-2 h-4 w-4" />
               List New Supply
             </Button>
           </div>
 
-          <div className="grid gap-6">
-            {supplies.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <CardHeader>
-                    <CardTitle className="text-xl text-green-800">{item.title}</CardTitle>
-                    <CardDescription className="text-green-600">{item.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 mb-4">
-                      <p className="text-gray-600"><strong>Price:</strong> {item.price}</p>
-                      <p className="text-gray-600"><strong>Seller:</strong> {item.seller}</p>
-                      <p className="text-gray-600"><strong>Location:</strong> {item.location}</p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button 
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handlePurchase(item.title)}
-                      >
-                        Purchase
-                      </Button>
-                      <Button variant="outline" className="flex-1">
-                        Contact Seller
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {supplies?.map((supply) => (
+                <motion.div
+                  key={supply.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <ProductCard product={supply} />
+                </motion.div>
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
       <BottomNav />
