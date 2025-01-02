@@ -1,35 +1,28 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Wrench } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
-import EquipmentCard from "@/components/marketplace/EquipmentCard";
+import EquipmentGrid from "@/components/resources/equipment/EquipmentGrid";
+import EquipmentHeader from "@/components/resources/equipment/EquipmentHeader";
+import ListEquipmentDialog from "@/components/resources/ListEquipmentDialog";
+import RequestsDialog from "@/components/resources/RequestsDialog";
+import { Equipment } from "@/types/equipment";
 
-interface Equipment {
-  id: string;
-  name: string;
-  description: string | null;
-  price: string;
-  type: 'rent' | 'sale';
-  status: string;
-  location: string;
-  image_url: string | null;
-  owner: {
-    name: string | null;
-    phone?: string | null;
-  };
-  owner_id: string;
-}
-
-const Equipment = () => {
+const EquipmentPage = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [showListDialog, setShowListDialog] = useState(false);
+  const [showRequestsDialog, setShowRequestsDialog] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const loadEquipment = async () => {
       try {
+        setIsLoading(true);
+        console.log('Fetching equipment...');
+
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           setCurrentUserId(user.id);
@@ -44,25 +37,12 @@ const Equipment = () => {
               phone_text
             )
           `)
-          .eq('status', 'Available');
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        setEquipment(data.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          type: item.type,
-          status: item.status,
-          location: item.location,
-          image_url: item.image_url,
-          owner: {
-            name: item.owner.full_name,
-            phone: item.owner.phone_text
-          },
-          owner_id: item.owner_id
-        })));
+        console.log('Equipment fetched:', data);
+        setEquipment(data || []);
       } catch (error) {
         console.error('Error loading equipment:', error);
         toast({
@@ -70,6 +50,8 @@ const Equipment = () => {
           description: "Failed to load equipment listings",
           variant: "destructive",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -91,6 +73,38 @@ const Equipment = () => {
     };
   }, [toast]);
 
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('equipment')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setEquipment(prev => prev.filter(item => item.id !== id));
+      toast({
+        title: "Success",
+        description: "Equipment deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting equipment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete equipment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700" />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-4 pb-20">
       <motion.div
@@ -98,24 +112,39 @@ const Equipment = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center gap-2 mb-6">
-          <Wrench className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">Farming Equipment</h1>
-        </div>
+        <EquipmentHeader
+          onViewRequests={() => setShowRequestsDialog(true)}
+          onListEquipment={() => setShowListDialog(true)}
+          currentUserId={currentUserId}
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {equipment.map((item) => (
-            <EquipmentCard 
-              key={item.id} 
-              equipment={item} 
-              currentUserId={currentUserId || undefined}
-            />
-          ))}
-        </div>
+        {equipment.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-600">No equipment listings available.</p>
+          </div>
+        ) : (
+          <EquipmentGrid
+            equipment={equipment}
+            currentUserId={currentUserId}
+            onDelete={handleDelete}
+          />
+        )}
       </motion.div>
+
+      <ListEquipmentDialog
+        isOpen={showListDialog}
+        onClose={() => setShowListDialog(false)}
+      />
+
+      <RequestsDialog
+        isOpen={showRequestsDialog}
+        onClose={() => setShowRequestsDialog(false)}
+        type="equipment"
+      />
+
       <BottomNav />
     </div>
   );
 };
 
-export default Equipment;
+export default EquipmentPage;

@@ -29,8 +29,8 @@ const Marketplace = () => {
         .insert({
           image_url: imageUrl,
           category: 'marketplace',
-          content: 'New marketplace item', // Required field
-          user_id: user.data.user.id // Required field
+          content: 'New marketplace item',
+          user_id: user.data.user.id
         });
 
       if (error) throw error;
