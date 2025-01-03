@@ -20,55 +20,9 @@ We're here to revolutionize the agricultural sector by integrating technology wi
 
 How to Get Started 🚀
 
-1. Use Your Preferred IDE
+1. Request Access to the Repository
 
-You can work locally using your favorite IDE. Follow these steps to set up the project:
-
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-
-✨ Note: Ensure that you have Node.js and npm installed. Use nvm for hassle-free installation.
-
-
----
-
-2. Edit Directly in GitHub ✏️
-
-Want to make quick edits?
-
-Navigate to the file you want to edit.
-
-Click the pencil icon 🖉 at the top right of the file view.
-
-Make your changes and commit them directly.
-
-
-
----
-
-3. Use GitHub Codespaces 💻
-
-Prefer a cloud-based environment? GitHub Codespaces is your friend!
-
-Go to your repository's main page.
-
-Click the "Code" button (green button).
-
-Switch to the Codespaces tab.
-
-Click "New codespace" to launch an instant development environment.
-
-Make changes, commit, and push effortlessly.
-
+Before using the repository, please request access by reaching out to us at Tlhalefangntshilane@gmail.com. Once granted, you'll be able to clone and contribute to the project.
 
 
 ---
