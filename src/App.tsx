@@ -8,6 +8,7 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useToast } from "@/hooks/use-toast";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import OfflineAlert from "@/components/OfflineAlert";
+import BottomNav from "@/components/BottomNav";
 import GetStarted from "./pages/GetStarted";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
@@ -57,6 +58,7 @@ const AppContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const isMobile = window.innerWidth < 1024;
 
   useEffect(() => {
     if (!isOnline && PROTECTED_ROUTES.includes(location.pathname)) {
@@ -70,51 +72,54 @@ const AppContent = () => {
   }, [isOnline, location.pathname, navigate, toast]);
 
   return (
-    <>
-      <OfflineAlert show={!isOnline} />
-      <Routes>
-        <Route path="/" element={<Navigate to="/get-started" replace />} />
-        <Route path="/get-started" element={<GetStarted />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/verify" element={<OTPVerification />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/forums" element={<Forums />} />
-        <Route path="/resources" element={<Resources />} />
-        <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/learning" element={<Learning />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/notifications" element={<Notifications />} />
-        
-        {/* Forum Routes */}
-        <Route path="/forums/livestock" element={<LivestockFarming />} />
-        <Route path="/forums/crops" element={<CropCultivation />} />
-        <Route path="/forums/market" element={<MarketTrends />} />
-        
-        {/* Resource Routes */}
-        <Route path="/resources/equipment" element={<Equipment />} />
-        <Route path="/resources/seeds" element={<Seeds />} />
-        <Route path="/resources/land" element={<Land />} />
-        
-        {/* Marketplace Routes */}
-        <Route path="/marketplace/products" element={<Products />} />
-        <Route path="/marketplace/equipment" element={<MarketEquipment />} />
-        <Route path="/marketplace/supplies" element={<Supplies />} />
-        
-        {/* Learning Routes */}
-        <Route path="/learning/guides" element={<Guides />} />
-        <Route path="/learning/videos" element={<Videos />} />
-        <Route path="/learning/certificates" element={<Certificates />} />
-        <Route path="/learning/ai-assistant" element={<AIAssistant />} />
-        
-        {/* Community Routes */}
-        <Route path="/community/groups" element={<Groups />} />
-        <Route path="/community/events" element={<Events />} />
-        <Route path="/community/mentorship" element={<Mentorship />} />
-      </Routes>
-    </>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 pb-[70px] lg:pb-0">
+        <OfflineAlert show={!isOnline} />
+        <Routes>
+          <Route path="/" element={<Navigate to="/get-started" replace />} />
+          <Route path="/get-started" element={<GetStarted />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/verify" element={<OTPVerification />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/forums" element={<Forums />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/learning" element={<Learning />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/notifications" element={<Notifications />} />
+          
+          {/* Forum Routes */}
+          <Route path="/forums/livestock" element={<LivestockFarming />} />
+          <Route path="/forums/crops" element={<CropCultivation />} />
+          <Route path="/forums/market" element={<MarketTrends />} />
+          
+          {/* Resource Routes */}
+          <Route path="/resources/equipment" element={<Equipment />} />
+          <Route path="/resources/seeds" element={<Seeds />} />
+          <Route path="/resources/land" element={<Land />} />
+          
+          {/* Marketplace Routes */}
+          <Route path="/marketplace/products" element={<Products />} />
+          <Route path="/marketplace/equipment" element={<MarketEquipment />} />
+          <Route path="/marketplace/supplies" element={<Supplies />} />
+          
+          {/* Learning Routes */}
+          <Route path="/learning/guides" element={<Guides />} />
+          <Route path="/learning/videos" element={<Videos />} />
+          <Route path="/learning/certificates" element={<Certificates />} />
+          <Route path="/learning/ai-assistant" element={<AIAssistant />} />
+          
+          {/* Community Routes */}
+          <Route path="/community/groups" element={<Groups />} />
+          <Route path="/community/events" element={<Events />} />
+          <Route path="/community/mentorship" element={<Mentorship />} />
+        </Routes>
+      </div>
+      {isMobile && <BottomNav />}
+    </div>
   );
 };
 
@@ -132,11 +137,13 @@ const App = () => {
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
+          <div className="min-h-screen bg-background">
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </div>
         </TooltipProvider>
       </QueryClientProvider>
     </LanguageProvider>

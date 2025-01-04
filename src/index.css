@@ -37,7 +37,36 @@
   }
 
   #root {
-    @apply min-h-screen w-full max-w-md mx-auto;
+    @apply min-h-screen w-full mx-auto;
+    max-width: 100%;
+  }
+
+  /* Desktop styles */
+  @media (min-width: 1024px) {
+    #root {
+      @apply max-w-7xl px-8;
+    }
+  }
+
+  /* Tablet styles */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #root {
+      @apply max-w-3xl px-6;
+    }
+  }
+
+  /* Mobile styles */
+  @media (max-width: 767px) {
+    #root {
+      @apply max-w-full px-4;
+    }
+  }
+
+  /* Landscape orientation styles */
+  @media (orientation: landscape) and (max-width: 915px) {
+    #root {
+      @apply py-2;
+    }
   }
 }
 
