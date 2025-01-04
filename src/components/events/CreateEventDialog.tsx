@@ -22,7 +22,6 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [topic, setTopic] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -57,8 +56,7 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
           location,
           topic,
           organizer_id: user.id,
-          image_url: imageUrl,
-          contact_phone: contactPhone || null
+          image_url: imageUrl
         });
 
       if (error) throw error;
@@ -143,16 +141,6 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               required
-            />
-          </div>
-          <div>
-            <Label htmlFor="contactPhone">WhatsApp/Phone Number (Optional)</Label>
-            <Input
-              id="contactPhone"
-              type="tel"
-              value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-              placeholder="Enter contact number for inquiries"
             />
           </div>
           <div>

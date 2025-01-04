@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Phone, Users } from "lucide-react";
+import { Loader2, Users } from "lucide-react";
 
 interface EventRegistrationsDialogProps {
   isOpen: boolean;
@@ -62,15 +62,9 @@ const EventRegistrationsDialog = ({ isOpen, onClose, eventId }: EventRegistratio
                 {registrations.map((registration) => (
                   <div key={registration.id} className="py-3">
                     <p className="font-medium">{registration.user?.full_name}</p>
-                    <div className="text-sm text-gray-500 space-y-1">
-                      <p>Location: {registration.user?.location || 'Not specified'}</p>
-                      {registration.phone_number && (
-                        <p className="flex items-center gap-1">
-                          <Phone className="h-4 w-4" />
-                          {registration.phone_number}
-                        </p>
-                      )}
-                    </div>
+                    <p className="text-sm text-gray-500">
+                      Location: {registration.user?.location || 'Not specified'}
+                    </p>
                   </div>
                 ))}
               </div>
