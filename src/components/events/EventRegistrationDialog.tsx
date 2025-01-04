@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Phone } from "lucide-react";
 
 interface EventRegistrationDialogProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ const EventRegistrationDialog = ({
 }: EventRegistrationDialogProps) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
   const { toast } = useToast();
 
   const handleRegister = async () => {
@@ -35,6 +38,7 @@ const EventRegistrationDialog = ({
         .insert({
           event_id: event.id,
           user_id: user.id,
+          phone_number: phoneNumber
         });
 
       if (error) throw error;
@@ -42,7 +46,6 @@ const EventRegistrationDialog = ({
       setShowSuccess(true);
       onRegistrationComplete();
       
-      // Show success toast after animation
       setTimeout(() => {
         toast({
           title: "Registration Successful",
@@ -81,8 +84,12 @@ const EventRegistrationDialog = ({
                 </DialogTitle>
                 <DialogDescription className="pt-4 space-y-4">
                   <div className="bg-yellow-50 p-4 rounded-lg text-yellow-700 text-sm">
-                    Please note that event registrations cannot be cancelled once confirmed.
-                    The event organizer will be notified of your registration.
+                    <p className="font-semibold mb-2">Important Notice:</p>
+                    <ul className="list-disc pl-4 space-y-1">
+                      <li>Event registrations cannot be cancelled once confirmed.</li>
+                      <li>The event organizer will be notified of your registration.</li>
+                      <li>Your contact number will be shared with the event organizer.</li>
+                    </ul>
                   </div>
                   
                   <div className="space-y-2">
@@ -92,6 +99,24 @@ const EventRegistrationDialog = ({
                     <p>Time: {event.time}</p>
                     <p>Location: {event.location}</p>
                     <p>Organizer: {event.organizer?.full_name}</p>
+                    {event.contact_phone && (
+                      <p>Contact Number: {event.contact_phone}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phoneNumber" className="flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      Your Contact Number
+                    </Label>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="Enter your phone number"
+                      required
+                    />
                   </div>
 
                   <div className="flex gap-4 pt-4">
@@ -105,7 +130,7 @@ const EventRegistrationDialog = ({
                     <Button
                       onClick={handleRegister}
                       className="flex-1"
-                      disabled={isRegistering}
+                      disabled={isRegistering || !phoneNumber}
                     >
                       Confirm Registration
                     </Button>

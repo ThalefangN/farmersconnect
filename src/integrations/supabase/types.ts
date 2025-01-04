@@ -206,6 +206,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          phone_number: string | null
           status: string
           user_id: string
         }
@@ -213,6 +214,7 @@ export type Database = {
           created_at?: string
           event_id: string
           id?: string
+          phone_number?: string | null
           status?: string
           user_id: string
         }
@@ -220,6 +222,7 @@ export type Database = {
           created_at?: string
           event_id?: string
           id?: string
+          phone_number?: string | null
           status?: string
           user_id?: string
         }
@@ -243,6 +246,7 @@ export type Database = {
       events: {
         Row: {
           capacity: number | null
+          contact_phone: string | null
           created_at: string
           current_registrations: number | null
           date: string
@@ -258,6 +262,7 @@ export type Database = {
         }
         Insert: {
           capacity?: number | null
+          contact_phone?: string | null
           created_at?: string
           current_registrations?: number | null
           date: string
@@ -273,6 +278,7 @@ export type Database = {
         }
         Update: {
           capacity?: number | null
+          contact_phone?: string | null
           created_at?: string
           current_registrations?: number | null
           date?: string

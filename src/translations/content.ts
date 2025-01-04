@@ -1,7 +1,7 @@
 export const contentTranslations = {
   en: {
-    aboutSebotsa: "Sebotsa Farmers Hub is your one-stop platform for agricultural collaboration in Botswana.",
-    welcomeMessage: "Welcome to Sebotsa Farmers Hub",
+    aboutSebotsa: "FarmersConnect is your one-stop platform for agricultural collaboration in Botswana.",
+    welcomeMessage: "Welcome to FarmersConnect",
     farmersHub: "Farmers Hub",
     offlineTitle: "You're offline",
     offlineDesc: "Please connect to the internet to proceed.",
@@ -14,8 +14,8 @@ export const contentTranslations = {
     resourceSharing: "Resource Sharing"
   },
   tn: {
-    aboutSebotsa: "Sebotsa ke lefelo le le lengwe la tirisanommogo ya temothuo mo Botswana.",
-    welcomeMessage: "O amogelesegile mo Sebotsa",
+    aboutSebotsa: "FarmersConnect ke lefelo le le lengwe la tirisanommogo ya temothuo mo Botswana.",
+    welcomeMessage: "O amogelesegile mo FarmersConnect",
     farmersHub: "Lefelo la Balemi",
     offlineTitle: "Ga o a golagana",
     offlineDesc: "Tswêê-tswêê golagana le inthanete go tswelela.",
