@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar, Plus, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import CreateEventDialog from "@/components/events/CreateEventDialog";
+import EventRegistrationDialog from "@/components/events/EventRegistrationDialog";
+import EventRegistrationsDialog from "@/components/events/EventRegistrationsDialog";
 import { format } from "date-fns";
 
 const Events = () => {
@@ -16,6 +18,9 @@ const Events = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showRegistrationDialog, setShowRegistrationDialog] = useState(false);
+  const [showRegistrationsDialog, setShowRegistrationsDialog] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -70,6 +75,16 @@ const Events = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleRegistrationClick = (event: any) => {
+    setSelectedEvent(event);
+    setShowRegistrationDialog(true);
+  };
+
+  const handleViewRegistrations = (event: any) => {
+    setSelectedEvent(event);
+    setShowRegistrationsDialog(true);
   };
 
   return (
@@ -146,26 +161,36 @@ const Events = () => {
                           <strong>Topic:</strong> {event.topic}
                         </p>
                       )}
+                      {currentUserId === event.organizer_id && (
+                        <p className="text-gray-600">
+                          <strong>Registrations:</strong> {event.current_registrations || 0}
+                        </p>
+                      )}
                     </div>
                     <div className="flex space-x-2">
                       {currentUserId === event.organizer_id ? (
-                        <Button 
-                          variant="destructive"
-                          onClick={() => handleDelete(event.id)}
-                          className="flex-1"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete Event
-                        </Button>
+                        <>
+                          <Button 
+                            variant="outline"
+                            onClick={() => handleViewRegistrations(event)}
+                            className="flex-1"
+                          >
+                            <Users className="mr-2 h-4 w-4" />
+                            View Registrations
+                          </Button>
+                          <Button 
+                            variant="destructive"
+                            onClick={() => handleDelete(event.id)}
+                            className="flex-1"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Event
+                          </Button>
+                        </>
                       ) : (
                         <Button 
                           className="flex-1 bg-green-600 hover:bg-green-700"
-                          onClick={() => {
-                            toast({
-                              title: "Registration Successful",
-                              description: `You have been registered for ${event.title}. Check your email for details.`,
-                            });
-                          }}
+                          onClick={() => handleRegistrationClick(event)}
                         >
                           Register Now
                         </Button>
@@ -184,6 +209,29 @@ const Events = () => {
         onClose={() => setShowCreateDialog(false)}
         onEventCreated={fetchEvents}
       />
+
+      {selectedEvent && (
+        <>
+          <EventRegistrationDialog
+            isOpen={showRegistrationDialog}
+            onClose={() => {
+              setShowRegistrationDialog(false);
+              setSelectedEvent(null);
+            }}
+            event={selectedEvent}
+            onRegistrationComplete={fetchEvents}
+          />
+
+          <EventRegistrationsDialog
+            isOpen={showRegistrationsDialog}
+            onClose={() => {
+              setShowRegistrationsDialog(false);
+              setSelectedEvent(null);
+            }}
+            eventId={selectedEvent.id}
+          />
+        </>
+      )}
       
       <BottomNav />
     </div>
