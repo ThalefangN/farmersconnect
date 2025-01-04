@@ -31,7 +31,6 @@ const Equipment = () => {
         { event: '*', schema: 'public', table: 'equipment_requests' },
         async (payload) => {
           if (payload.new && currentUserId) {
-            // If this is a request update and the current user is the requester
             if (payload.eventType === 'UPDATE' && payload.new.user_id === currentUserId) {
               const status = payload.new.status;
               const equipment = await getEquipmentDetails(payload.new.equipment_id);
@@ -118,7 +117,7 @@ const Equipment = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-20">
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
         <EquipmentHeader
           onViewRequests={() => setShowRequests(true)}
           onListEquipment={() => setShowListDialog(true)}

@@ -7,29 +7,21 @@ interface EquipmentHeaderProps {
   currentUserId: string | null;
 }
 
-const EquipmentHeader = ({ onViewRequests, onListEquipment, currentUserId }: EquipmentHeaderProps) => {
+const EquipmentHeader = ({ onListEquipment, currentUserId }: EquipmentHeaderProps) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-2">
         <Wrench className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Farming Equipment</h1>
       </div>
-      <div className="flex gap-2">
+      <div>
         {currentUserId && (
-          <>
-            <Button
-              onClick={onViewRequests}
-              variant="outline"
-            >
-              View Requests
-            </Button>
-            <Button
-              onClick={onListEquipment}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              List Equipment
-            </Button>
-          </>
+          <Button
+            onClick={onListEquipment}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            List Equipment
+          </Button>
         )}
       </div>
     </div>
