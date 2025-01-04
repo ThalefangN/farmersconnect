@@ -8,14 +8,14 @@ const BottomNav = () => {
   const { t } = useLanguage();
 
   const items = [
-    { icon: HomeIcon, label: "FarmersConnect", path: "/home" },
+    { icon: HomeIcon, label: "Sebotsa", path: "/home" },
     { icon: Settings, label: t("services"), path: "/services" },
     { icon: Bell, label: t("notifications"), path: "/notifications" },
     { icon: User, label: t("profile"), path: "/profile" },
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-green-50 border-t border-green-200 z-50">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-green-50 border-t border-green-200">
       <nav className="flex justify-around">
         {items.map(({ icon: Icon, label, path }) => (
           <Link
