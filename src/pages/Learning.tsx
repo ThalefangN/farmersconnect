@@ -4,12 +4,9 @@ import BottomNav from "@/components/BottomNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { AIChatDialog } from "@/components/learning/AIChatDialog";
 
 const Learning = () => {
   const navigate = useNavigate();
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   const resources = [
     {
@@ -49,7 +46,7 @@ const Learning = () => {
               <h1 className="text-2xl font-bold text-green-800">Learning Hub</h1>
             </div>
             <Button
-              onClick={() => setIsAIChatOpen(true)}
+              onClick={() => navigate('/learning/ai-assistant')}
               className="bg-green-600 hover:bg-green-700"
             >
               <MessageSquareMore className="h-5 w-5 mr-2" />
@@ -102,11 +99,6 @@ const Learning = () => {
           </div>
         </motion.div>
       </div>
-      
-      <AIChatDialog
-        isOpen={isAIChatOpen}
-        onClose={() => setIsAIChatOpen(false)}
-      />
       
       <BottomNav />
     </div>

@@ -36,6 +36,7 @@ import Certificates from "./pages/learning/Certificates";
 import Groups from "./pages/community/Groups";
 import Events from "./pages/community/Events";
 import Mentorship from "./pages/community/Mentorship";
+import AIAssistant from "./pages/learning/AIAssistant";
 
 const PROTECTED_ROUTES = [
   '/signin',
@@ -106,6 +107,7 @@ const AppContent = () => {
         <Route path="/learning/guides" element={<Guides />} />
         <Route path="/learning/videos" element={<Videos />} />
         <Route path="/learning/certificates" element={<Certificates />} />
+        <Route path="/learning/ai-assistant" element={<AIAssistant />} />
         
         {/* Community Routes */}
         <Route path="/community/groups" element={<Groups />} />

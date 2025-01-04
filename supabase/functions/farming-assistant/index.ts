@@ -1,23 +1,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { message, imageUrl } = await req.json()
+    const { message, imageUrl } = await req.json();
 
-    // Create the system message with context about Botswana farming
-    const systemMessage = `You are a knowledgeable farming assistant specializing in agriculture in Botswana. 
-    You understand the local climate, soil conditions, and farming practices. 
-    Provide practical advice that's relevant to Botswana's agricultural context.`
+    // System message to ensure farming-focused responses
+    const systemMessage = `You are an expert farming assistant specializing in agriculture in Botswana. 
+    You understand local climate conditions, soil types, and farming practices. 
+    Provide practical, actionable advice that's relevant to Botswana's agricultural context. 
+    Only answer questions related to farming, agriculture, and related topics. 
+    If asked about non-farming topics, politely redirect the conversation back to farming.`;
 
     // Prepare the messages array
     const messages = [
@@ -26,9 +28,9 @@ serve(async (req) => {
         ? `Image: ${imageUrl}\n\nQuestion: ${message}`
         : message 
       }
-    ]
+    ];
 
-    // Call OpenAI API
+    // Call OpenAI API with GPT-4 Vision capabilities
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -41,10 +43,10 @@ serve(async (req) => {
         temperature: 0.7,
         max_tokens: 1000,
       }),
-    })
+    });
 
-    const data = await openAIResponse.json()
-    const response = data.choices[0].message.content
+    const data = await openAIResponse.json();
+    const response = data.choices[0].message.content;
 
     return new Response(
       JSON.stringify({ response }),
@@ -54,9 +56,9 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
       },
-    )
+    );
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
@@ -66,6 +68,6 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
       },
-    )
+    );
   }
-})
+});
