@@ -11,19 +11,38 @@ export const useOnlineStatus = () => {
     const handleOnline = () => {
       setIsOnline(true);
       localStorage.setItem("isOnline", "true");
+      // Trigger a custom event that other components can listen to
+      window.dispatchEvent(new CustomEvent('onlineStatusChange', { 
+        detail: { isOnline: true } 
+      }));
     };
     
     const handleOffline = () => {
       setIsOnline(false);
       localStorage.setItem("isOnline", "false");
-      
-      // Show a message when going offline
-      const event = new CustomEvent('offlineStatusChange', { detail: { isOnline: false } });
-      window.dispatchEvent(event);
+      // Trigger a custom event that other components can listen to
+      window.dispatchEvent(new CustomEvent('offlineStatusChange', { 
+        detail: { isOnline: false } 
+      }));
+    };
+
+    // Handle page visibility changes
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // When page becomes visible, check connection
+        if (navigator.onLine !== isOnline) {
+          if (navigator.onLine) {
+            handleOnline();
+          } else {
+            handleOffline();
+          }
+        }
+      }
     };
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // Update localStorage with current state
     localStorage.setItem("isOnline", JSON.stringify(isOnline));
@@ -31,6 +50,7 @@ export const useOnlineStatus = () => {
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [isOnline]);
 

@@ -7,10 +7,25 @@
     <meta name="description" content="FarmersConnectBW" />
     <meta name="author" content="Tlhalefang Ntshilane" />
     <meta property="og:image" content="/Green and Orange Bold Typographic Agriculture Organic Farm Logo.png" />
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#16a34a">
   </head>
 
   <body>
     <div id="root"></div>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
     <script src="http://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
