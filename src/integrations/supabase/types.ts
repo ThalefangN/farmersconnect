@@ -9,6 +9,78 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      certificate_courses: {
+        Row: {
+          created_at: string
+          description: string
+          documents: Json | null
+          id: string
+          notes: Json | null
+          title: string
+          updated_at: string
+          videos: Json | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          documents?: Json | null
+          id?: string
+          notes?: Json | null
+          title: string
+          updated_at?: string
+          videos?: Json | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          documents?: Json | null
+          id?: string
+          notes?: Json | null
+          title?: string
+          updated_at?: string
+          videos?: Json | null
+        }
+        Relationships: []
+      }
+      certificate_enrollments: {
+        Row: {
+          course_id: string
+          enrolled_at: string
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          enrolled_at?: string
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          enrolled_at?: string
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificate_enrollments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           content: string

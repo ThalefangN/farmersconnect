@@ -102,9 +102,9 @@ const AIAssistant = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-20">
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="mb-6">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      <div className="container mx-auto px-4 py-6 max-w-4xl h-screen flex flex-col">
+        <div className="mb-6 flex-shrink-0">
           <Button
             variant="ghost"
             onClick={() => navigate('/learning')}
@@ -125,7 +125,7 @@ const AIAssistant = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md h-[600px] flex flex-col">
+        <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 ? (
               <div className="text-center text-gray-500 mt-8">

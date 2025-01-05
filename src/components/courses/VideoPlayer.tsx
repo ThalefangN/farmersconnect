@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Play, Download } from "lucide-react";
+import { Star, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 
 interface VideoPlayerProps {
   isOpen: boolean;
@@ -24,12 +23,10 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer = ({ isOpen, onClose, video }: VideoPlayerProps) => {
-  const { toast } = useToast();
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handlePlayClick = () => {
     setIsPlaying(true);
-    // Add your video playing logic here
   };
 
   return (
