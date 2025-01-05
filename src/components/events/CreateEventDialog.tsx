@@ -22,6 +22,7 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [topic, setTopic] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -55,6 +56,7 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
           time,
           location,
           topic,
+          contact_phone: contactPhone,
           organizer_id: user.id,
           image_url: imageUrl
         });
@@ -131,6 +133,17 @@ const CreateEventDialog = ({ isOpen, onClose, onEventCreated }: CreateEventDialo
               id="location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="contactPhone">Contact Phone</Label>
+            <Input
+              id="contactPhone"
+              type="tel"
+              value={contactPhone}
+              onChange={(e) => setContactPhone(e.target.value)}
+              placeholder="+267 XXXXXXXX"
               required
             />
           </div>
