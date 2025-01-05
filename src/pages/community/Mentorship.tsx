@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ const Mentorship = () => {
       </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Under Construction</DialogTitle>
             <DialogDescription>
@@ -34,7 +34,10 @@ const Mentorship = () => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => setShowDialog(false)}>
+            <Button 
+              onClick={() => setShowDialog(false)}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
               Ok, Great!
             </Button>
           </DialogFooter>

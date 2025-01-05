@@ -69,7 +69,7 @@ const AIAssistant = () => {
       setInput('');
       setSelectedImage(null);
 
-      // Call the AI assistant edge function
+      console.log('Sending request to farming-assistant function...');
       const response = await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.functions.supabase.co/farming-assistant`, {
         method: 'POST',
         headers: {
@@ -82,7 +82,13 @@ const AIAssistant = () => {
         }),
       });
 
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || 'Failed to get response from AI');
+      }
+
       const data = await response.json();
+      console.log('Received response:', data);
 
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -93,7 +99,7 @@ const AIAssistant = () => {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
     } finally {

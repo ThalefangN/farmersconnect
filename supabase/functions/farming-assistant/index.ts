@@ -13,6 +13,7 @@ serve(async (req) => {
 
   try {
     const { message, imageUrl } = await req.json();
+    console.log('Received request:', { message, imageUrl });
 
     // System message to ensure farming-focused responses
     const systemMessage = `You are an expert farming assistant specializing in agriculture in Botswana. 
@@ -30,7 +31,9 @@ serve(async (req) => {
       }
     ];
 
-    // Call OpenAI API with GPT-4 Vision capabilities
+    console.log('Calling OpenAI API with messages:', messages);
+
+    // Call OpenAI API
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -45,11 +48,17 @@ serve(async (req) => {
       }),
     });
 
+    if (!openAIResponse.ok) {
+      const error = await openAIResponse.json();
+      console.error('OpenAI API error:', error);
+      throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
+    }
+
     const data = await openAIResponse.json();
-    const response = data.choices[0].message.content;
+    console.log('OpenAI API response:', data);
 
     return new Response(
-      JSON.stringify({ response }),
+      JSON.stringify({ response: data.choices[0].message.content }),
       { 
         headers: { 
           ...corsHeaders,
@@ -58,9 +67,12 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in farming-assistant function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: 'Failed to process your request. Please try again.',
+        details: error.message 
+      }),
       { 
         status: 500,
         headers: { 
