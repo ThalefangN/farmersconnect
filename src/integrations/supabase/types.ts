@@ -939,6 +939,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_trial_active: boolean | null
+          ai_trial_start: string | null
           created_at: string
           farming_type: string | null
           full_name: string | null
@@ -950,6 +952,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_trial_active?: boolean | null
+          ai_trial_start?: string | null
           created_at?: string
           farming_type?: string | null
           full_name?: string | null
@@ -961,6 +965,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_trial_active?: boolean | null
+          ai_trial_start?: string | null
           created_at?: string
           farming_type?: string | null
           full_name?: string | null

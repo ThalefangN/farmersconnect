@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ProfileUpdate } from "@/integrations/supabase/types/profile";
 
 interface WelcomeModalProps {
   isOpen: boolean;
@@ -30,12 +31,14 @@ const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
       }
 
       // Start the trial by setting the trial start date
+      const updateData: ProfileUpdate = {
+        ai_trial_start: new Date().toISOString(),
+        ai_trial_active: true
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          ai_trial_start: new Date().toISOString(),
-          ai_trial_active: true
-        })
+        .update(updateData)
         .eq('id', session.user.id);
 
       if (error) throw error;

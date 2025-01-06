@@ -1,3 +1,6 @@
+import { Profile, ProfileUpdate } from './profile';
+import { Json } from './json';
+
 export type Tables = {
   comments: {
     Row: {
@@ -289,37 +292,13 @@ export type Tables = {
       },
     ];
   };
+  
   profiles: {
-    Row: {
-      created_at: string;
-      farming_type: string | null;
-      full_name: string | null;
-      id: string;
-      location: string | null;
-      phone_text: string | null;
-      profile_photo_url: string | null;
-      updated_at: string;
-    };
-    Insert: {
+    Row: Profile;
+    Insert: Omit<Profile, 'created_at' | 'updated_at'> & {
       created_at?: string;
-      farming_type?: string | null;
-      full_name?: string | null;
-      id: string;
-      location?: string | null;
-      phone_text?: string | null;
-      profile_photo_url?: string | null;
       updated_at?: string;
     };
-    Update: {
-      created_at?: string;
-      farming_type?: string | null;
-      full_name?: string | null;
-      id?: string;
-      location?: string | null;
-      phone_text?: string | null;
-      profile_photo_url?: string | null;
-      updated_at?: string;
-    };
-    Relationships: [];
+    Update: ProfileUpdate;
   };
 };
