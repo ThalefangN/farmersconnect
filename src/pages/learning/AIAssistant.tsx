@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bot, ArrowLeft, Send, Loader2, Upload, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import WelcomeModal from "@/components/ai/WelcomeModal";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,8 +19,60 @@ const AIAssistant = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    checkAccess();
+  }, []);
+
+  const checkAccess = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setShowWelcomeModal(true);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('ai_trial_start, ai_trial_active')
+        .eq('id', session.user.id)
+        .single();
+
+      if (!profile) {
+        setShowWelcomeModal(true);
+        return;
+      }
+
+      // Check if trial is active and within 7 days
+      if (profile.ai_trial_active && profile.ai_trial_start) {
+        const trialStart = new Date(profile.ai_trial_start);
+        const trialEnd = new Date(trialStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const now = new Date();
+
+        if (now > trialEnd) {
+          // Trial has expired
+          await supabase
+            .from('profiles')
+            .update({ ai_trial_active: false })
+            .eq('id', session.user.id);
+          setShowWelcomeModal(true);
+          setHasAccess(false);
+        } else {
+          setHasAccess(true);
+        }
+      } else {
+        setShowWelcomeModal(true);
+        setHasAccess(false);
+      }
+    } catch (error) {
+      console.error('Error checking access:', error);
+      setShowWelcomeModal(true);
+    }
+  };
 
   const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -111,7 +164,12 @@ const AIAssistant = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-green-50 to-white flex flex-col">
+      <WelcomeModal 
+        isOpen={showWelcomeModal} 
+        onClose={() => setShowWelcomeModal(false)} 
+      />
+      
       <div className="container mx-auto px-4 py-4 flex-1 flex flex-col max-w-4xl">
         <Button
           variant="ghost"
@@ -190,18 +248,22 @@ const AIAssistant = () => {
                 onChange={handleImageSelect}
                 className="hidden"
                 id="image-upload"
+                disabled={!hasAccess}
               />
               <label
                 htmlFor="image-upload"
-                className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50"
+                className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 ${
+                  !hasAccess ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
                 <Upload className="h-4 w-4" />
               </label>
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about farming in Botswana..."
-                className="flex-1 min-h-[60px] max-h-[120px]"
+                placeholder={hasAccess ? "Ask about farming in Botswana..." : "Start your trial to chat with AI"}
+                className="flex-1 min-h-[44px] max-h-[120px]"
+                disabled={!hasAccess}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -211,7 +273,7 @@ const AIAssistant = () => {
               />
               <Button
                 onClick={handleSendMessage}
-                disabled={isLoading || (!input.trim() && !selectedImage)}
+                disabled={isLoading || (!input.trim() && !selectedImage) || !hasAccess}
                 className="self-end bg-green-600 hover:bg-green-700"
               >
                 {isLoading ? (
