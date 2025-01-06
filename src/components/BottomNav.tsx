@@ -2,7 +2,6 @@ import { HomeIcon, Settings, Bell, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { motion } from "framer-motion";
 
 const BottomNav = () => {
   const location = useLocation();
@@ -16,29 +15,25 @@ const BottomNav = () => {
   ];
 
   return (
-    <motion.div 
-      initial={{ y: 100 }}
-      animate={{ y: 0 }}
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md border-t border-border z-50"
-    >
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-green-50 border-t border-green-200">
       <nav className="flex justify-around">
         {items.map(({ icon: Icon, label, path }) => (
           <Link
             key={path}
             to={path}
             className={cn(
-              "flex flex-col items-center py-3 px-4 touch-target hover-lift press-effect",
+              "flex flex-col items-center py-2 px-4 text-sm",
               location.pathname === path
-                ? "text-primary"
-                : "text-muted-foreground hover:text-primary"
+                ? "text-green-700"
+                : "text-gray-600 hover:text-green-700"
             )}
           >
-            <Icon className="h-5 w-5" />
-            <span className="text-xs mt-1">{label}</span>
+            <Icon className="h-6 w-6" />
+            <span className="mt-1">{label}</span>
           </Link>
         ))}
       </nav>
-    </motion.div>
+    </div>
   );
 };
 

@@ -8,48 +8,35 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useToast } from "@/hooks/use-toast";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import OfflineAlert from "@/components/OfflineAlert";
-import { motion, AnimatePresence } from "framer-motion";
-
-// Page Imports
-import GetStarted from "@/pages/GetStarted";
-import SignUp from "@/pages/SignUp";
-import SignIn from "@/pages/SignIn";
-import OTPVerification from "@/pages/OTPVerification";
-import Home from "@/pages/Home";
-import Forums from "@/pages/Forums";
-import Resources from "@/pages/Resources";
-import Marketplace from "@/pages/Marketplace";
-import Learning from "@/pages/Learning";
-import Community from "@/pages/Community";
-import Services from "@/pages/Services";
-import Profile from "@/pages/Profile";
-import Notifications from "@/pages/Notifications";
-
-// Forum Routes
-import LivestockFarming from "@/pages/forums/LivestockFarming";
-import CropCultivation from "@/pages/forums/CropCultivation";
-import MarketTrends from "@/pages/forums/MarketTrends";
-
-// Resource Routes
-import Equipment from "@/pages/resources/Equipment";
-import Seeds from "@/pages/resources/Seeds";
-import Land from "@/pages/resources/Land";
-
-// Marketplace Routes
-import Products from "@/pages/marketplace/Products";
-import MarketEquipment from "@/pages/marketplace/Equipment";
-import Supplies from "@/pages/marketplace/Supplies";
-
-// Learning Routes
-import Guides from "@/pages/learning/Guides";
-import Videos from "@/pages/learning/Videos";
-import Certificates from "@/pages/learning/Certificates";
-import AIAssistant from "@/pages/learning/AIAssistant";
-
-// Community Routes
-import Groups from "@/pages/community/Groups";
-import Events from "@/pages/community/Events";
-import Mentorship from "@/pages/community/Mentorship";
+import GetStarted from "./pages/GetStarted";
+import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
+import OTPVerification from "./pages/OTPVerification";
+import Home from "./pages/Home";
+import Forums from "./pages/Forums";
+import Resources from "./pages/Resources";
+import Marketplace from "./pages/Marketplace";
+import Learning from "./pages/Learning";
+import Community from "./pages/Community";
+import Services from "./pages/Services";
+import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
+import LivestockFarming from "./pages/forums/LivestockFarming";
+import CropCultivation from "./pages/forums/CropCultivation";
+import MarketTrends from "./pages/forums/MarketTrends";
+import Equipment from "./pages/resources/Equipment";
+import Seeds from "./pages/resources/Seeds";
+import Land from "./pages/resources/Land";
+import Products from "./pages/marketplace/Products";
+import MarketEquipment from "./pages/marketplace/Equipment";
+import Supplies from "./pages/marketplace/Supplies";
+import Guides from "./pages/learning/Guides";
+import Videos from "./pages/learning/Videos";
+import Certificates from "./pages/learning/Certificates";
+import Groups from "./pages/community/Groups";
+import Events from "./pages/community/Events";
+import Mentorship from "./pages/community/Mentorship";
+import AIAssistant from "./pages/learning/AIAssistant";
 
 const PROTECTED_ROUTES = [
   '/signin',
@@ -64,12 +51,6 @@ const PROTECTED_ROUTES = [
   '/profile',
   '/notifications'
 ];
-
-const pageTransition = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 }
-};
 
 const AppContent = () => {
   const isOnline = useOnlineStatus();
@@ -91,60 +72,48 @@ const AppContent = () => {
   return (
     <>
       <OfflineAlert show={!isOnline} />
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={location.pathname}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          variants={pageTransition}
-          transition={{ duration: 0.3 }}
-          className="page-transition min-h-screen"
-        >
-          <Routes location={location}>
-            <Route path="/" element={<Navigate to="/get-started" replace />} />
-            <Route path="/get-started" element={<GetStarted />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/verify" element={<OTPVerification />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/forums" element={<Forums />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/learning" element={<Learning />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/notifications" element={<Notifications />} />
-            
-            {/* Forum Routes */}
-            <Route path="/forums/livestock" element={<LivestockFarming />} />
-            <Route path="/forums/crops" element={<CropCultivation />} />
-            <Route path="/forums/market" element={<MarketTrends />} />
-            
-            {/* Resource Routes */}
-            <Route path="/resources/equipment" element={<Equipment />} />
-            <Route path="/resources/seeds" element={<Seeds />} />
-            <Route path="/resources/land" element={<Land />} />
-            
-            {/* Marketplace Routes */}
-            <Route path="/marketplace/products" element={<Products />} />
-            <Route path="/marketplace/equipment" element={<MarketEquipment />} />
-            <Route path="/marketplace/supplies" element={<Supplies />} />
-            
-            {/* Learning Routes */}
-            <Route path="/learning/guides" element={<Guides />} />
-            <Route path="/learning/videos" element={<Videos />} />
-            <Route path="/learning/certificates" element={<Certificates />} />
-            <Route path="/learning/ai-assistant" element={<AIAssistant />} />
-            
-            {/* Community Routes */}
-            <Route path="/community/groups" element={<Groups />} />
-            <Route path="/community/events" element={<Events />} />
-            <Route path="/community/mentorship" element={<Mentorship />} />
-          </Routes>
-        </motion.div>
-      </AnimatePresence>
+      <Routes>
+        <Route path="/" element={<Navigate to="/get-started" replace />} />
+        <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/verify" element={<OTPVerification />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/forums" element={<Forums />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/learning" element={<Learning />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/notifications" element={<Notifications />} />
+        
+        {/* Forum Routes */}
+        <Route path="/forums/livestock" element={<LivestockFarming />} />
+        <Route path="/forums/crops" element={<CropCultivation />} />
+        <Route path="/forums/market" element={<MarketTrends />} />
+        
+        {/* Resource Routes */}
+        <Route path="/resources/equipment" element={<Equipment />} />
+        <Route path="/resources/seeds" element={<Seeds />} />
+        <Route path="/resources/land" element={<Land />} />
+        
+        {/* Marketplace Routes */}
+        <Route path="/marketplace/products" element={<Products />} />
+        <Route path="/marketplace/equipment" element={<MarketEquipment />} />
+        <Route path="/marketplace/supplies" element={<Supplies />} />
+        
+        {/* Learning Routes */}
+        <Route path="/learning/guides" element={<Guides />} />
+        <Route path="/learning/videos" element={<Videos />} />
+        <Route path="/learning/certificates" element={<Certificates />} />
+        <Route path="/learning/ai-assistant" element={<AIAssistant />} />
+        
+        {/* Community Routes */}
+        <Route path="/community/groups" element={<Groups />} />
+        <Route path="/community/events" element={<Events />} />
+        <Route path="/community/mentorship" element={<Mentorship />} />
+      </Routes>
     </>
   );
 };
@@ -153,7 +122,7 @@ const App = () => {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 5, // 5 minutes
         retry: 1,
       },
     },
@@ -163,13 +132,11 @@ const App = () => {
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <div className="bg-background min-h-screen transition-colors duration-300">
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppContent />
-            </BrowserRouter>
-          </div>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
     </LanguageProvider>
