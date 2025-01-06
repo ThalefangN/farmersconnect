@@ -10,6 +10,47 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import OfflineAlert from "@/components/OfflineAlert";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Page Imports
+import GetStarted from "@/pages/GetStarted";
+import SignUp from "@/pages/SignUp";
+import SignIn from "@/pages/SignIn";
+import OTPVerification from "@/pages/OTPVerification";
+import Home from "@/pages/Home";
+import Forums from "@/pages/Forums";
+import Resources from "@/pages/Resources";
+import Marketplace from "@/pages/Marketplace";
+import Learning from "@/pages/Learning";
+import Community from "@/pages/Community";
+import Services from "@/pages/Services";
+import Profile from "@/pages/Profile";
+import Notifications from "@/pages/Notifications";
+
+// Forum Routes
+import LivestockFarming from "@/pages/forums/LivestockFarming";
+import CropCultivation from "@/pages/forums/CropCultivation";
+import MarketTrends from "@/pages/forums/MarketTrends";
+
+// Resource Routes
+import Equipment from "@/pages/resources/Equipment";
+import Seeds from "@/pages/resources/Seeds";
+import Land from "@/pages/resources/Land";
+
+// Marketplace Routes
+import Products from "@/pages/marketplace/Products";
+import MarketEquipment from "@/pages/marketplace/Equipment";
+import Supplies from "@/pages/marketplace/Supplies";
+
+// Learning Routes
+import Guides from "@/pages/learning/Guides";
+import Videos from "@/pages/learning/Videos";
+import Certificates from "@/pages/learning/Certificates";
+import AIAssistant from "@/pages/learning/AIAssistant";
+
+// Community Routes
+import Groups from "@/pages/community/Groups";
+import Events from "@/pages/community/Events";
+import Mentorship from "@/pages/community/Mentorship";
+
 const PROTECTED_ROUTES = [
   '/signin',
   '/signup',
