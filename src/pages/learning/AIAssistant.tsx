@@ -83,12 +83,15 @@ const AIAssistant = () => {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.details || 'Failed to get response from AI');
+        throw new Error('Failed to get response from AI');
       }
 
       const data = await response.json();
       console.log('Received response:', data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -108,26 +111,24 @@ const AIAssistant = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      <div className="container mx-auto px-4 py-6 max-w-4xl h-screen flex flex-col">
-        <div className="mb-6 flex-shrink-0">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/learning')}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Learning Hub
-          </Button>
-          
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-green-100 p-3 rounded-full">
-              <Bot className="h-6 w-6 text-green-700" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-green-800">AI Farming Assistant</h1>
-              <p className="text-green-600">Get expert farming advice and analyze your crops</p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col">
+      <div className="container mx-auto px-4 py-4 flex-1 flex flex-col max-w-4xl">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/learning')}
+          className="mb-4 self-start"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Learning Hub
+        </Button>
+        
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-green-100 p-3 rounded-full">
+            <Bot className="h-6 w-6 text-green-700" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-green-800">AI Farming Assistant</h1>
+            <p className="text-green-600">Get expert farming advice and analyze your crops</p>
           </div>
         </div>
 
@@ -168,9 +169,9 @@ const AIAssistant = () => {
             )}
           </div>
 
-          <div className="border-t p-4 space-y-2">
+          <div className="border-t p-4">
             {selectedImage && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                 <Image className="h-4 w-4" />
                 {selectedImage.name}
                 <Button
@@ -200,7 +201,7 @@ const AIAssistant = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about farming in Botswana..."
-                className="flex-1 min-h-[80px]"
+                className="flex-1 min-h-[60px] max-h-[120px]"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
