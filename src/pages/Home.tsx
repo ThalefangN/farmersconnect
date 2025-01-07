@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Search, Sprout, Users, ShoppingBag, BookOpen, MessageSquare } from "lucide-react";
+import { Search, Sprout, Users, ShoppingBag, BookOpen, MessageSquare, PawPrint } from "lucide-react";
 import ServiceCard from "@/components/ServiceCard";
 import BottomNav from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,12 @@ const Home = () => {
   const navigate = useNavigate();
   
   const services = [
+    {
+      title: "Animal Tracking",
+      description: "Monitor and track your livestock in real-time",
+      icon: PawPrint,
+      path: "/animal-tracking"
+    },
     {
       title: "Forums",
       description: "Join discussions with other farmers about agriculture",

@@ -37,6 +37,7 @@ import Groups from "./pages/community/Groups";
 import Events from "./pages/community/Events";
 import Mentorship from "./pages/community/Mentorship";
 import AIAssistant from "./pages/learning/AIAssistant";
+import AnimalTracking from "./pages/AnimalTracking";
 
 const PROTECTED_ROUTES = [
   '/signin',
@@ -49,7 +50,8 @@ const PROTECTED_ROUTES = [
   '/community',
   '/services',
   '/profile',
-  '/notifications'
+  '/notifications',
+  '/animal-tracking'
 ];
 
 const AppContent = () => {
@@ -113,6 +115,9 @@ const AppContent = () => {
         <Route path="/community/groups" element={<Groups />} />
         <Route path="/community/events" element={<Events />} />
         <Route path="/community/mentorship" element={<Mentorship />} />
+        
+        {/* Animal Tracking Route */}
+        <Route path="/animal-tracking" element={<AnimalTracking />} />
       </Routes>
     </>
   );
