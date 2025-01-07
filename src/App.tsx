@@ -71,6 +71,7 @@ const AppContent = () => {
 
   return (
     <>
+      <div className="status-bar-area safe-area-top" />
       <OfflineAlert show={!isOnline} />
       <Routes>
         <Route path="/" element={<Navigate to="/get-started" replace />} />
@@ -114,6 +115,7 @@ const AppContent = () => {
         <Route path="/community/events" element={<Events />} />
         <Route path="/community/mentorship" element={<Mentorship />} />
       </Routes>
+      <div className="navigation-bar-area safe-area-bottom" />
     </>
   );
 };
