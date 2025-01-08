@@ -16,7 +16,7 @@ const GetStarted = () => {
     en: {
       title: "Farmers Connect",
       description: "Empowering Farmers through Collaboration and Innovation",
-      joinButton: "Join Sebotsa",
+      joinButton: "Sign up now or create account",
       signInButton: "Sign In",
       communityText: "Join our community of farmers and agricultural experts",
       offlineMessage: "You are currently offline. Some features may be limited."
@@ -24,7 +24,7 @@ const GetStarted = () => {
     tn: {
       title: "Farmers Connect",
       description: "Re thusa balemi ba Botswana ka tirisano mmogo le ditlhabololo",
-      joinButton: "Tsena mo Sebotsa",
+      joinButton: "Sign up now or create account",
       signInButton: "Tsena",
       communityText: "Nna leloko la setshaba sa balemi le baitseanape ba temo",
       offlineMessage: "Ga o a golagana le inthanete. Ditirelo dingwe di ka nna tsa sa bereke."
@@ -45,7 +45,7 @@ const GetStarted = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#16a34a] flex flex-col items-center justify-center p-4">
       <div className="absolute top-4 w-full max-w-xs mx-auto">
         <RadioGroup
           defaultValue={language}
@@ -78,10 +78,10 @@ const GetStarted = () => {
         )}
 
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight text-green-800">
+          <h1 className="text-4xl font-bold tracking-tight text-white">
             {content[language as keyof typeof content].title}
           </h1>
-          <p className="text-lg text-green-700">
+          <p className="text-lg text-white/90">
             {content[language as keyof typeof content].description}
           </p>
         </div>
@@ -108,7 +108,7 @@ const GetStarted = () => {
           <Button 
             asChild 
             variant="outline" 
-            className={`w-full border-green-700 text-green-700 hover:bg-green-50 ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`w-full border-white text-white hover:bg-white/10 ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
             size="lg"
             onClick={handleAction}
           >
@@ -118,7 +118,7 @@ const GetStarted = () => {
           </Button>
         </div>
 
-        <p className="text-sm text-green-700/80">
+        <p className="text-sm text-white/80">
           {content[language as keyof typeof content].communityText}
         </p>
       </motion.div>
