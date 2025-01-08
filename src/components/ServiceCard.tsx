@@ -33,7 +33,7 @@ const ServiceCard = ({ title, description, icon: Icon, path }: ServiceCardProps)
 
   return (
     <Card 
-      className={`hover:bg-white/90 transition-colors cursor-pointer bg-white/80 border-green-600/20 ${
+      className={`hover:bg-green-50 transition-colors cursor-pointer border-green-100 ${
         !isOnline ? "opacity-50 cursor-not-allowed" : ""
       }`}
       onClick={handleClick}
@@ -45,7 +45,7 @@ const ServiceCard = ({ title, description, icon: Icon, path }: ServiceCardProps)
           </div>
           <div className="space-y-1">
             <CardTitle className="text-lg text-green-800">{title}</CardTitle>
-            <CardDescription className="text-green-700/80">{description}</CardDescription>
+            <CardDescription className="text-green-600">{description}</CardDescription>
           </div>
         </div>
       </CardHeader>
