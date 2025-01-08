@@ -38,6 +38,9 @@ import Events from "./pages/community/Events";
 import Mentorship from "./pages/community/Mentorship";
 import AIAssistant from "./pages/learning/AIAssistant";
 import AnimalTracking from "./pages/AnimalTracking";
+import RegisterAnimal from "./pages/animal-tracking/RegisterAnimal";
+import ViewMap from "./pages/animal-tracking/ViewMap";
+import ViewHistory from "./pages/animal-tracking/ViewHistory";
 
 const PROTECTED_ROUTES = [
   '/signin',
@@ -116,8 +119,11 @@ const AppContent = () => {
         <Route path="/community/events" element={<Events />} />
         <Route path="/community/mentorship" element={<Mentorship />} />
         
-        {/* Animal Tracking Route */}
+        {/* Animal Tracking Routes */}
         <Route path="/animal-tracking" element={<AnimalTracking />} />
+        <Route path="/animal-tracking/register" element={<RegisterAnimal />} />
+        <Route path="/animal-tracking/map" element={<ViewMap />} />
+        <Route path="/animal-tracking/history" element={<ViewHistory />} />
       </Routes>
     </>
   );
