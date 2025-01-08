@@ -15,7 +15,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#F2FCE2] border-t border-green-600/20 pb-[env(safe-area-inset-bottom)]">
       <nav className="flex justify-around">
         {items.map(({ icon: Icon, label, path }) => (
           <Link
@@ -24,8 +24,8 @@ const BottomNav = () => {
             className={cn(
               "flex flex-col items-center py-2 px-4 text-sm",
               location.pathname === path
-                ? "text-white"
-                : "text-white/70 hover:text-white"
+                ? "text-green-700"
+                : "text-green-600/70 hover:text-green-700"
             )}
           >
             <Icon className="h-6 w-6" />
