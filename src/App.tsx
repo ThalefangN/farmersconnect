@@ -11,6 +11,9 @@ import OfflineAlert from "@/components/OfflineAlert";
 import GetStarted from "./pages/GetStarted";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import About from "./pages/About";
 import OTPVerification from "./pages/OTPVerification";
 import Home from "./pages/Home";
 import Forums from "./pages/Forums";
@@ -82,6 +85,9 @@ const AppContent = () => {
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/about" element={<About />} />
         <Route path="/verify" element={<OTPVerification />} />
         <Route path="/home" element={<Home />} />
         <Route path="/forums" element={<Forums />} />
