@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Lock } from "lucide-react";
+import { Lock, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ResetPassword = () => {
@@ -50,11 +50,11 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-green-600 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8 bg-white p-6 rounded-lg shadow-xl">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-green-800">Set New Password</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl font-bold">Set New Password</h1>
+          <p className="text-muted-foreground mt-2">
             Please enter your new password
           </p>
         </div>
@@ -62,7 +62,7 @@ const ResetPassword = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="relative">
-              <Lock className="absolute left-3 top-3 h-5 w-5 text-green-600" />
+              <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 type="password"
                 value={password}
@@ -74,7 +74,7 @@ const ResetPassword = () => {
               />
             </div>
             <div className="relative">
-              <Lock className="absolute left-3 top-3 h-5 w-5 text-green-600" />
+              <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 type="password"
                 value={confirmPassword}
@@ -89,10 +89,20 @@ const ResetPassword = () => {
 
           <Button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700"
+            className="w-full"
             disabled={loading}
           >
             {loading ? "Updating..." : "Reset Password"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full flex items-center justify-center gap-2"
+            onClick={() => navigate("/signin")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Sign In
           </Button>
         </form>
       </div>

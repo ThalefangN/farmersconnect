@@ -1,12 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Search, Sprout, Users, ShoppingBag, BookOpen, MessageSquare, PawPrint } from "lucide-react";
+import { Search, Sprout, Users, ShoppingBag, BookOpen, MessageSquare, PawPrint, Loader2 } from "lucide-react";
 import ServiceCard from "@/components/ServiceCard";
 import BottomNav from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   
   const services = [
     {
@@ -47,8 +51,67 @@ const Home = () => {
     }
   ];
 
+  const { data: searchResults, isLoading } = useQuery({
+    queryKey: ['search', searchQuery],
+    queryFn: async () => {
+      if (!searchQuery) return null;
+
+      console.log('Searching for:', searchQuery);
+      
+      const [products, equipment, seeds, land] = await Promise.all([
+        supabase
+          .from('products')
+          .select('*')
+          .ilike('title', `%${searchQuery}%`)
+          .limit(5),
+        supabase
+          .from('equipment')
+          .select('*')
+          .ilike('name', `%${searchQuery}%`)
+          .limit(5),
+        supabase
+          .from('equipment')
+          .select('*')
+          .eq('type', 'seed')
+          .ilike('name', `%${searchQuery}%`)
+          .limit(5),
+        supabase
+          .from('equipment')
+          .select('*')
+          .eq('type', 'land')
+          .ilike('name', `%${searchQuery}%`)
+          .limit(5)
+      ]);
+
+      return {
+        products: products.data || [],
+        equipment: equipment.data || [],
+        seeds: seeds.data || [],
+        land: land.data || []
+      };
+    },
+    enabled: searchQuery.length > 2
+  });
+
+  const handleResultClick = (type: string, id: string) => {
+    switch (type) {
+      case 'product':
+        navigate(`/marketplace/products/${id}`);
+        break;
+      case 'equipment':
+        navigate(`/marketplace/equipment/${id}`);
+        break;
+      case 'seed':
+        navigate(`/resources/seeds/${id}`);
+        break;
+      case 'land':
+        navigate(`/resources/land/${id}`);
+        break;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16">
+    <div className="min-h-screen bg-background pb-16">
       <div className="p-4 space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -56,8 +119,8 @@ const Home = () => {
           className="space-y-6"
         >
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-bold text-green-800">Farmers Connect</h1>
-            <p className="text-lg text-green-700">
+            <h1 className="text-3xl font-bold">Farmers Connect</h1>
+            <p className="text-lg text-muted-foreground">
               Empowering Farmers through Collaboration and Innovation
             </p>
           </div>
@@ -70,43 +133,107 @@ const Home = () => {
             />
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-semibold text-green-800 mb-3">About Farmers Connect</h2>
-            <p className="text-gray-600 mb-4">
-              Farmers Connect is your one-stop platform for agricultural collaboration worldwide. 
-              We connect farmers, share resources, and provide essential knowledge to help you succeed 
-              in your farming journey.
-            </p>
-            <Button 
-              variant="outline" 
-              className="border-green-700 text-green-700 hover:bg-green-50"
-              onClick={() => navigate("/about")}
-            >
-              Learn More
-            </Button>
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <input 
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              placeholder="Search for products, equipment, seeds, or land..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            
+            {searchQuery.length > 2 && (
+              <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg border max-h-96 overflow-y-auto">
+                {isLoading ? (
+                  <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : searchResults ? (
+                  <div className="p-2 space-y-2">
+                    {searchResults.products.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold px-2 py-1">Products</h3>
+                        {searchResults.products.map((item) => (
+                          <div
+                            key={item.id}
+                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
+                            onClick={() => handleResultClick('product', item.id)}
+                          >
+                            {item.title}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {searchResults.equipment.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold px-2 py-1">Equipment</h3>
+                        {searchResults.equipment.map((item) => (
+                          <div
+                            key={item.id}
+                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
+                            onClick={() => handleResultClick('equipment', item.id)}
+                          >
+                            {item.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {searchResults.seeds.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold px-2 py-1">Seeds</h3>
+                        {searchResults.seeds.map((item) => (
+                          <div
+                            key={item.id}
+                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
+                            onClick={() => handleResultClick('seed', item.id)}
+                          >
+                            {item.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {searchResults.land.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold px-2 py-1">Land</h3>
+                        {searchResults.land.map((item) => (
+                          <div
+                            key={item.id}
+                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
+                            onClick={() => handleResultClick('land', item.id)}
+                          >
+                            {item.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {Object.values(searchResults).every(arr => arr.length === 0) && (
+                      <div className="p-4 text-center text-muted-foreground">
+                        No results found
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-4">
+            {services.map((service, index) => (
+              <motion.div
+                key={service.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <ServiceCard {...service} />
+              </motion.div>
+            ))}
           </div>
         </motion.div>
-
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-5 w-5 text-green-600" />
-          <input 
-            className="w-full pl-10 pr-4 py-2 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            placeholder="Search resources, products, or farmers..."
-          />
-        </div>
-
-        <div className="grid gap-4">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <ServiceCard {...service} />
-            </motion.div>
-          ))}
-        </div>
       </div>
 
       <BottomNav />
