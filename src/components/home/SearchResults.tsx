@@ -5,7 +5,7 @@ interface SearchResult {
   title?: string;
   name?: string;
   type?: string;
-  price?: number;
+  price?: string | number; // Updated to accept both string and number
   location?: string;
 }
 
@@ -38,6 +38,12 @@ const SearchResults = ({ products, equipment, seeds, land, onResultClick }: Sear
     }
   };
 
+  const formatPrice = (price: string | number | undefined) => {
+    if (!price) return '';
+    const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return !isNaN(numericPrice) ? `BWP ${numericPrice}` : '';
+  };
+
   return (
     <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg border max-h-96 overflow-y-auto">
       <div className="p-2 space-y-2">
@@ -52,7 +58,7 @@ const SearchResults = ({ products, equipment, seeds, land, onResultClick }: Sear
               >
                 <div className="font-medium">{item.title}</div>
                 <div className="text-sm text-gray-600">
-                  {item.location} • BWP {item.price}
+                  {item.location} • {formatPrice(item.price)}
                 </div>
               </div>
             ))}
@@ -70,7 +76,7 @@ const SearchResults = ({ products, equipment, seeds, land, onResultClick }: Sear
               >
                 <div className="font-medium">{item.name}</div>
                 <div className="text-sm text-gray-600">
-                  {item.location} • BWP {item.price}
+                  {item.location} • {formatPrice(item.price)}
                 </div>
               </div>
             ))}
@@ -88,14 +94,14 @@ const SearchResults = ({ products, equipment, seeds, land, onResultClick }: Sear
               >
                 <div className="font-medium">{item.name}</div>
                 <div className="text-sm text-gray-600">
-                  {item.location} • BWP {item.price}
+                  {item.location} • {formatPrice(item.price)}
                 </div>
               </div>
             ))}
           </div>
         )}
         
-        {seeds.length > 0 && (
+        {land.length > 0 && (
           <div>
             <h3 className="font-semibold px-2 py-1">Land</h3>
             {land.map((item) => (
