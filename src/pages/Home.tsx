@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import AboutSection from "@/components/home/AboutSection";
+import SearchResults from "@/components/home/SearchResults";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -32,12 +34,6 @@ const Home = () => {
       path: "/resources"
     },
     {
-      title: "Marketplace",
-      description: "Buy and sell agricultural products and equipment",
-      icon: ShoppingBag,
-      path: "/marketplace"
-    },
-    {
       title: "Learning Hub",
       description: "Access agricultural guides and training materials",
       icon: BookOpen,
@@ -48,6 +44,12 @@ const Home = () => {
       description: "Connect with other farmers in your area",
       icon: Users,
       path: "/community"
+    },
+    {
+      title: "Marketplace",
+      description: "Buy and sell agricultural products and equipment",
+      icon: ShoppingBag,
+      path: "/marketplace"
     }
   ];
 
@@ -93,25 +95,8 @@ const Home = () => {
     enabled: searchQuery.length > 2
   });
 
-  const handleResultClick = (type: string, id: string) => {
-    switch (type) {
-      case 'product':
-        navigate(`/marketplace/products/${id}`);
-        break;
-      case 'equipment':
-        navigate(`/marketplace/equipment/${id}`);
-        break;
-      case 'seed':
-        navigate(`/resources/seeds/${id}`);
-        break;
-      case 'land':
-        navigate(`/resources/land/${id}`);
-        break;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background pb-16">
+    <div className="min-h-screen bg-gray-50 pb-16">
       <div className="p-4 space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -120,7 +105,7 @@ const Home = () => {
         >
           <div className="text-center space-y-4">
             <h1 className="text-3xl font-bold">Farmers Connect</h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-gray-600">
               Empowering Farmers through Collaboration and Innovation
             </p>
           </div>
@@ -128,96 +113,30 @@ const Home = () => {
           <div className="rounded-xl overflow-hidden shadow-lg h-48 mb-6">
             <img 
               src="/lovable-uploads/18a8902a-f4eb-4b86-8c45-c8914ecb854c.png"
-              alt="Sebotsa Farmers"
+              alt="Farmers Connect"
               className="w-full h-full object-cover"
             />
           </div>
 
+          <AboutSection />
+
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
             <input 
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent"
               placeholder="Search for products, equipment, seeds, or land..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             
-            {searchQuery.length > 2 && (
-              <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg border max-h-96 overflow-y-auto">
-                {isLoading ? (
-                  <div className="flex items-center justify-center p-4">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  </div>
-                ) : searchResults ? (
-                  <div className="p-2 space-y-2">
-                    {searchResults.products.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold px-2 py-1">Products</h3>
-                        {searchResults.products.map((item) => (
-                          <div
-                            key={item.id}
-                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
-                            onClick={() => handleResultClick('product', item.id)}
-                          >
-                            {item.title}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {searchResults.equipment.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold px-2 py-1">Equipment</h3>
-                        {searchResults.equipment.map((item) => (
-                          <div
-                            key={item.id}
-                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
-                            onClick={() => handleResultClick('equipment', item.id)}
-                          >
-                            {item.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {searchResults.seeds.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold px-2 py-1">Seeds</h3>
-                        {searchResults.seeds.map((item) => (
-                          <div
-                            key={item.id}
-                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
-                            onClick={() => handleResultClick('seed', item.id)}
-                          >
-                            {item.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {searchResults.land.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold px-2 py-1">Land</h3>
-                        {searchResults.land.map((item) => (
-                          <div
-                            key={item.id}
-                            className="p-2 hover:bg-muted rounded-lg cursor-pointer"
-                            onClick={() => handleResultClick('land', item.id)}
-                          >
-                            {item.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {Object.values(searchResults).every(arr => arr.length === 0) && (
-                      <div className="p-4 text-center text-muted-foreground">
-                        No results found
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-              </div>
+            {searchQuery.length > 2 && searchResults && (
+              <SearchResults
+                products={searchResults.products}
+                equipment={searchResults.equipment}
+                seeds={searchResults.seeds}
+                land={searchResults.land}
+                onResultClick={() => setSearchQuery("")}
+              />
             )}
           </div>
 
