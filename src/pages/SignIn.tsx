@@ -83,82 +83,80 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-green-600 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md space-y-8"
       >
-        <div className="bg-white rounded-lg shadow-xl p-6">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-green-800">Welcome Back to Sebotsa</h1>
-            <p className="text-green-700 mt-2">Sign in to your farmer account</p>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-green-800">Welcome Back to Sebotsa Farmers Hub</h1>
+          <p className="text-green-700 mt-2">Sign in to your farmer account</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-5 w-5 text-green-600" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Enter your email"
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-green-600" />
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Enter your password"
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6 mt-8">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-5 w-5 text-green-600" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Enter your email"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-5 w-5 text-green-600" />
-                  <Input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Enter your password"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-green-600 hover:text-green-700"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              size="lg"
-              disabled={loading}
+          <div className="flex justify-end">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-green-600 hover:text-green-700"
             >
-              {loading ? "Signing In..." : "Sign In"}
-            </Button>
-          </form>
-
-          <SocialAuth />
-
-          <p className="text-center text-sm text-green-700 mt-6">
-            New to Sebotsa?{" "}
-            <Link to="/signup" className="font-medium text-green-600 hover:underline">
-              Create an account
+              Forgot password?
             </Link>
-          </p>
-        </div>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
+            size="lg"
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </Button>
+        </form>
+
+        <SocialAuth />
+
+        <p className="text-center text-sm text-green-700">
+          New to Sebotsa?{" "}
+          <Link to="/signup" className="font-medium text-yellow-600 hover:underline">
+            Create an account
+          </Link>
+        </p>
       </motion.div>
     </div>
   );
