@@ -26,15 +26,24 @@ serve(async (req) => {
         to: [to],
         subject: 'Welcome to Farmers Connect!',
         html: `
-          <h1>Welcome to Farmers Connect, ${name}!</h1>
-          <p>We're excited to have you join our community of farmers. Here at Farmers Connect, you'll find:</p>
-          <ul>
-            <li>A supportive community of fellow farmers</li>
-            <li>Access to valuable resources and equipment</li>
-            <li>Opportunities to learn and grow</li>
-            <li>A marketplace to buy and sell agricultural products</li>
-          </ul>
-          <p>Get started by exploring our platform and connecting with other farmers!</p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #166534; text-align: center;">Welcome to Farmers Connect!</h1>
+            <p>Dear ${name},</p>
+            <p>We're thrilled to welcome you to Farmers Connect, your one-stop platform for agricultural collaboration in Botswana!</p>
+            <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #166534; margin-top: 0;">Here's what you can do with Farmers Connect:</h3>
+              <ul style="color: #166534;">
+                <li>Connect with fellow farmers and agricultural experts</li>
+                <li>Access valuable resources and equipment</li>
+                <li>Join farming communities and share knowledge</li>
+                <li>Buy and sell agricultural products</li>
+                <li>Stay updated with latest farming trends and practices</li>
+              </ul>
+            </div>
+            <p>Get started by exploring our platform and connecting with other farmers in your area!</p>
+            <p>If you have any questions, our support team is always here to help.</p>
+            <p style="margin-top: 30px;">Best regards,<br>The Farmers Connect Team</p>
+          </div>
         `,
       }),
     });

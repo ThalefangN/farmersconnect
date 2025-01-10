@@ -27,18 +27,14 @@ const ForgotPassword = () => {
     try {
       const generatedOTP = generateOTP();
       
-      const response = await fetch('/api/send-otp-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await supabase.functions.invoke('send-otp-email', {
+        body: {
           to: email,
           otp: generatedOTP,
-        }),
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to send OTP');
+      if (response.error) throw new Error('Failed to send OTP');
 
       // Store OTP in localStorage with expiration
       const expirationTime = new Date().getTime() + 10 * 60 * 1000; // 10 minutes
@@ -99,16 +95,16 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-green-600 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8 bg-white p-6 rounded-lg shadow-xl">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-green-800">Reset Password</h1>
           {!showOTP ? (
-            <p className="text-gray-600 mt-2">
+            <p className="text-green-700 mt-2">
               Enter your email address and we'll send you an OTP to reset your password
             </p>
           ) : (
-            <p className="text-gray-600 mt-2">
+            <p className="text-green-700 mt-2">
               Enter the OTP sent to your email
             </p>
           )}

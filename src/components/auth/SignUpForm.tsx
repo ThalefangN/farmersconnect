@@ -85,6 +85,14 @@ export const SignUpForm = () => {
         return;
       }
 
+      // Send welcome email
+      await supabase.functions.invoke('send-welcome-email', {
+        body: {
+          to: formData.email,
+          name: formData.fullName,
+        },
+      });
+
       toast({
         title: "Success",
         description: "Account created successfully! Please check your email to verify your account before signing in.",

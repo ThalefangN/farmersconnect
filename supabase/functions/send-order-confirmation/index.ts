@@ -13,7 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    const { to, otp } = await req.json();
+    const { to, orderDetails, type } = await req.json();
+
+    let subject = type === 'rental' 
+      ? 'Your Equipment Rental Confirmation' 
+      : 'Your Order Confirmation';
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -24,17 +28,22 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'Farmers Connect <onboarding@resend.dev>',
         to: [to],
-        subject: 'Password Reset OTP',
+        subject,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #166534; text-align: center;">Password Reset Request</h1>
-            <p>Hello,</p>
-            <p>You have requested to reset your password for your Farmers Connect account. Here is your One-Time Password (OTP):</p>
-            <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-              <h2 style="color: #166534; margin: 0;">${otp}</h2>
+            <h1 style="color: #166534; text-align: center;">${subject}</h1>
+            <p>Thank you for your ${type === 'rental' ? 'rental' : 'purchase'} on Farmers Connect!</p>
+            <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #166534; margin-top: 0;">Order Details:</h3>
+              <p><strong>Order ID:</strong> ${orderDetails.id}</p>
+              <p><strong>Item:</strong> ${orderDetails.name}</p>
+              <p><strong>Quantity:</strong> ${orderDetails.quantity}</p>
+              <p><strong>Total Amount:</strong> BWP ${orderDetails.totalAmount}</p>
+              ${type === 'rental' ? `<p><strong>Rental Period:</strong> ${orderDetails.rentalDays} days</p>` : ''}
+              <p><strong>Delivery/Pickup:</strong> ${orderDetails.deliveryType}</p>
             </div>
-            <p>This code will expire in 10 minutes for security purposes.</p>
-            <p>If you didn't request this password reset, please ignore this email or contact support if you have concerns.</p>
+            <p>You can track your ${type === 'rental' ? 'rental' : 'order'} status in your account dashboard.</p>
+            <p>If you have any questions about your ${type === 'rental' ? 'rental' : 'order'}, please don't hesitate to contact us.</p>
             <p style="margin-top: 30px;">Best regards,<br>The Farmers Connect Team</p>
           </div>
         `,
