@@ -14,28 +14,32 @@ const Services = () => {
       description: "Rent farming equipment from other farmers or list your own equipment for rent",
       additionalInfo: "Access tractors, harvesters, and specialized farming tools",
       icon: Tractor,
-      path: "/resources/equipment"
+      path: "/resources/equipment",
+      color: "bg-[#F2FCE2] hover:bg-[#E5F5D5]"
     },
     {
       title: "Resource Sharing",
       description: "Share and access farming resources including seeds, land, and tools",
       additionalInfo: "Connect with local farmers to share resources efficiently",
       icon: Sprout,
-      path: "/resources"
+      path: "/resources",
+      color: "bg-[#FEF7CD] hover:bg-[#F9EEB3]"
     },
     {
       title: "Marketplace",
       description: "Buy and sell agricultural products, supplies, and equipment",
       additionalInfo: "Direct access to local markets and buyers",
       icon: ShoppingBag,
-      path: "/marketplace"
+      path: "/marketplace",
+      color: "bg-[#E5DEFF] hover:bg-[#D6CFEF]"
     },
     {
       title: "Community Support",
       description: "Connect with other farmers, join groups, and access mentorship",
       additionalInfo: "Learn from experienced farmers and share knowledge",
       icon: Users,
-      path: "/community"
+      path: "/community",
+      color: "bg-[#FFE8D6] hover:bg-[#FFD7B5]"
     }
   ];
 
@@ -62,18 +66,18 @@ const Services = () => {
               transition={{ delay: index * 0.1 }}
               onClick={() => navigate(service.path)}
             >
-              <Card className="cursor-pointer hover:shadow-lg transition-all border-gray-200">
+              <Card className={`cursor-pointer hover:shadow-lg transition-all ${service.color}`}>
                 <CardHeader className="space-y-4">
                   <div className="flex items-start space-x-4">
-                    <div className="p-3 rounded-full bg-gray-100">
-                      <service.icon className="h-6 w-6 text-gray-700" />
+                    <div className="p-3 rounded-full bg-white/80">
+                      <service.icon className="h-6 w-6 text-green-700" />
                     </div>
                     <div className="space-y-1 flex-1">
                       <CardTitle className="text-xl">{service.title}</CardTitle>
-                      <CardDescription className="text-gray-600">
+                      <CardDescription className="text-gray-700">
                         {service.description}
                       </CardDescription>
-                      <div className="flex items-start space-x-2 mt-2 text-sm text-gray-500">
+                      <div className="flex items-start space-x-2 mt-2 text-sm text-gray-600">
                         <Info className="h-4 w-4 mt-0.5" />
                         <p>{service.additionalInfo}</p>
                       </div>

@@ -47,8 +47,10 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
     setIsUploading(true);
 
     try {
+      // Compress image before upload
+      const compressedFile = await compressImage(file);
       console.log('Starting profile photo upload for user:', userId);
-      const imageUrl = await uploadImage(file, 'profile_photos');
+      const imageUrl = await uploadImage(compressedFile, 'profile_photos');
       console.log('Image uploaded successfully:', imageUrl);
       
       const { error } = await supabase
@@ -79,6 +81,52 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
     }
   };
 
+  // Image compression function
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+
+        // Calculate new dimensions while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        const maxDimension = 800;
+
+        if (width > height && width > maxDimension) {
+          height = (height * maxDimension) / width;
+          width = maxDimension;
+        } else if (height > maxDimension) {
+          width = (width * maxDimension) / height;
+          height = maxDimension;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+          },
+          'image/jpeg',
+          0.8
+        );
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+    });
+  };
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative w-32 h-32 group cursor-pointer">
@@ -88,6 +136,7 @@ const ProfilePhotoUpload = ({ currentPhotoUrl, userId, onPhotoUpdated }: Profile
               src={currentPhotoUrl || "/placeholder.svg"}
               alt="Profile"
               className="object-cover"
+              loading="eager"
             />
             <AvatarFallback className="bg-primary/10">
               {userId.slice(0, 2).toUpperCase()}
