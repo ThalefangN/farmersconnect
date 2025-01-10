@@ -33,7 +33,7 @@ const ServiceCard = ({ title, description, icon: Icon, path }: ServiceCardProps)
 
   return (
     <Card 
-      className={`hover:bg-green-50 transition-colors cursor-pointer border-green-100 ${
+      className={`hover:bg-green-50 transition-colors cursor-pointer border-green-100 shadow-md hover:shadow-lg ${
         !isOnline ? "opacity-50 cursor-not-allowed" : ""
       }`}
       onClick={handleClick}

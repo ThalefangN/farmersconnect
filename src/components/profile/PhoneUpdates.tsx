@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import PhoneInput from "@/components/PhoneInput";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Phone } from "lucide-react";
 
 const PhoneUpdates = ({ userId }: { userId: string }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -47,17 +46,11 @@ const PhoneUpdates = ({ userId }: { userId: string }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="relative">
-        <Phone className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-        <Input
-          type="tel"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          placeholder="Enter phone number for updates"
-          className="pl-10"
-          required
-        />
-      </div>
+      <PhoneInput
+        value={phoneNumber}
+        onChange={setPhoneNumber}
+        placeholder="Enter phone number for updates"
+      />
       <Button 
         type="submit" 
         className="w-full"
