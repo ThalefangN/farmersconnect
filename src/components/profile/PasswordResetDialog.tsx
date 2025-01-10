@@ -70,11 +70,16 @@ const PasswordResetDialog = ({ isOpen, onClose }: PasswordResetDialogProps) => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        // If no session, use the recovery flow
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+      } else {
+        // If session exists, use the standard update
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+      }
 
       toast({
         title: "Success",

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Search, Sprout, Users, ShoppingBag, BookOpen, MessageSquare, PawPrint, Loader2 } from "lucide-react";
+import { Search, Sprout, Users, ShoppingBag, BookOpen, MessageSquare, PawPrint } from "lucide-react";
 import ServiceCard from "@/components/ServiceCard";
 import BottomNav from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
@@ -16,22 +16,22 @@ const Home = () => {
   
   const services = [
     {
-      title: "Animal Tracking",
-      description: "Monitor and track your livestock in real-time",
-      icon: PawPrint,
-      path: "/animal-tracking"
-    },
-    {
-      title: "Forums",
-      description: "Join discussions with other farmers about agriculture",
-      icon: MessageSquare,
-      path: "/forums"
+      title: "Marketplace",
+      description: "Buy and sell agricultural products and equipment",
+      icon: ShoppingBag,
+      path: "/marketplace"
     },
     {
       title: "Resource Sharing",
       description: "Share and access farming resources and equipment",
       icon: Sprout,
       path: "/resources"
+    },
+    {
+      title: "Forums",
+      description: "Join discussions with other farmers about agriculture",
+      icon: MessageSquare,
+      path: "/forums"
     },
     {
       title: "Learning Hub",
@@ -46,10 +46,10 @@ const Home = () => {
       path: "/community"
     },
     {
-      title: "Marketplace",
-      description: "Buy and sell agricultural products and equipment",
-      icon: ShoppingBag,
-      path: "/marketplace"
+      title: "Animal Tracking",
+      description: "Monitor and track your livestock in real-time",
+      icon: PawPrint,
+      path: "/animal-tracking"
     }
   ];
 
@@ -57,8 +57,6 @@ const Home = () => {
     queryKey: ['search', searchQuery],
     queryFn: async () => {
       if (!searchQuery) return null;
-
-      console.log('Searching for:', searchQuery);
       
       const [products, equipment, seeds, land] = await Promise.all([
         supabase
@@ -106,7 +104,7 @@ const Home = () => {
           <div className="text-center space-y-4">
             <h1 className="text-3xl font-bold">Farmers Connect</h1>
             <p className="text-lg text-gray-600">
-              Empowering Farmers through Collaboration and Innovation
+              Empowering Farmers through Collaboration
             </p>
           </div>
 

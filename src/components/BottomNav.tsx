@@ -22,14 +22,14 @@ const BottomNav = () => {
             key={path}
             to={path}
             className={cn(
-              "flex flex-col items-center py-2 px-4 text-sm",
+              "flex flex-col items-center py-2 px-4 text-sm border-2 rounded-lg m-1",
               location.pathname === path
-                ? "text-primary"
-                : "text-muted-foreground hover:text-primary"
+                ? "text-primary border-primary bg-primary/5"
+                : "text-muted-foreground border-transparent hover:text-primary hover:border-primary/50"
             )}
           >
             <Icon className="h-6 w-6" />
-            <span className="mt-1">{label}</span>
+            <span className="mt-1 font-medium">{label}</span>
           </Link>
         ))}
       </nav>
