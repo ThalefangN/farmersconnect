@@ -1,12 +1,12 @@
 🌾 Welcome to Farmers Connect BW! 🌾
 
 A Product by Tlhalefang Ntshilane
-📧 Email: Tlhalefangntshilane@gmail.com
+📧 Email: Tlhalefangntshilane@gmail.com 
 
 
 ---
 
-About Farmers Connect BW
+About Farmers Connect BW (SEBOTSA)
 
 Farmers Connect BW is a cutting-edge platform designed to empower farmers by enabling them to:
 🌟 Share valuable information and resources.
