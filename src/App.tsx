@@ -33,6 +33,8 @@ import Land from "./pages/resources/Land";
 import Products from "./pages/marketplace/Products";
 import MarketEquipment from "./pages/marketplace/Equipment";
 import Supplies from "./pages/marketplace/Supplies";
+import SponsoredShops from "./pages/marketplace/SponsoredShops";
+import ShopProducts from "./pages/marketplace/ShopProducts";
 import Guides from "./pages/learning/Guides";
 import Videos from "./pages/learning/Videos";
 import Certificates from "./pages/learning/Certificates";
@@ -113,6 +115,8 @@ const AppContent = () => {
         <Route path="/marketplace/products" element={<Products />} />
         <Route path="/marketplace/equipment" element={<MarketEquipment />} />
         <Route path="/marketplace/supplies" element={<Supplies />} />
+        <Route path="/marketplace/shops" element={<SponsoredShops />} />
+        <Route path="/marketplace/shops/:shopId/products" element={<ShopProducts />} />
         
         {/* Learning Routes */}
         <Route path="/learning/guides" element={<Guides />} />

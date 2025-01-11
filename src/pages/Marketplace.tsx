@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Leaf, Wrench, Package } from "lucide-react";
+import { ShoppingBag, Leaf, Wrench, Package, Store } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,6 +72,13 @@ const Marketplace = () => {
       icon: Package,
       details: "Access quality seeds, fertilizers, pesticides, and other farming supplies",
       path: "/marketplace/supplies"
+    },
+    {
+      title: "Sponsored Agri Shops",
+      description: "Explore trusted agricultural suppliers",
+      icon: Store,
+      details: "Discover certified agricultural shops offering quality products and services",
+      path: "/marketplace/shops"
     }
   ];
 
