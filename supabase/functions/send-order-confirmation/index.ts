@@ -13,11 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { to, orderDetails, type } = await req.json();
-
-    let subject = type === 'rental' 
-      ? 'Your Equipment Rental Confirmation' 
-      : 'Your Order Confirmation';
+    const { to, orderDetails } = await req.json();
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -28,22 +24,22 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'Farmers Connect <onboarding@resend.dev>',
         to: [to],
-        subject,
+        subject: 'Your Order Confirmation',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #166534; text-align: center;">${subject}</h1>
-            <p>Thank you for your ${type === 'rental' ? 'rental' : 'purchase'} on Farmers Connect!</p>
+            <h1 style="color: #166534; text-align: center;">Order Confirmation</h1>
+            <p>Thank you for your purchase on Farmers Connect!</p>
             <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <h3 style="color: #166534; margin-top: 0;">Order Details:</h3>
               <p><strong>Order ID:</strong> ${orderDetails.id}</p>
-              <p><strong>Item:</strong> ${orderDetails.name}</p>
-              <p><strong>Quantity:</strong> ${orderDetails.quantity}</p>
+              <p><strong>Product:</strong> ${orderDetails.title}</p>
+              <p><strong>Quantity:</strong> ${orderDetails.quantity} ${orderDetails.unit_type}</p>
               <p><strong>Total Amount:</strong> BWP ${orderDetails.totalAmount}</p>
-              ${type === 'rental' ? `<p><strong>Rental Period:</strong> ${orderDetails.rentalDays} days</p>` : ''}
               <p><strong>Delivery/Pickup:</strong> ${orderDetails.deliveryType}</p>
+              <p><strong>Delivery Address:</strong> ${orderDetails.deliveryAddress || 'Not provided'}</p>
             </div>
-            <p>You can track your ${type === 'rental' ? 'rental' : 'order'} status in your account dashboard.</p>
-            <p>If you have any questions about your ${type === 'rental' ? 'rental' : 'order'}, please don't hesitate to contact us.</p>
+            <p>You can track your order status in your account dashboard.</p>
+            <p>If you have any questions about your order, please don't hesitate to contact us.</p>
             <p style="margin-top: 30px;">Best regards,<br>The Farmers Connect Team</p>
           </div>
         `,

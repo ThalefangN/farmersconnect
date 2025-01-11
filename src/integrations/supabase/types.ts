@@ -866,6 +866,7 @@ export type Database = {
           delivery_type: string
           id: string
           product_id: string
+          proof_of_payment_url: string | null
           quantity: number
           seller_id: string
           status: string
@@ -880,6 +881,7 @@ export type Database = {
           delivery_type: string
           id?: string
           product_id: string
+          proof_of_payment_url?: string | null
           quantity: number
           seller_id: string
           status?: string
@@ -894,6 +896,7 @@ export type Database = {
           delivery_type?: string
           id?: string
           product_id?: string
+          proof_of_payment_url?: string | null
           quantity?: number
           seller_id?: string
           status?: string

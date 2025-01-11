@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Clock, Check, X } from "lucide-react";
+import { Clock, Check, X, Image } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ interface OrderNotificationProps {
     status: string;
     created_at: string;
     seller_id: string;
+    proof_of_payment_url?: string;
   };
   currentUserId?: string;
   onOrderAction: (orderId: string, action: 'approve' | 'decline') => Promise<void>;
@@ -52,6 +53,22 @@ const OrderNotification = ({ order, currentUserId, onOrderAction }: OrderNotific
               <p>Buyer: {order.buyer.full_name}</p>
               {order.whatsapp_number && <p>WhatsApp: {order.whatsapp_number}</p>}
               {order.delivery_address && <p>Delivery Address: {order.delivery_address}</p>}
+              {order.proof_of_payment_url && (
+                <div className="mt-2">
+                  <p className="font-medium flex items-center gap-2">
+                    <Image className="h-4 w-4" />
+                    Proof of Payment
+                  </p>
+                  <a 
+                    href={order.proof_of_payment_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    View Image
+                  </a>
+                </div>
+              )}
               <div className="flex items-center gap-2 mt-2">
                 <Clock className="h-4 w-4" />
                 <span className="text-xs">

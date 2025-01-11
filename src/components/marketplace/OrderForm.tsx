@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
+import { uploadImage } from "@/utils/fileUpload";
 
 interface OrderFormProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface OrderFormProps {
     price: number;
     user_id: string;
     quantity: number;
+    unit_type: string;
   };
   selectedQuantity: number;
 }
@@ -27,7 +29,15 @@ const OrderForm = ({ isOpen, onClose, product, selectedQuantity }: OrderFormProp
     whatsappNumber: "",
     location: "",
   });
+  const [proofOfPayment, setProofOfPayment] = useState<File | null>(null);
   const { toast } = useToast();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProofOfPayment(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +49,14 @@ const OrderForm = ({ isOpen, onClose, product, selectedQuantity }: OrderFormProp
 
       const totalAmount = product.price * selectedQuantity;
 
-      const { error: orderError } = await supabase
+      // Upload proof of payment if provided
+      let proofOfPaymentUrl = null;
+      if (proofOfPayment) {
+        proofOfPaymentUrl = await uploadImage(proofOfPayment, 'payment_proofs');
+      }
+
+      // Create order
+      const { error: orderError, data: orderData } = await supabase
         .from('orders')
         .insert({
           product_id: product.id,
@@ -50,10 +67,33 @@ const OrderForm = ({ isOpen, onClose, product, selectedQuantity }: OrderFormProp
           delivery_address: formData.location,
           whatsapp_number: formData.whatsappNumber,
           status: 'pending',
-          delivery_type: 'standard' // Adding the required delivery_type field
-        });
+          delivery_type: 'standard',
+          proof_of_payment_url: proofOfPaymentUrl
+        })
+        .select()
+        .single();
 
       if (orderError) throw orderError;
+
+      // Send confirmation email
+      const { error: emailError } = await supabase.functions.invoke('send-order-confirmation', {
+        body: {
+          to: user.email,
+          orderDetails: {
+            id: orderData.id,
+            title: product.title,
+            quantity: selectedQuantity,
+            unit_type: product.unit_type,
+            totalAmount: totalAmount.toFixed(2),
+            deliveryType: 'standard',
+            deliveryAddress: formData.location
+          }
+        }
+      });
+
+      if (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+      }
 
       toast({
         title: "Order Submitted Successfully!",
@@ -106,6 +146,20 @@ const OrderForm = ({ isOpen, onClose, product, selectedQuantity }: OrderFormProp
               onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="proofOfPayment">Proof of Payment</Label>
+            <Input
+              id="proofOfPayment"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="cursor-pointer"
+              required
+            />
+            <p className="text-sm text-muted-foreground">
+              Please upload a screenshot of your payment confirmation
+            </p>
           </div>
           <div className="pt-4 space-y-2">
             <div className="font-medium">Order Summary:</div>
