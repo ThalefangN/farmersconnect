@@ -83,7 +83,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#F2FCE2] flex flex-col items-center justify-center p-4 pb-[env(safe-area-inset-bottom)]">
+    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4 safe-area-inset-bottom">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

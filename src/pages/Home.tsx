@@ -94,7 +94,7 @@ const Home = () => {
   });
 
   return (
-    <div className="min-h-[100dvh] bg-[#F2FCE2] pb-[calc(4rem+env(safe-area-inset-bottom))]">
+    <div className="min-h-screen bg-gray-50 pb-16">
       <div className="p-4 space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
