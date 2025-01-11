@@ -2,34 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>FarmersConnectBW</title>
-    <meta name="description" content="FarmersConnectBW" />
-    <meta name="author" content="Tlhalefang Ntshilane" />
-    <meta property="og:image" content="/Green and Orange Bold Typographic Agriculture Organic Farm Logo.png" />
-    <meta name="theme-color" content="#16a34a" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#052e16" media="(prefers-color-scheme: dark)" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#F2FCE2" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta property="og:image" content="/og-image.png" />
+    <title>Farmers Connect</title>
   </head>
-
   <body>
     <div id="root"></div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful');
-            })
-            .catch(err => {
-              console.log('ServiceWorker registration failed: ', err);
-            });
-        });
-      }
-    </script>
-    <script src="http://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
