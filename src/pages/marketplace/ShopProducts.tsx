@@ -50,15 +50,19 @@ const shopProducts = {
       }
     ]
   }
-};
+} as const;
+
+type ShopId = keyof typeof shopProducts;
 
 const ShopProducts = () => {
   const navigate = useNavigate();
   const { shopId } = useParams();
-  const shop = shopProducts[shopId as keyof typeof shopProducts];
+  const shop = shopId && (parseInt(shopId) as ShopId) in shopProducts 
+    ? shopProducts[parseInt(shopId) as ShopId] 
+    : null;
 
   if (!shop) {
-    return <div>Shop not found</div>;
+    return <div className="p-4">Shop not found</div>;
   }
 
   return (
