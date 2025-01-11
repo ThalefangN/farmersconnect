@@ -45,7 +45,7 @@ const GetStarted = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F2FCE2] flex flex-col items-center justify-center p-4 safe-area-inset-bottom">
+    <div className="min-h-[100dvh] bg-[#F2FCE2] flex flex-col items-center justify-center p-4 pb-[env(safe-area-inset-bottom)]">
       <div className="absolute top-4 w-full max-w-xs mx-auto">
         <RadioGroup
           defaultValue={language}
