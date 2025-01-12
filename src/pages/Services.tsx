@@ -44,8 +44,8 @@ const Services = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="p-4 space-y-4">
+    <div className="min-h-[100dvh] bg-[#F2FCE2] flex flex-col pb-[calc(4rem+env(safe-area-inset-bottom))]">
+      <div className="p-4 space-y-4 flex-1">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}

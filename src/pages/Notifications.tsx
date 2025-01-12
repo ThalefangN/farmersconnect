@@ -112,12 +112,13 @@ const Notifications = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
+    <div className="min-h-[100dvh] bg-[#F2FCE2] flex flex-col pb-[calc(4rem+env(safe-area-inset-bottom))]">
+      <div className="p-4 flex-1">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Bell className="h-6 w-6" />
@@ -141,7 +142,8 @@ const Notifications = () => {
             ))}
           </div>
         </ScrollArea>
-      </motion.div>
+        </motion.div>
+      </div>
       <BottomNav />
     </div>
   );
