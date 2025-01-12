@@ -50,7 +50,7 @@ const GetStarted = () => {
         <RadioGroup
           defaultValue={language}
           onValueChange={(value) => setLanguage(value as "en" | "tn")}
-          className="flex justify-center space-x-4 p-2 bg-white rounded-lg shadow-sm"
+          className="flex justify-center space-x-4 p-2 agriculture-card-yellow rounded-lg shadow-sm"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="en" id="en" />
@@ -86,7 +86,7 @@ const GetStarted = () => {
           </p>
         </div>
         
-        <div className="relative h-64 w-full rounded-2xl overflow-hidden shadow-xl">
+        <div className="relative h-64 w-full agriculture-card-green rounded-2xl overflow-hidden shadow-xl">
           <img
             src="/lovable-uploads/18a8902a-f4eb-4b86-8c45-c8914ecb854c.png"
             alt="Botswana Farming"

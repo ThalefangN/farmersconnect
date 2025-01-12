@@ -107,7 +107,7 @@ const SignIn = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="Enter your email"
-                  className="pl-10"
+                  className="pl-10 agriculture-card-yellow"
                   required
                 />
               </div>
@@ -123,7 +123,7 @@ const SignIn = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Enter your password"
-                  className="pl-10"
+                  className="pl-10 agriculture-card-yellow"
                   required
                 />
               </div>
@@ -149,7 +149,9 @@ const SignIn = () => {
           </Button>
         </form>
 
-        <SocialAuth />
+        <div className="agriculture-card-orange p-6 rounded-lg">
+          <SocialAuth />
+        </div>
 
         <p className="text-center text-sm text-green-700">
           New to Sebotsa?{" "}

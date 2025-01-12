@@ -10,19 +10,19 @@
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 0%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 355 100% 100%;
+    --secondary: 60 56% 91%;
+    --secondary-foreground: 24 10% 10%;
+    --muted: 60 56% 91%;
+    --muted-foreground: 24 5% 45%;
+    --accent: 142 76% 36%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 0%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --ring: 142 76% 36%;
     --radius: 1rem;
   }
 
@@ -33,19 +33,19 @@
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 0%;
     --popover-foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 100%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 355 100% 100%;
+    --secondary: 60 56% 91%;
+    --secondary-foreground: 24 10% 10%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
-    --accent: 0 0% 15%;
+    --accent: 142 76% 36%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 15%;
     --input: 0 0% 15%;
-    --ring: 0 0% 100%;
+    --ring: 142 76% 36%;
   }
   
   * {
@@ -53,15 +53,47 @@
   }
   
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#F2FCE2] text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-tap-highlight-color: transparent;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   #root {
-    @apply min-h-screen w-full max-w-md mx-auto;
+    @apply min-h-[100dvh] w-full max-w-md mx-auto;
     min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  .agriculture-card {
+    @apply rounded-lg shadow-md transition-all duration-200 hover:shadow-lg;
+  }
+
+  .agriculture-card-green {
+    @apply bg-[#F2FCE2] agriculture-card;
+  }
+
+  .agriculture-card-yellow {
+    @apply bg-[#FEF7CD] agriculture-card;
+  }
+
+  .agriculture-card-orange {
+    @apply bg-[#FEC6A1] agriculture-card;
+  }
+
+  .agriculture-card-purple {
+    @apply bg-[#E5DEFF] agriculture-card;
+  }
+
+  .agriculture-card-pink {
+    @apply bg-[#FFDEE2] agriculture-card;
+  }
+
+  .agriculture-card-peach {
+    @apply bg-[#FDE1D3] agriculture-card;
+  }
+
+  .agriculture-card-blue {
+    @apply bg-[#D3E4FD] agriculture-card;
   }
 }
 
