@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import AboutSection from "@/components/home/AboutSection";
 import SearchResults from "@/components/home/SearchResults";
 
 const Home = () => {
@@ -52,46 +51,6 @@ const Home = () => {
     }
   ];
 
-  const { data: searchResults, isLoading } = useQuery({
-    queryKey: ['search', searchQuery],
-    queryFn: async () => {
-      if (!searchQuery) return null;
-      
-      const [products, equipment, seeds, land] = await Promise.all([
-        supabase
-          .from('products')
-          .select('*')
-          .ilike('title', `%${searchQuery}%`)
-          .limit(5),
-        supabase
-          .from('equipment')
-          .select('*')
-          .ilike('name', `%${searchQuery}%`)
-          .limit(5),
-        supabase
-          .from('equipment')
-          .select('*')
-          .eq('type', 'seed')
-          .ilike('name', `%${searchQuery}%`)
-          .limit(5),
-        supabase
-          .from('equipment')
-          .select('*')
-          .eq('type', 'land')
-          .ilike('name', `%${searchQuery}%`)
-          .limit(5)
-      ]);
-
-      return {
-        products: products.data || [],
-        equipment: equipment.data || [],
-        seeds: seeds.data || [],
-        land: land.data || []
-      };
-    },
-    enabled: searchQuery.length > 2
-  });
-
   return (
     <div className="min-h-[100dvh] bg-[#F2FCE2] flex flex-col pb-[calc(4rem+env(safe-area-inset-bottom))]">
       <div className="p-4 space-y-6 flex-1">
@@ -115,10 +74,6 @@ const Home = () => {
             />
           </div>
 
-          <div className="agriculture-card-yellow p-6 rounded-lg">
-            <AboutSection />
-          </div>
-
           <div className="relative">
             <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
             <input 
@@ -128,13 +83,13 @@ const Home = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             
-            {searchQuery.length > 2 && searchResults && (
+            {searchQuery.length > 2 && (
               <div className="agriculture-card-white mt-2">
                 <SearchResults
-                  products={searchResults.products}
-                  equipment={searchResults.equipment}
-                  seeds={searchResults.seeds}
-                  land={searchResults.land}
+                  products={[]}
+                  equipment={[]}
+                  seeds={[]}
+                  land={[]}
                   onResultClick={() => setSearchQuery("")}
                 />
               </div>

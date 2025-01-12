@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Settings, User, Phone, Mail, MapPin, Edit } from "lucide-react";
+import { LogOut, Settings, User, Phone, Mail, MapPin, Edit, Info } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
 
@@ -106,6 +106,14 @@ const Profile = () => {
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Profile
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full mb-4"
+                onClick={() => navigate('/about')}
+              >
+                <Info className="mr-2 h-4 w-4" />
+                About Platform
               </Button>
               <Button 
                 variant="destructive" 
