@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Search, Sprout, Users, ShoppingBag, BookOpen, MessageSquare, PawPrint } from "lucide-react";
 import ServiceCard from "@/components/ServiceCard";
@@ -93,8 +94,8 @@ const Home = () => {
   });
 
   return (
-    <div className="min-h-[100dvh] bg-[#F2FCE2] flex flex-col pb-[calc(4rem+env(safe-area-inset-bottom))]">
-      <div className="p-4 space-y-6 flex-1">
+    <div className="min-h-[100dvh] bg-[#F2FCE2] pb-[calc(4rem+env(safe-area-inset-bottom))]">
+      <div className="p-4 space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -156,6 +157,7 @@ const Home = () => {
           </div>
         </motion.div>
       </div>
+
       <BottomNav />
     </div>
   );
